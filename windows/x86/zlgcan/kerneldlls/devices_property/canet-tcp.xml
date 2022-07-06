@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<info locale="device_locale_strings.xml">
+	<device>
+		<value>0</value>
+		<meta>
+			<visible>false</visible>
+			<type>options.int32</type>
+			<desc>设备索引</desc>
+			<options>
+				<option type="int32" value="0" desc="0"></option>
+				<option type="int32" value="1" desc="1"></option>
+				<option type="int32" value="2" desc="2"></option>
+				<option type="int32" value="3" desc="3"></option>
+				<option type="int32" value="4" desc="4"></option>
+				<option type="int32" value="5" desc="5"></option>
+				<option type="int32" value="6" desc="6"></option>
+				<option type="int32" value="7" desc="7"></option>
+			</options>
+		</meta>
+	</device>
+	<channel>
+		<value>0</value>
+		<meta>
+			<visible>false</visible>
+			<type>options.int32</type>
+			<desc>通道号</desc>
+			<options>
+				<option type="int32" value="0" desc="Channel 0"></option>
+			</options>
+		</meta>
+		<channel_0 stream="channel_0" case="parent-value=0">
+			<work_mode flag="0x0004" at_initcan="pre">
+				<value>1</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>工作模式</desc>
+					<options>
+						<option type="int32" value="1" desc="mode_server"></option>
+						<option type="int32" value="0" desc="mode_client"></option>
+					</options>
+				</meta>
+			</work_mode>
+			<local_port flag="0x0002" at_initcan="pre">
+				<value>4001</value>
+				<meta>
+					<visible>$/info/channel/channel_0/work_mode == 0</visible>
+					<type>uint32</type>
+					<desc>本地端口</desc>
+				</meta>
+			</local_port>
+			<ip flag="0x0000" at_initcan="pre">
+				<value>192.168.0.177</value>
+				<meta>
+					<visible>$/info/channel/channel_0/work_mode == 1</visible>
+					<type>string</type>
+					<desc>ip</desc>
+				</meta>
+			</ip>
+			<work_port flag="0x0001" at_initcan="pre">
+				<value>4003</value>
+				<meta>
+					<visible>$/info/channel/channel_0/work_mode == 1</visible>
+					<type>uint32</type>
+					<desc>工作端口</desc>
+				</meta>
+			</work_port>
+		</channel_0>
+	</channel>
+</info>

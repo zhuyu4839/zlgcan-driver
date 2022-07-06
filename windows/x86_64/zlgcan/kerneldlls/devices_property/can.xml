@@ -1,0 +1,629 @@
+<?xml version="1.0"?>
+<info locale="device_locale_strings.xml">	
+	<DeviceType>
+		<value>3</value>
+		<meta>
+			<type>options.int32</type>
+			<desc>device type</desc>
+			<options>
+				<option type="int32" value="1" desc="PCI5121" />
+				<option type="int32" value="2" desc="PCI9810" />
+				<option type="int32" value="3" desc="USBCAN1" />
+				<option type="int32" value="4" desc="USBCAN2" />
+				<option type="int32" value="5" desc="PCI9820" />
+				<option type="int32" value="7" desc="PCI5110" />
+				<option type="int32" value="11" desc="PC104-CAN" />
+				<option type="int32" value="16" desc="PCI9820I" />
+				<option type="int32" value="15" desc="PC104-CAN2" />
+				<option type="int32" value="24" desc="PCIE-9221" />
+				<option type="int32" value="28" desc="PCIe-9110I" />
+				<option type="int32" value="27" desc="PCIe-9120I" />
+				<option type="int32" value="30" desc="PCI5010P" />
+				<option type="int32" value="12" desc="CANET-UDP" />
+				<option type="int32" value="26" desc="CANWIFI-UDP" />
+				<option type="int32" value="14" desc="PCI9840" />
+				<option type="int32" value="29" desc="PCIe-9140I" />
+				<option type="int32" value="17" desc="CANET-TCP" />
+				<option type="int32" value="25" desc="CANWIFI-TCP" />
+				<option type="int32" value="19" desc="PCI-5010-U" />
+				<option type="int32" value="22" desc="PCI-5020-U" />
+				<option type="int32" value="20" desc="USBCAN-E-U" />
+				<option type="int32" value="21" desc="USBCAN-2E-U" />
+				<option type="int32" value="31" desc="USBCAN-4E-U" />
+				<option type="int32" value="34" desc="USBCAN-8E-U" />
+				<option type="int32" value="38" desc="PCIE-CANFD-100U" />
+				<option type="int32" value="39" desc="PCIE-CANFD-200U" />
+				<option type="int32" value="40" desc="PCIE-CANFD-400U" />
+				<option type="int32" value="37" desc="CANDTU-100UR" />
+				<option type="int32" value="32" desc="CANDTU-200UR" />
+				<option type="int32" value="36" desc="CANDTU-NET" />
+				<option type="int32" value="99" desc="VIRTUAL" />
+				<option type="int32" value="41" desc="USBCANFD-200U" />
+				<option type="int32" value="42" desc="USBCANFD-100U" />
+				<option type="int32" value="43" desc="USBCANFD-MINI" />
+				<option type="int32" value="44" desc="CANFDCOM-100IE" />
+				<option type="int32" value="45" desc="CANSCOPE" />
+				<option type="int32" value="47" desc="CANDTU-NET-400" />
+				<option type="int32" value="48" desc="CANFDNET-TCP" />
+				<option type="int32" value="49" desc="CANFDNET-UDP" />
+				<option type="int32" value="50" desc="CANFDWIFI-TCP" />
+				<option type="int32" value="51" desc="CANFDWIFI-UDP" />
+				<option type="int32" value="52" desc="CANFDNET400U-TCP" />
+				<option type="int32" value="53" desc="CANFDNET400U-UDP" />
+				<option type="int32" value="54" desc="CANFDBLUE-200U" />
+				<option type="int32" value="55" desc="CANFDNET100-MINI-TCP" />
+				<option type="int32" value="56" desc="CANFDNET100-MINI-UDP" />
+				<option type="int32" value="57" desc="CANFDNET800U-TCP" />
+				<option type="int32" value="58" desc="CANFDNET800U-UDP" />
+				<option type="int32" value="59" desc="USBCANFD-800U" />
+				<option type="int32" value="60" desc="PCIE-CANFD-100U" />
+				<option type="int32" value="61" desc="PCIE-CANFD-400U" />
+				<option type="int32" value="62" desc="PCIE-CANFD-200U-MINI" />
+				<option type="int32" value="63" desc="PCIE-CANFD-200U-M2" />
+				<option type="int32" value="64" desc="CANFDDTU400-TCP" />
+				<option type="int32" value="65" desc="CANFDDTU400-UDP" />
+				<option type="int32" value="66" desc="CANFDWIFI200U-TCP" />
+				<option type="int32" value="67" desc="CANFDWIFI200U-UDP" />
+			</options>
+		</meta>
+		<PCI5121 stream="PCI5121" case="parent-value=1">
+			<include_file>
+				<value>usbcan2.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCI5121 config file</desc>
+				</meta>
+			</include_file>
+		</PCI5121>
+
+		<PCI9810 stream="PCI9810" case="parent-value=2">
+			<include_file>
+				<value>usbcan1.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCI9810 config file</desc>
+				</meta>
+			</include_file>
+		</PCI9810>
+
+		<USBCAN1 stream="USBCAN1" case="parent-value=3">
+			<include_file>
+				<value>usbcan1.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>USBCAN1 config file</desc>
+				</meta>
+			</include_file>
+		</USBCAN1>
+
+		<USBCAN2 stream="USBCAN2" case="parent-value=4">
+			<include_file>
+				<value>usbcan2.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>USBCAN2 config file</desc>
+				</meta>
+			</include_file>
+		</USBCAN2>
+
+		<PCI9820 stream="PCI9820" case="parent-value=5">
+			<include_file>
+				<value>usbcan2.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCI9820 config file</desc>
+				</meta>
+			</include_file>
+		</PCI9820>
+
+		<PCI5110 stream="PCI5110" case="parent-value=7">
+			<include_file>
+				<value>usbcan1.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCI5110 config file</desc>
+				</meta>
+			</include_file>
+		</PCI5110>
+
+		<PC104-CAN stream="PC104-CAN" case="parent-value=11">
+			<include_file>
+				<value>usbcan1.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PC104-CAN config file</desc>
+				</meta>
+			</include_file>
+		</PC104-CAN>
+
+		<PCI9820I stream="PCI9820I" case="parent-value=16">
+			<include_file>
+				<value>usbcan2.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCI9820I config file</desc>
+				</meta>
+			</include_file>
+		</PCI9820I>
+
+		<PC104-CAN2 stream="PC104-CAN2" case="parent-value=15">
+			<include_file>
+				<value>usbcan2.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PC104-CAN2 config file</desc>
+				</meta>
+			</include_file>
+		</PC104-CAN2>
+
+		<PCIE-9221 stream="PCIE-9221" case="parent-value=24">
+			<include_file>
+				<value>usbcan2.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCIE-9221 config file</desc>
+				</meta>
+			</include_file>
+		</PCIE-9221>
+
+		<PCIe-9110I stream="PCIe-9110I" case="parent-value=28">
+			<include_file>
+				<value>usbcan1.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCIe-9110I config file</desc>
+				</meta>
+			</include_file>
+		</PCIe-9110I>
+
+		<PCIe-9120I stream="PCIe-9120I" case="parent-value=27">
+			<include_file>
+				<value>usbcan2.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCIe-9120I config file</desc>
+				</meta>
+			</include_file>
+		</PCIe-9120I>
+
+		<PCI5010P stream="PCI5010P" case="parent-value=30">
+			<include_file>
+				<value>usbcan1.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCI5010P config file</desc>
+				</meta>
+			</include_file>
+		</PCI5010P>
+
+		<CANET-UDP stream="CANET-UDP" case="parent-value=12">
+			<include_file>
+				<value>canet-udp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANET-UDP config file</desc>
+				</meta>
+			</include_file>
+		</CANET-UDP>
+
+		<CANWIFI-UDP stream="CANWIFI-UDP" case="parent-value=26">
+			<include_file>
+				<value>canet-udp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANWIFI-UDP config file</desc>
+				</meta>
+			</include_file>
+		</CANWIFI-UDP>
+
+		<PCI9840 stream="PCI9840" case="parent-value=14">
+			<include_file>
+				<value>usbcan4.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCI9840 config file</desc>
+				</meta>
+			</include_file>
+		</PCI9840>
+
+		<PCIe-9140I stream="PCIe-9140I" case="parent-value=29">
+			<include_file>
+				<value>usbcan4.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCIe-9140I config file</desc>
+				</meta>
+			</include_file>
+		</PCIe-9140I>
+
+		<CANET-TCP stream="CANET-TCP" case="parent-value=17">
+			<include_file>
+				<value>canet-tcp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANET-TCP config file</desc>
+				</meta>
+			</include_file>
+		</CANET-TCP>
+
+		<CANWIFI-TCP stream="CANWIFI-TCP" case="parent-value=25">
+			<include_file>
+				<value>canet-tcp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANWIFI-TCP config file</desc>
+				</meta>
+			</include_file>
+		</CANWIFI-TCP>
+
+		<PCI-5010-U stream="PCI-5010-U" case="parent-value=19">
+			<include_file>
+				<value>pci-5010-u.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCI-5010-U config file</desc>
+				</meta>
+			</include_file>
+		</PCI-5010-U>
+
+		<PCI-5020-U stream="PCI-5020-U" case="parent-value=22">
+			<include_file>
+				<value>pci-5020-u.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCI-5020-U config file</desc>
+				</meta>
+			</include_file>
+		</PCI-5020-U>
+
+		<USBCAN-E-U stream="USBCAN-E-U" case="parent-value=20">
+			<include_file>
+				<value>pci-5010-u.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>USBCAN-E-U config file</desc>
+				</meta>
+			</include_file>
+		</USBCAN-E-U>
+
+		<USBCAN-2E-U stream="USBCAN-2E-U" case="parent-value=21">
+			<include_file>
+				<value>pci-5020-u.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>USBCAN-2E-U config file</desc>
+				</meta>
+			</include_file>
+		</USBCAN-2E-U>
+
+		<USBCAN-4E-U stream="USBCAN-4E-U" case="parent-value=31">
+			<include_file>
+				<value>usbcan-4e-u.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>USBCAN-4E-U config file</desc>
+				</meta>
+			</include_file>
+		</USBCAN-4E-U>
+
+		<USBCAN-8E-U stream="USBCAN-8E-U" case="parent-value=34">
+			<include_file>
+				<value>usbcan-8e-u.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>USBCAN-8E-U config file</desc>
+				</meta>
+			</include_file>
+		</USBCAN-8E-U>
+
+		<PCIE-CANFD-100U stream="PCIE-CANFD-100U" case="parent-value=38">
+			<include_file>
+				<value>pcie-canfd-100u.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCIE-CANFD-100U config file</desc>
+				</meta>
+			</include_file>
+		</PCIE-CANFD-100U>
+
+		<PCIE-CANFD-200U stream="PCIE-CANFD-200U" case="parent-value=39">
+			<include_file>
+				<value>pcie-canfd-200u.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCIE-CANFD-200U config file</desc>
+				</meta>
+			</include_file>
+		</PCIE-CANFD-200U>
+
+		<PCIE-CANFD-400U stream="PCIE-CANFD-400U" case="parent-value=40">
+			<include_file>
+				<value>pcie-canfd-400u.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCIE-CANFD-400U config file</desc>
+				</meta>
+			</include_file>
+		</PCIE-CANFD-400U>
+
+		<CANDTU-100UR stream="CANDTU-100UR" case="parent-value=37">
+			<include_file>
+				<value>candtu-100ur.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANDTU-100UR config file</desc>
+				</meta>
+			</include_file>
+		</CANDTU-100UR>
+
+		<CANDTU-200UR stream="CANDTU-200UR" case="parent-value=32">
+			<include_file>
+				<value>candtu-200ur.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANDTU-100UR config file</desc>
+				</meta>
+			</include_file>
+		</CANDTU-200UR>
+
+		<CANDTU-NET stream="CANDTU-NET" case="parent-value=36">
+			<include_file>
+				<value>candtu-net.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANDTU-NET config file</desc>
+				</meta>
+			</include_file>
+		</CANDTU-NET>
+
+		<VIRTUAL stream="VIRTUAL" case="parent-value=99">
+			<include_file>
+				<value>virtual.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>VIRTUAL config file</desc>
+				</meta>
+			</include_file>
+		</VIRTUAL>
+
+		<USBCANFD-200U stream="USBCANFD-200U" case="parent-value=41">
+			<include_file>
+				<value>usbcanfd-200u.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>USBCANFD-200U config file</desc>
+				</meta>
+			</include_file>
+		</USBCANFD-200U>
+
+		<USBCANFD-100U stream="USBCANFD-100U" case="parent-value=42">
+			<include_file>
+				<value>usbcanfd-100u.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>USBCANFD-100U config file</desc>
+				</meta>
+			</include_file>
+		</USBCANFD-100U>
+
+		<USBCANFD-MINI stream="USBCANFD-MINI" case="parent-value=43">
+			<include_file>
+				<value>usbcanfd-100u.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>USBCANFD-MIN config file</desc>
+				</meta>
+			</include_file>
+		</USBCANFD-MINI>
+
+		<CANSCOPE stream="CANSCOPE" case="parent-value=45">
+			<include_file>
+				<value>canscope.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANSCOPE config file</desc>
+				</meta>
+			</include_file>
+		</CANSCOPE>
+
+		<CANDTU-NET-400 stream="CANDTU-NET-400" case="parent-value=47">
+			<include_file>
+				<value>candtu-net-400.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANDTU-NET-400 config file</desc>
+				</meta>
+			</include_file>
+		</CANDTU-NET-400>
+
+		<CANFDCOM-100IE stream="CANFDCOM-100IE" case="parent-value=44">
+			<include_file>
+				<value>canfdcom-100ie.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANFDCOM-100IE config file</desc>
+				</meta>
+			</include_file>
+		</CANFDCOM-100IE>
+		<CANFDNET-TCP stream="CANFDNET-TCP" case="parent-value=48">
+			<include_file>
+				<value>canfdnet-tcp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>canfdnet-tcp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDNET-TCP>
+		<CANFDNET-UDP stream="CANFDNET-UDP" case="parent-value=49">
+			<include_file>
+				<value>canfdnet-udp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>canfdnet-udp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDNET-UDP>
+		<CANFDWIFI-TCP stream="CANFDWIFI-TCP" case="parent-value=50">
+			<include_file>
+				<value>canfdwifi-tcp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>canfdwifi-tcp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDWIFI-TCP>
+		<CANFDWIFI-UDP stream="CANFDWIFI-UDP" case="parent-value=51">
+			<include_file>
+				<value>canfdwifi-udp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>canfdwifi-udp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDWIFI-UDP>
+		<CANFDNET400U-TCP stream="CANFDNET400U-TCP" case="parent-value=52">
+			<include_file>
+				<value>canfdnet400u-tcp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>canfdnet400u-tcp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDNET400U-TCP>
+		<CANFDNET400U-UDP stream="CANFDNET400U-UDP" case="parent-value=53">
+			<include_file>
+				<value>canfdnet400u-udp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>canfdnet400u-udp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDNET400U-UDP>
+		<CANFDBLUE-200U stream="CANFDBLUE-200U" case="parent-value=54">
+			<include_file>
+				<value>canfdblue-200u.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>canfdblue-200u config file</desc>
+				</meta>
+			</include_file>
+		</CANFDBLUE-200U>
+		<CANFDNET100-MINI-TCP stream="CANFDNET100-MINI-TCP" case="parent-value=55">
+			<include_file>
+				<value>canfdnet100-tcp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>canfdnet100-tcp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDNET100-MINI-TCP>
+		<CANFDNET100-MINI-UDP  stream="CANFDNET100-MINI-UDP" case="parent-value=56">
+			<include_file>
+				<value>canfdnet100-udp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>canfdnet100-udp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDNET100-MINI-UDP>
+		<CANFDNET800U-TCP stream="CANFDNET800U-TCP" case="parent-value=57">
+			<include_file>
+				<value>canfdnet800u-tcp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>canfdnet800u-tcp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDNET800U-TCP>
+		<CANFDNET800U-UDP  stream="CANFDNET800U-UDP" case="parent-value=58">
+			<include_file>
+				<value>canfdnet800u-udp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>canfdnet800u-udp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDNET800U-UDP>
+		<USBCANFD-800U  stream="USBCANFD-800U" case="parent-value=59">
+			<include_file>
+				<value>usbcanfd-800u.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>usbcanfd-800u config file</desc>
+				</meta>
+			</include_file>
+		</USBCANFD-800U>
+		<PCIE-CANFD-100U-EX stream="PCIE-CANFD-100U-EX" case="parent-value=60">
+			<include_file>
+				<value>pcie-canfd-100u-ex.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCIE-CANFD-100U config file</desc>
+				</meta>
+			</include_file>
+		</PCIE-CANFD-100U-EX>
+		<PCIE-CANFD-400U-EX stream="PCIE-CANFD-400U-EX" case="parent-value=61">
+			<include_file>
+				<value>pcie-canfd-400u-ex.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCIE-CANFD-400U config file</desc>
+				</meta>
+			</include_file>
+		</PCIE-CANFD-400U-EX>
+		<PCIE-CANFD-200U-MINI stream="PCIE-CANFD-200U-MINI" case="parent-value=62">
+			<include_file>
+				<value>pcie-canfd-200u-ex.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCIE-CANFD-200U-MINI config file</desc>
+				</meta>
+			</include_file>
+		</PCIE-CANFD-200U-MINI>
+		<PCIE-CANFD-200U-M2 stream="PCIE-CANFD-200U-M2" case="parent-value=63">
+			<include_file>
+				<value>pcie-canfd-200u-ex.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>PCIE-CANFD-200U-M2 config file</desc>
+				</meta>
+			</include_file>
+		</PCIE-CANFD-200U-M2>
+		<CANFDDTU400-TCP stream="CANFDDTU400-TCP" case="parent-value=64">
+			<include_file>
+				<value>canfdnet400u-tcp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANFDDTU400-tcp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDDTU400-TCP>
+		<CANFDDTU400-UDP stream="CANFDDTU400-UDP" case="parent-value=65">
+			<include_file>
+				<value>canfdnet400u-udp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANFDDTU400-udp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDDTU400-UDP>
+		<CANFDWIFI200U-TCP stream="CANFDNET200U-TCP" case="parent-value=66">
+			<include_file>
+				<value>canfdnet-tcp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>canfdwifi-200u-tcp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDWIFI200U-TCP>
+		<CANFDWIFI200U-UDP stream="CANFDNET200U-UDP" case="parent-value=67">
+			<include_file>
+				<value>canfdnet-udp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>canfdwifi-200u-udp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDWIFI200U-UDP>
+	</DeviceType>
+</info>

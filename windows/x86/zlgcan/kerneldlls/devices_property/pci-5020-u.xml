@@ -1,0 +1,253 @@
+<?xml version="1.0"?>
+<info locale="device_locale_strings.xml">
+	<device>
+		<value>7</value>
+		<meta>
+			<visible>false</visible>
+			<type>options.int32</type>
+			<desc>设备索引</desc>
+			<options>
+				<option type="int32" value="0" desc="0"></option>
+				<option type="int32" value="1" desc="1"></option>
+				<option type="int32" value="2" desc="2"></option>
+				<option type="int32" value="3" desc="3"></option>
+				<option type="int32" value="4" desc="4"></option>
+				<option type="int32" value="5" desc="5"></option>
+				<option type="int32" value="6" desc="6"></option>
+				<option type="int32" value="7" desc="7"></option>
+			</options>
+		</meta>
+	</device>
+	<channel>
+		<value>0</value>
+		<meta>
+			<visible>false</visible>
+			<type>options.int32</type>
+			<desc>通道号</desc>
+			<options>
+				<option type="int32" value="0" desc="Channel 0"></option>
+				<option type="int32" value="1" desc="Channel 1"></option>
+			</options>
+		</meta>
+		<channel_0 stream="channel_0" case="parent-value=0">
+			<baud_rate flag="0x0046" at_initcan="pre">
+				<value>1000000</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>波特率</desc>
+					<options>
+						<option type="int32" value="1000000" desc="1000kbps"></option>
+						<option type="int32" value="800000" desc="800kbps"></option>
+						<option type="int32" value="500000" desc="500kbps"></option>
+						<option type="int32" value="250000" desc="250kbps"></option>
+						<option type="int32" value="125000" desc="125kbps"></option>
+						<option type="int32" value="100000" desc="100kbps"></option>
+						<option type="int32" value="50000" desc="50kbps"></option>
+						<option type="int32" value="20000" desc="20kbps"></option>
+						<option type="int32" value="10000" desc="10kbps"></option>
+						<option type="int32" value="5000" desc="5kbps"></option>
+						<option type="int32" value="0" desc="custom"></option>
+					</options>
+				</meta>
+			</baud_rate>
+			<baud_rate_custom flag="0x0044" at_initcan="pre">
+				<value>1.0Mbps(72%),(004B0001)</value>
+				<meta>
+					<visible>$/info/channel/channel_0/baud_rate == 10</visible>
+					<type>string</type>
+					<desc>自定义波特率</desc>
+				</meta>
+			</baud_rate_custom>
+			<work_mode initcan="work_mode">
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>工作模式</desc>
+					<options>
+						<option type="int32" value="0" desc="normal_mode"></option>
+						<option type="int32" value="1" desc="readonly_mode"></option>
+					</options>
+				</meta>
+			</work_mode>
+			<auto_send flag="0x0034">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>定时发送</desc>
+				</meta>
+			</auto_send>
+			<clear_auto_send flag="0x0036">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>清空定时发送</desc>
+				</meta>
+			</clear_auto_send>
+			<filter_clear flag="0x0049" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>清除滤波</desc>
+				</meta>
+			</filter_clear>
+			<filter_mode flag="0x0031" at_initcan="post">
+				<value>2</value>
+				<meta>
+					<type>options.int32</type>
+					<visible>false</visible>
+					<desc>滤波模式</desc>
+					<options>
+						<option type="int32" value="0" desc="filter_standard"></option>
+						<option type="int32" value="1" desc="filter_extend"></option>
+						<option type="int32" value="2" desc="filter_disable"></option>
+					</options>
+				</meta>
+			</filter_mode>
+			<filter_start flag="0x0032" hex="1" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>uint32</type>
+					<visible>false</visible>
+					<desc>滤波起始帧</desc>
+				</meta>
+			</filter_start>
+			<filter_end flag="0x0033" hex="1" at_initcan="post">
+				<value>0xFFFFFFFF</value>
+				<meta>
+					<type>uint32</type>
+					<visible>false</visible>
+					<desc>滤波结束帧</desc>
+				</meta>
+			</filter_end>
+			<filter_ack flag="0x0050" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>滤波生效</desc>
+				</meta>
+			</filter_ack>
+			<filter_batch flag="0x0045" at_initcan="post">
+				<value></value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc></desc>
+				</meta>
+			</filter_batch>
+		</channel_0>
+		<channel_1 stream="channel_1" case="parent-value=1">
+			<baud_rate flag="0x0146" at_initcan="pre">
+				<value>1000000</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>波特率</desc>
+					<options>
+						<option type="int32" value="1000000" desc="1000kbps"></option>
+						<option type="int32" value="800000" desc="800kbps"></option>
+						<option type="int32" value="500000" desc="500kbps"></option>
+						<option type="int32" value="250000" desc="250kbps"></option>
+						<option type="int32" value="125000" desc="125kbps"></option>
+						<option type="int32" value="100000" desc="100kbps"></option>
+						<option type="int32" value="50000" desc="50kbps"></option>
+						<option type="int32" value="20000" desc="20kbps"></option>
+						<option type="int32" value="10000" desc="10kbps"></option>
+						<option type="int32" value="5000" desc="5kbps"></option>
+						<option type="int32" value="0" desc="custom"></option>
+					</options>
+				</meta>
+			</baud_rate>
+			<baud_rate_custom flag="0x0144" at_initcan="pre">
+				<value>1.0Mbps(72%),(004B0001)</value>
+				<meta>
+					<visible>$/info/channel/channel_1/baud_rate == 10</visible>
+					<type>string</type>
+					<desc>自定义波特率</desc>
+				</meta>
+			</baud_rate_custom>
+			<work_mode initcan="work_mode">
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>工作模式</desc>
+					<options>
+						<option type="int32" value="0" desc="normal_mode"></option>
+						<option type="int32" value="1" desc="readonly_mode"></option>
+					</options>
+				</meta>
+			</work_mode>
+			<auto_send flag="0x0134">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>定时发送</desc>
+				</meta>
+			</auto_send>
+			<clear_auto_send flag="0x0136">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>清空定时发送</desc>
+				</meta>
+			</clear_auto_send>
+			<filter_clear flag="0x0149" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>清除滤波</desc>
+				</meta>
+			</filter_clear>
+			<filter_mode flag="0x0131" at_initcan="post">
+				<value>2</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>滤波模式</desc>
+					<visible>false</visible>
+					<options>
+						<option type="int32" value="0" desc="filter_standard"></option>
+						<option type="int32" value="1" desc="filter_extend"></option>
+						<option type="int32" value="2" desc="filter_disable"></option>
+					</options>
+				</meta>
+			</filter_mode>
+			<filter_start flag="0x0132" hex="1" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波起始帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_start>
+			<filter_end flag="0x0133" hex="1" at_initcan="post">
+				<value>0xFFFFFFFF</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波结束帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_end>
+			<filter_ack flag="0x0150" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>滤波生效</desc>
+				</meta>
+			</filter_ack>
+			<filter_batch flag="0x0145" at_initcan="post">
+				<value></value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc></desc>
+				</meta>
+			</filter_batch>
+		</channel_1>
+	</channel>
+</info>

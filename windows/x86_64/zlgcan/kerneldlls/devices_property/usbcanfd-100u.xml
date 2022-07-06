@@ -1,0 +1,432 @@
+<?xml version="1.0"?>
+<info locale="device_locale_strings.xml">
+	<device canfd="1">
+		<value>0</value>
+		<meta>
+			<visible>false</visible>
+			<type>options.int32</type>
+			<desc>设备索引</desc>
+			<options>
+				<option type="int32" value="0" desc="0"></option>
+				<option type="int32" value="1" desc="1"></option>
+				<option type="int32" value="2" desc="2"></option>
+				<option type="int32" value="3" desc="3"></option>
+				<option type="int32" value="4" desc="4"></option>
+				<option type="int32" value="5" desc="5"></option>
+				<option type="int32" value="6" desc="6"></option>
+				<option type="int32" value="7" desc="7"></option>
+				<option type="int32" value="8" desc="8"></option>
+				<option type="int32" value="9" desc="9"></option>
+				<option type="int32" value="10" desc="10"></option>
+				<option type="int32" value="11" desc="11"></option>
+				<option type="int32" value="12" desc="12"></option>
+				<option type="int32" value="13" desc="13"></option>
+				<option type="int32" value="14" desc="14"></option>
+				<option type="int32" value="15" desc="15"></option>
+				<option type="int32" value="16" desc="16"></option>
+				<option type="int32" value="17" desc="17"></option>
+				<option type="int32" value="18" desc="18"></option>
+				<option type="int32" value="19" desc="19"></option>
+				<option type="int32" value="20" desc="20"></option>
+				<option type="int32" value="21" desc="21"></option>
+				<option type="int32" value="22" desc="22"></option>
+				<option type="int32" value="23" desc="23"></option>
+				<option type="int32" value="24" desc="24"></option>
+				<option type="int32" value="25" desc="25"></option>
+				<option type="int32" value="26" desc="26"></option>
+				<option type="int32" value="27" desc="27"></option>
+				<option type="int32" value="28" desc="28"></option>
+				<option type="int32" value="29" desc="29"></option>
+				<option type="int32" value="30" desc="30"></option>
+				<option type="int32" value="31" desc="31"></option>
+			</options>
+		</meta>
+	</device>
+	<channel>
+		<value>0</value>
+		<meta>
+			<visible>false</visible>
+			<type>options.int32</type>
+			<desc>通道号</desc>
+			<options>
+				<option type="int32" value="0" desc="Channel 0"></option>
+			</options>
+		</meta>
+		<channel_0 stream="channel_0" case="parent-value=0">
+			<protocol flag="0x0052" at_initcan="pre">
+				<value>1</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>协议</desc>
+					<options>
+						<option type="int32" value="0" desc="CAN"></option>
+						<option type="int32" value="1" desc="CANFD"></option>
+					</options>
+				</meta>
+			</protocol>
+			<canfd_standard flag="0x0011" at_initcan="pre">
+				<value>0</value>
+				<meta>
+					<desc>CANFD标准</desc>
+					<type>options.int32</type>
+					<visible>$/info/channel/channel_0/protocol != 0</visible>
+					<options>
+						<option type="int32" value="0" desc="CANFD ISO"></option>
+						<option type="int32" value="1" desc="Non-ISO"></option>
+					</options>
+				</meta>
+			</canfd_standard>
+			<canfd_exp>
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>CANFD加速</desc>
+					<visible>$/info/channel/channel_0/protocol != 0</visible>
+					<options>
+						<option type="int32" value="0" desc="str_no"></option>
+						<option type="int32" value="1" desc="str_yes"></option>
+					</options>
+				</meta>
+			</canfd_exp>
+			<canfd_abit_baud_rate flag="0x0046" at_initcan="pre">
+				<value>1000000</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>仲裁域波特率</desc>
+					<options>
+						<option type="int32" value="1000000" desc="1Mbps 80%"></option>
+						<option type="int32" value="800000" desc="800kbps 80%"></option>
+						<option type="int32" value="500000" desc="500kbps 80%"></option>
+						<option type="int32" value="250000" desc="250kbps 80%"></option>
+						<option type="int32" value="125000" desc="125kbps 80%"></option>
+						<option type="int32" value="100000" desc="100kbps 80%"></option>
+						<option type="int32" value="50000" desc="50kbps 80%"></option>
+						<option type="int32" value="0" desc="custom"></option>
+					</options>
+				</meta>
+			</canfd_abit_baud_rate>
+			<canfd_dbit_baud_rate flag="0x0047" at_initcan="pre">
+				<value>5000000</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>数据域波特率</desc>
+					<visible>$/info/channel/channel_0/canfd_abit_baud_rate!=7&amp;&amp;$/info/channel/channel_0/protocol!=0&amp;&amp;$/info/channel/channel_0/canfd_exp!=0</visible>
+					<options>
+						<option type="int32" value="5000000" desc="5Mbps 75%"></option>
+						<option type="int32" value="4000000" desc="4Mbps 80%"></option>
+						<option type="int32" value="2000000" desc="2Mbps 80%"></option>
+						<option type="int32" value="1000000" desc="1Mbps 80%"></option>
+						<option type="int32" value="800000" desc="800kbps 80%"></option>
+						<option type="int32" value="500000" desc="500kbps 80%"></option>
+						<option type="int32" value="250000" desc="250kbps 80%"></option>
+						<option type="int32" value="125000" desc="125kbps 80%"></option>
+						<option type="int32" value="100000" desc="100kbps 80%"></option>
+					</options>
+				</meta>
+			</canfd_dbit_baud_rate>
+			<baud_rate_custom flag="0x0044" at_initcan="pre">
+				<value>1.0Mbps(66%),4.0Mbps(66%),(60,04C00000,01000000)</value>
+				<meta>
+					<visible>$/info/channel/channel_0/canfd_abit_baud_rate == 7</visible>
+					<type>string</type>
+					<desc>自定义波特率</desc>
+				</meta>
+			</baud_rate_custom>
+			<work_mode initcan="work_mode">
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>工作模式</desc>
+					<options>
+						<option type="int32" value="0" desc="normal_mode"></option>
+						<option type="int32" value="1" desc="readonly_mode"></option>
+					</options>
+				</meta>
+			</work_mode>
+			<initenal_resistance flag="0x000B" at_initcan="post">
+				<value>1</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>终端电阻</desc>
+					<options>
+						<option type="int32" value="0" desc="disable"></option>
+						<option type="int32" value="1" desc="enable"></option>
+					</options>
+				</meta>
+			</initenal_resistance>
+			<auto_send flag="0x0034">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>定时发送CAN</desc>
+				</meta>
+			</auto_send>
+			<auto_send_canfd flag="0x0035">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>定时发送CANFD</desc>
+				</meta>
+			</auto_send_canfd>
+			<clear_auto_send flag="0x0036">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>清空定时发送</desc>
+				</meta>
+			</clear_auto_send>
+			<apply_auto_send flag="0x0048">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>应用定时发送</desc>
+				</meta>
+			</apply_auto_send>
+			<set_cn flag="0x000C">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>设置序列号</desc>
+				</meta>
+			</set_cn>
+			<get_cn flag="0x000D">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>获取序列号</desc>
+				</meta>
+			</get_cn>
+			<update flag="0x0005">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>升级</desc>
+				</meta>
+			</update>
+			<update_status flag="0x0006">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>uint32</type>
+					<desc>升级状态</desc>
+				</meta>
+			</update_status>
+			<channel_err_count flag="0x000E">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>uint32</type>
+					<desc>通道错误计数</desc>
+				</meta>
+			</channel_err_count>
+			<log_size flag="0x000F">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>uint32</type>
+					<desc>日志文件大小</desc>
+				</meta>
+			</log_size>
+			<log_data flag="0x0010">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>uint32</type>
+					<desc>日志文件数据</desc>
+				</meta>
+			</log_data>
+			<device_datetime flag="0x0012">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>设备时间日期</desc>
+				</meta>
+			</device_datetime>
+			<clock flag="0x0001" at_initcan="pre">
+				<value>60000000</value>
+				<meta>
+					<type>int32</type>
+					<visible>false</visible>
+					<desc>时钟</desc>
+				</meta>
+			</clock>
+			<filter_clear flag="0x0049" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>清除滤波</desc>
+				</meta>
+			</filter_clear>
+			<filter_mode flag="0x0031" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>滤波模式</desc>
+					<visible>false</visible>
+					<options>
+						<option type="int32" value="0" desc="filter_standard"></option>
+						<option type="int32" value="1" desc="filter_extend"></option>
+						<option type="int32" value="2" desc="filter_disable"></option>
+					</options>
+				</meta>
+			</filter_mode>
+			<filter_start flag="0x0032" hex="1" at_initcan="post">
+				<value>ffbdd8</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波起始帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_start>
+			<filter_end flag="0x0033" hex="1" at_initcan="post">
+				<value>ffbe28</value>
+				<meta>
+					<type>uint32</type>
+					<desc>滤波结束帧</desc>
+					<visible>false</visible>
+				</meta>
+			</filter_end>
+			<filter_ack flag="0x0050" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc>滤波生效</desc>
+				</meta>
+			</filter_ack>
+			<filter_batch flag="0x0045" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc></desc>
+				</meta>
+			</filter_batch>
+			<tx_timeout flag="0x0051" at_initcan="post">
+				<value>0</value>
+				<meta>
+					<type>uint32</type>
+					<visible>false</visible>
+					<desc></desc>
+				</meta>
+			</tx_timeout>
+			<set_tx_timestamp flag="0x0053">
+				<value>0</value>
+				<meta>
+					<type>uint32</type>
+					<visible>false</visible>
+					<desc></desc>
+				</meta>
+			</set_tx_timestamp>
+			<get_tx_timestamp flag="0x0054">
+				<value>0</value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc></desc>
+				</meta>
+			</get_tx_timestamp>
+			<ctrl_mode flag="0x0055">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>uint32</type>
+					<desc>控制器模式</desc>
+				</meta>
+			</ctrl_mode>
+			<auto_send_param flag="0x0057">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>定时发送参数</desc>
+				</meta>
+			</auto_send_param>
+			<set_send_mode flag="0x0058">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>uint32</type>
+					<desc>设置设备模式</desc>
+				</meta>
+			</set_send_mode>
+			<get_device_available_tx_count flag="0x0059">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>uint32</type>
+					<desc>获取设备当前可以用的发送帧缓存数量</desc>
+				</meta>
+			</get_device_available_tx_count>
+			<clear_delay_send_queue flag="0x001D">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>队列模式下取消当前正在发送的队列, 队列中未发送的数据会被清除</desc>
+				</meta>
+			</clear_delay_send_queue>
+			<set_tx_retry_policy flag="0x001E">
+				<value>2</value>
+				<meta>
+					<visible>true</visible>
+					<type>options.int32</type>
+					<desc>设置发送失败时重试策略, 使用单次发送还是一直发送到总线关闭</desc>
+					<options>
+						<option type="int32" value="1" desc="tx_retry_policy_once"></option>
+						<option type="int32" value="2" desc="tx_retry_policy_till_busoff"></option>
+					</options>
+				</meta>
+			</set_tx_retry_policy>
+			<get_send_mode flag="0x001F">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>uint32</type>
+					<desc>获取设备模式</desc>
+				</meta>
+			</get_send_mode>
+			<set_device_recv_merge flag="0x0020">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>uint32</type>
+					<desc>设置设备合并接收</desc>
+				</meta>
+			</set_device_recv_merge>
+			<get_device_recv_merge flag="0x0021">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>uint32</type>
+					<desc>获取设备合并接收状态</desc>
+				</meta>
+			</get_device_recv_merge>
+			<set_device_tx_echo flag="0x0022">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>uint32</type>
+					<desc>强制设备发送回显</desc>
+				</meta>
+			</set_device_tx_echo>
+			<get_device_tx_echo flag="0x0023">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>uint32</type>
+					<desc>获取设备发送回显状态</desc>
+				</meta>
+			</get_device_tx_echo>
+		</channel_0>
+	</channel>
+</info>
