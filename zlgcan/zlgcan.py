@@ -738,6 +738,12 @@ if _is_windows:
                     ("GetValue", c_void_p),
                     ("GetPropertys", c_void_p)]
 
+def _library_check_run(func_name, code, *args, **kwargs):
+    ret = getattr(_library, func_name)(*args, **kwargs)
+    if ret != code:
+        raise ZCANException(f'ZLG: {func_name} failed!')
+    return ret
+
 class ZCAN(object):
 
     def __init__(self):
@@ -856,10 +862,9 @@ class ZCAN(object):
         elif _is_linux:
             warnings.warn('ZLG: Cant get the resistance status in Linux.')
             if status is not None:
-                ret = _library.VCI_SetReference(self._dev_type, self._dev_index, channel,
-                                                CMD_CAN_RES, byref(c_int32(status)))      # TODO 不使用结构体行不行
-                if ret != ZCAN_STATUS_OK:
-                    raise ZCANException('ZLG: Set resistance status failed!')
+                _library_check_run('VCI_SetReference', ZCAN_STATUS_OK,
+                                   self._dev_type, self._dev_index, channel,
+                                   CMD_CAN_RES, byref(c_int32(status)))      # TODO 不使用结构体行不行
 
     def SetFilters(self, channel, filters=None):
         if _is_windows:
@@ -897,19 +902,17 @@ class ZCAN(object):
                     table.sid = start
                     table.eid = end
                     _filter.table[index] = table
-            ret = _library.VCI_SetReference(self._dev_type, self._dev_index, channel, CMD_CAN_FILTER, byref(_filter))
-            if ret != ZCAN_STATUS_OK:
-                raise ZCANException('ZLG: SetReference failed!')
+            _library_check_run('VCI_SetReference', ZCAN_STATUS_OK,
+                               self._dev_index, channel, CMD_CAN_FILTER, byref(_filter))
 
     # DEVICE_HANDLE FUNC_CALL ZCAN_OpenDevice(UINT device_type, UINT device_index, UINT reserved);
     def OpenDevice(self, dev_type: ZCANDeviceType, dev_index=0, reserved=0):
         if _is_windows:
-            ret = _library.ZCAN_OpenDevice(dev_type, dev_index, reserved)
+            self._dev_handler = _library_check_run('ZCAN_OpenDevice', INVALID_DEVICE_HANDLE,
+                                                   dev_type, dev_index, reserved)
         elif _is_linux:
-            ret = _library.VCI_OpenDevice(dev_type, dev_index, reserved)
-        if ret == INVALID_DEVICE_HANDLE:
-            raise ZCANException('ZLG: Open device failed!')
-        self._dev_handler = ret
+            self._dev_handler = _library_check_run('VCI_OpenDevice', ZCAN_STATUS_OK,
+                                                   dev_type, dev_index, reserved)
         self._dev_index = dev_index
         self._dev_type = dev_type
         # matched = re.findall(r'[.](\w*?),', inspect.getframeinfo(inspect.currentframe().f_back)[3][0])
@@ -929,31 +932,23 @@ class ZCAN(object):
                 self.ResetCAN(index)
             for index, _ in enumerate(lin_channels):
                 self.ResetLIN(index)
-            ret = _library.ZCAN_CloseDevice(self._dev_handler)
-            if ret != ZCAN_STATUS_OK:
-                self._logger.error(f'ZLG: Close device failed, code {ret}!')
-                raise ZCANException('ZLG: Close device failed!')
+            _library_check_run('ZCAN_CloseDevice', ZCAN_STATUS_OK, self._dev_handler)
             can_channels.clear()
             lin_channels.clear()
+            self._dev_handler = None
         elif _is_linux:
             for channel in self._channels:
                 self.ResetCAN(channel)
-            ret = _library.VCI_CloseDevice(self._dev_type, self._dev_index)
-            if ret != ZCAN_STATUS_OK:
-                self._logger.warning(f'ZLG: Close device failed, code {ret}!')
-                raise ZCANException('ZLG: Close device failed!')
-        self._dev_handler = None
+            _library_check_run('VCI_CloseDevice', ZCAN_STATUS_OK, self._dev_type, self._dev_index)
 
     # UINT FUNC_CALL ZCAN_GetDeviceInf(DEVICE_HANDLE device_handle, ZCAN_DEVICE_INFO* pInfo);
     def GetDeviceInf(self) -> ZCAN_DEVICE_INFO:
         dev_info = ZCAN_DEVICE_INFO()
         if _is_windows:
-            ret = _library.ZCAN_GetDeviceInf(self._dev_handler, byref(dev_info))
+            return _library_check_run('ZCAN_GetDeviceInf', ZCAN_STATUS_OK, self._dev_handler, byref(dev_info))
         elif _is_linux:
-            ret = _library.VCI_ReadBoardInfo(self._dev_type, self._dev_type, byref(dev_info))
-        if ret == ZCAN_STATUS_OK:
-            return dev_info
-        self._logger.warning(f'ZLG: Get device info failed, code {ret}!')
+            return _library_check_run('VCI_ReadBoardInfo', ZCAN_STATUS_OK,
+                                      self._dev_type, self._dev_type, byref(dev_info))
 
     # CHANNEL_HANDLE FUNC_CALL ZCAN_InitCAN(DEVICE_HANDLE device_handle, UINT can_index, ZCAN_CHANNEL_INIT_CONFIG* pInitConfig);
     def InitCAN(self, channel, mode: ZCANCanMode = ZCANCanMode.NORMAL,
@@ -979,58 +974,47 @@ class ZCAN(object):
         """
         config = self._get_can_init_config(mode, filter, **kwargs)
         if _is_windows:
-            ret = _library.ZCAN_InitCAN(self._dev_handler, channel, byref(config))
+            self._channel_handlers['CAN'].append(
+                _library_check_run('ZCAN_InitCAN', INVALID_CHANNEL_HANDLE, self._dev_handler, channel, byref(config))
+            )
         elif _is_linux:
-            ret = _library.VCI_InitCAN(self._dev_type, self._dev_index, byref(config))
-        if ret == INVALID_CHANNEL_HANDLE:
-            raise ZCANException('ZLG: Can Channel initialize failed!')
-        self._logger.debug(f'ZLG: channel{channel} handler: {ret}')
-        # self._channel_handlers['CAN'][ret] = can_type == ZlgCanType.CANFD
-        self._channel_handlers['CAN'].append(ret)
+            _library_check_run('VCI_InitCAN', self._dev_type, self._dev_index, byref(config))
 
     # UINT FUNC_CALL ZCAN_StartCAN(CHANNEL_HANDLE channel_handle);
     def StartCAN(self, channel):
         if _is_windows:
             handler = self._get_channel_handler('CAN', channel)
-            ret = _library.ZCAN_StartCAN(handler)
+            _library_check_run('ZCAN_StartCAN', ZCAN_STATUS_OK, handler)
         elif _is_linux:
-            ret = _library.VCI_StartCAN(self._dev_type, self._dev_index, channel)
-        if ret != ZCAN_STATUS_OK:
-            raise ZCANException('ZLG: Can Channel start failed!')
+            _library_check_run('VCI_StartCAN', ZCAN_STATUS_OK, self._dev_type, self._dev_index, channel)
 
     # UINT FUNC_CALL ZCAN_ResetCAN(CHANNEL_HANDLE channel_handle);
     def ResetCAN(self, channel):
         if _is_windows:
             handler = self._get_channel_handler('CAN', channel)
-            ret = _library.ZCAN_ResetCAN(handler)
+            _library_check_run('ZCAN_ResetCAN', ZCAN_STATUS_OK, handler)
         elif _is_linux:
-            ret = _library.VCI_ResetCAN(self._dev_type, self._dev_type, channel)
-        if ret != ZCAN_STATUS_OK:
-            raise ZCANException('ZLG: Can Channel reset failed!')
+            _library_check_run('VCI_ResetCAN', ZCAN_STATUS_OK, self._dev_type, self._dev_type, channel)
 
     # UINT FUNC_CALL ZCAN_ClearBuffer(CHANNEL_HANDLE channel_handle);
     def ClearBuffer(self, channel):
         if _is_windows:
             handler = self._get_channel_handler('CAN', channel)
-            ret = _library.ZCAN_ClearBuffer(handler)
+            _library_check_run('ZCAN_ClearBuffer', ZCAN_STATUS_OK, handler)
         elif _is_linux:
-            ret = _library.VCI_ClearBuffer(self._dev_type, self._dev_index)
-        if ret != ZCAN_STATUS_OK:
-            raise ZCANException('ZLG: Can Channel reset failed!')
+            _library_check_run('VCI_ClearBuffer', ZCAN_STATUS_OK, self._dev_type, self._dev_index)
 
     # UINT FUNC_CALL ZCAN_ReadChannelErrInfo(CHANNEL_HANDLE channel_handle, ZCAN_CHANNEL_ERR_INFO* pErrInfo);
     def ReadChannelErrInfo(self, channel, chl_type='CAN'):
         error_info = ZCAN_CHANNEL_ERR_INFO()
         if _is_windows:
             handler = self._get_channel_handler(chl_type, channel)
-            ret = _library.ZCAN_ReadChannelErrInfo(handler, byref(error_info))
-            if ret == ZCAN_STATUS_OK:       # TODO 统一
-                return error_info
+            # TODO 统一
+            return _library_check_run('ZCAN_ReadChannelErrInfo', ZCAN_STATUS_OK, handler, byref(error_info))
         elif _is_linux:
-            ret = _library.VCI_ReadErrInfo(self._dev_type, self._dev_info, byref(error_info))
-            if ret == ZCAN_STATUS_OK:       # TODO 统一
-                return error_info
-        self._logger.warning(f'ZLG: Read channel error info failed, code {ret}!')
+            # TODO 统一
+            return _library_check_run('VCI_ReadErrInfo', ZCAN_STATUS_OK,
+                                      self._dev_type, self._dev_info, byref(error_info))
 
     # UINT FUNC_CALL ZCAN_ReadChannelStatus(CHANNEL_HANDLE channel_handle, ZCAN_CHANNEL_STATUS* pCANStatus);
     def ReadChannelStatus(self, channel, chl_type='CAN'):
@@ -1038,14 +1022,11 @@ class ZCAN(object):
         status_info = ZCAN_CHANNEL_STATUS()
         if _is_windows:
             handler = self._get_channel_handler(chl_type, channel)
-            ret = _library.ZCAN_ReadChannelStatus(handler, byref(status_info))
-            if ret == ZCAN_STATUS_OK:       # TODO 统一
-                return status_info
+            # TODO 统一
+            return _library_check_run('ZCAN_ReadChannelStatus', ZCAN_STATUS_OK, handler, byref(status_info))
         elif _is_linux:
-            ret = _library.VCI_ReadCANStatus(self._dev_type, self._dev_index, byref(status_info))
-            if ret == ZCAN_STATUS_OK:       # TODO 统一
-                return status_info
-        self._logger.warning(f'ZLG: Read channel status info failed, code {ret}!')
+            return _library_check_run('VCI_ReadCANStatus', ZCAN_STATUS_OK,
+                                      self._dev_type, self._dev_index, byref(status_info))
 
     # UINT FUNC_CALL ZCAN_GetLINReceiveNum(CHANNEL_HANDLE channel_handle);
     # UINT FUNC_CALL ZCAN_GetReceiveNum(CHANNEL_HANDLE channel_handle, BYTE type);//type:TYPE_CAN, TYPE_CANFD, TYPE_ALL_DATA
@@ -1140,19 +1121,16 @@ class ZCAN(object):
                     for key, value in interval_msg.items():
                         setattr(table, key, value)
                     msgs.table[index] = table
-                ret = _library.VCI_SetReference(self._dev_type, self._dev_index, channel, CMD_CAN_SKD_SEND, byref(msgs))
-                if ret != ZCAN_STATUS_OK:
-                    raise ZCANException('ZLG: Set interval transmit msg failed!')
-                ret = _library.VCI_SetReference(self._dev_type, self._dev_index, channel, CMD_CAN_SKD_SEND_STATUS,
-                                                byref(c_int32(1)))      # TODO 不使用结构体行不行
-                if ret != ZCAN_STATUS_OK:
-                    raise ZCANException('ZLG: Set interval transmit status on failed!')
+                _library_check_run('VCI_SetReference', ZCAN_STATUS_OK,
+                                   self._dev_type, self._dev_index, channel, CMD_CAN_SKD_SEND, byref(msgs))
+                _library_check_run('VCI_SetReference', ZCAN_STATUS_OK,
+                                   self._dev_type, self._dev_index, channel, CMD_CAN_SKD_SEND_STATUS,
+                                   byref(c_int32(1)))      # TODO 不使用结构体行不行
             else:
                 # TODO 清空自动发送列表(怎么做)
-                ret = _library.VCI_SetReference(self._dev_type, self._dev_index, channel, CMD_CAN_SKD_SEND_STATUS,
-                                                byref(c_int32(0)))      # TODO 不使用结构体行不行
-                if ret != ZCAN_STATUS_OK:
-                    raise ZCANException('ZLG: Set interval transmit status on failed!')
+                _library_check_run('VCI_SetReference', ZCAN_STATUS_OK,
+                                   self._dev_type, self._dev_index, channel, CMD_CAN_SKD_SEND_STATUS,
+                                   byref(c_int32(0)))      # TODO 不使用结构体行不行
         elif _is_windows:
             prop = self.GetIProperty()
             func = CFUNCTYPE(c_uint, c_char_p, c_char_p)(prop.contents.SetValue)
@@ -1176,33 +1154,9 @@ class ZCAN(object):
             finally:
                 self.ReleaseIProperty(prop)
 
-    # def SetAutoTransmit(self, channel, auto_tran: Union[ZCAN_AUTO_TRANSMIT_OBJ, ZCANFD_AUTO_TRANSMIT_OBJ],
-    #                     delay: ZCANFD_AUTO_TRANSMIT_OBJ_PARAM = None):
-    #     prop = self.GetIProperty()
-    #     try:
-    #         func = CFUNCTYPE(c_uint, c_char_p, c_char_p)(prop.contents.SetValue)
-    #         ret = func(c_char_p(f'{channel}/clear_auto_send'.encode("utf-8")), c_char_p('0'.encode('utf-8')))
-    #         if ret != ZCAN_STATUS_OK:
-    #             raise ZCANException(f'ZLG: Set {channel}/clear_auto_send failed!')
-    #         func1 = CFUNCTYPE(c_uint, c_char_p, c_void_p)(prop.contents.SetValue)
-    #         ret = func1(c_char_p(f'{channel}/auto_send'.encode("utf-8")), cast(byref(auto_tran), c_void_p))
-    #         if ret != ZCAN_STATUS_OK:
-    #             raise ZCANException(f'ZLG: Set {channel} auto transmit object failed!')
-    #         if delay:
-    #             ret = func1(c_char_p(f'{channel}/auto_send_param'.encode("utf-8")), cast(byref(delay), c_void_p))
-    #             if ret != ZCAN_STATUS_OK:
-    #                 raise ZCANException(f'ZLG: Set {channel} auto transmit object param failed!')
-    #         ret = func(c_char_p(f'{channel}/apply_auto_send'.encode("utf-8")), c_char_p('0'.encode('utf-8')))
-    #         if ret != ZCAN_STATUS_OK:
-    #             raise ZCANException(f'ZLG: Set {channel}/apply_auto_send failed!')
-    #     finally:
-    #         self.ReleaseIProperty(prop)
-
     if _is_linux:
         def Debug(self, level):
-            ret = _library.VCI_Debug(level)
-            if ret != ZCAN_STATUS_OK:
-                raise ZCANException(f'ZLG: Set debug level failed, code {ret}!')
+            _library_check_run('VCI_Debug', ZCAN_STATUS_OK, level)
 
     if _is_windows:
         def _get_channel_handler(self, chl_type, channel):
@@ -1339,11 +1293,10 @@ class ZCAN(object):
 
         # void FUNC_CALL ZCLOUD_SetServerInfo(const char* httpSvr, unsigned short httpPort, const char* authSvr, unsigned short authPort);
         def SetServerInfo(self, auth_host: str, auth_port, data_host=None, data_post=None):
-            ret = _library.ZCLOUD_SetServerInfo(c_char_p(auth_host.encode('utf-8')), c_ushort(auth_port),
-                                                c_char_p((data_host or auth_host).encode('utf-8')),
-                                                c_ushort(data_post or auth_port))
-            if ret != ZCAN_STATUS_OK:
-                raise ZCANException(f'ZLG: set server info failed!')
+            _library_check_run('ZCLOUD_SetServerInfo', ZCAN_STATUS_OK,
+                               c_char_p(auth_host.encode('utf-8')), c_ushort(auth_port),
+                               c_char_p((data_host or auth_host).encode('utf-8')),
+                               c_ushort(data_post or auth_port))
 
         # // return 0:success, 1:failure, 2:https error, 3:user login info error, 4:mqtt connection error, 5:no device
         # UINT FUNC_CALL ZCLOUD_ConnectServer(const char* username, const char* password);
@@ -1386,32 +1339,25 @@ class ZCAN(object):
 
         # CHANNEL_HANDLE FUNC_CALL ZCAN_InitLIN(DEVICE_HANDLE device_handle, UINT can_index, PZCAN_LIN_INIT_CONFIG pLINInitConfig);
         def InitLIN(self, channel, config: ZCAN_LIN_INIT_CONFIG):
-            ret = _library.ZCAN_InitLIN(self._dev_handler, channel, byref(config))
-            if ret == INVALID_CHANNEL_HANDLE:
-                raise ZCANException('ZLG: Lin Channel initialize failed!')
-            self._channel_handlers['LIN'][ret] = True
+            self._channel_handlers['LIN'][
+                _library_check_run('ZCAN_InitLIN', INVALID_CHANNEL_HANDLE, self._dev_handler, channel, byref(config))
+            ] = True
 
         # UINT FUNC_CALL ZCAN_StartLIN(CHANNEL_HANDLE channel_handle);
         def StartLIN(self, channel):
             handler = self._get_channel_handler('LIN', channel)
-            ret = _library.ZCAN_StartLIN(handler)
-            if ret != ZCAN_STATUS_OK:
-                raise ZCANException(f'ZLG: Lin Channel start failed, code {ret}!')
+            _library_check_run('ZCAN_StartLIN', ZCAN_STATUS_OK, handler)
 
         # UINT FUNC_CALL ZCAN_ResetLIN(CHANNEL_HANDLE channel_handle);
         def ResetLIN(self, channel):
             handler = self._get_channel_handler('LIN', channel)
-            ret = _library.ZCAN_ResetLIN(handler)
-            if ret != ZCAN_STATUS_OK:
-                raise ZCANException(f'ZLG: Lin Channel reset failed, code {ret}!')
+            _library_check_run('ZCAN_ResetLIN', ZCAN_STATUS_OK, handler)
 
         # UINT FUNC_CALL ZCAN_TransmitLIN(CHANNEL_HANDLE channel_handle, PZCAN_LIN_MSG pSend, UINT Len);
         def TransmitLIN(self, channel, msgs, size=None):
             handler = self._get_channel_handler('LIN', channel)
             _size = size or len(msgs)
-            ret = _library.ZCAN_TransmitLIN(handler, byref(msgs), _size)
-            if ret != ZCAN_STATUS_OK:
-                raise ZCANException(f'ZLG: Clear Lin master write failed, code {ret}!')
+            return _library.ZCAN_TransmitLIN(handler, byref(msgs), _size)
 
         # UINT FUNC_CALL ZCAN_ReceiveLIN(CHANNEL_HANDLE channel_handle, PZCAN_LIN_MSG pReceive, UINT Len,int WaitTime);
         def ReceiveLIN(self, channel, size=1, timeout=-1):
@@ -1423,17 +1369,12 @@ class ZCAN(object):
         # UINT FUNC_CALL ZCAN_SetLINSlaveMsg(CHANNEL_HANDLE channel_handle, PZCAN_LIN_MSG pSend, UINT nMsgCount);
         def SetLINSlaveMsg(self, channel, msgs):
             handler = self._get_channel_handler('LIN', channel)
-            ret = _library.ZCAN_SetLINSlaveMsg(handler, byref(msgs), len(msgs))
-            if ret != ZCAN_STATUS_OK:
-                raise ZCANException(f'ZLG: Clear Lin slave write failed, code {ret}!')
+            return _library.ZCAN_SetLINSlaveMsg(handler, byref(msgs), len(msgs))
 
         # UINT FUNC_CALL ZCAN_ClearLINSlaveMsg(CHANNEL_HANDLE channel_handle, BYTE* pLINID, UINT nIDCount);
         def ClearLINSlaveMsg(self, channel, lin_ids):
             handler = self._get_channel_handler('LIN', channel)
-            ret = _library.ZCAN_ClearLINSlaveMsg(handler, byref(lin_ids), len(lin_ids))
-            # self._logger.debug(f'ZLG: Clear Lin slave message return code {ret}.')
-            if ret != ZCAN_STATUS_OK:
-                raise ZCANException(f'ZLG: Clear Lin slave message failed, code {ret}!')
+            return _library.ZCAN_ClearLINSlaveMsg(handler, byref(lin_ids), len(lin_ids))
 
 
 
