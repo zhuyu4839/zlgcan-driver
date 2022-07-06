@@ -7,7 +7,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <pthread.h>
-#include "zcan.h"
+#include "../zcan.h"
 
 #define msleep(ms)  usleep((ms)*1000)
 #define min(a,b)  (((a) < (b)) ? (a) : (b))
@@ -310,6 +310,12 @@ int test()
         printf("CMD_CAN_TX_TIMEOUT failed\n");
     }
 
+    // terminal resistor
+    U32 on = 1;
+    if (!VCI_SetReference(gDevType, gDevIdx, 0, CMD_CAN_TRES, &on)) {
+        printf("CMD_CAN_TRES failed\n");
+    }
+
 #if 0
     // filter
     struct {
@@ -476,7 +482,7 @@ int test()
 
 int main(int argc, char* argv[])
 {
-    if (argc < 8) {
+    if (argc < 9) {
         printf("test [DevType] [DevIdx] [ChMask] [TxType] [TxSleep] [TxFrames] [TxCount] [Debug]\n"
             "    example: test 33 0 3 2 3 10 1000 0\n"
             "                  |  | | | | |  | 1000 times\n"

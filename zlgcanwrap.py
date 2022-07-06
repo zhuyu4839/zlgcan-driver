@@ -267,8 +267,8 @@ class ZCanBus(BusABC):
             return self.device.TransmitData(_convert_msg(msg, channel=channel, is_merge=is_merge, **kwargs), 1)
         else:
             if msg.is_fd:
-                return self.device.Transmit(channel, _convert_msg(msg, channel=channel, **kwargs), 1)
-            return self.device.TransmitFD(channel, _convert_msg(msg, channel=channel, **kwargs), 1)
+                return self.device.TransmitFD(channel, _convert_msg(msg, channel=channel, **kwargs), 1)
+            return self.device.Transmit(channel, _convert_msg(msg, channel=channel, **kwargs), 1)
 
     @staticmethod
     def _detect_available_configs():                    # -> List[can.typechecking.AutoDetectedConfig]:
