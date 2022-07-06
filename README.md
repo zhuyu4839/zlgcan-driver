@@ -27,8 +27,8 @@ pip install python-can
    from can.interfaces.zlgcan import ZCANDeviceType
    
    with can.Bus(bustype='zlgcan', device_type=ZCANDeviceType.ZCAN_USBCANFD_200U, 
-                configs=[{'canfd_abit_baud_rate': 500000, initenal_resistance=1}, 	# 1通道配置
-                         {'canfd_abit_baud_rate': 500000, initenal_resistance=1}]	# 2通道配置
+                configs=[{'canfd_abit_baud_rate': 500000, 'initenal_resistance':1}, 	# 1通道配置
+                         {'canfd_abit_baud_rate': 500000, 'initenal_resistance':1}]	# 2通道配置
                ) as bus:
        msg = bus.recv()
    ```
