@@ -72,14 +72,14 @@ U8 dlc_to_len(U8 dlc)
 #if CANFD_TEST
 void generate_frame(U8 chn, ZCAN_FD_MSG *can)
 {
-    U8 i, dlc = rand() % 16; // random data length£¨0~64£©
+    U8 i, dlc = rand() % 16; // random data lengthï¼ˆ0~64ï¼‰
     memset(can, 0, sizeof(ZCAN_FD_MSG));
     can->hdr.inf.fmt = 1; // canfd
     can->hdr.inf.brs = 1; // 1M+4M
 #else
 void generate_frame(U8 chn, ZCAN_20_MSG *can)
 {
-    U8 i, dlc = rand() % 9; // random data length£¨0~8£©
+    U8 i, dlc = rand() % 9; // random data lengthï¼ˆ0~8ï¼‰
     memset(can, 0, sizeof(ZCAN_20_MSG));
     can->hdr.inf.fmt = 0; // can2.0
     can->hdr.inf.brs = 0; // 1M+1M

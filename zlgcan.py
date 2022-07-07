@@ -56,7 +56,7 @@ logger = logging.getLogger(__name__)
 # ]
 ZCAN_Transmit_Data_1 = (ZCAN_Transmit_Data * 1)
 ZCAN_TransmitFD_Data_1 = (ZCAN_TransmitFD_Data * 1)
-ZCANDataOb_1 = (ZCANDataObj * 1)
+ZCANDataObj_1 = (ZCANDataObj * 1)
 
 
 def _convert_msg(msg, **kwargs):                        # channel=None, trans_type=0, is_merge=False, **kwargs):
@@ -69,43 +69,38 @@ def _convert_msg(msg, **kwargs):                        # channel=None, trans_ty
         if not is_merge:
             if msg.is_fd:
                 result = ZCAN_TransmitFD_Data_1()
-                data = ZCAN_TransmitFD_Data()
-                data.frame.len = msg.dlc
-                data.frame.brs = msg.bitrate_switch
+                result[0].frame.len = msg.dlc
+                result[0].frame.brs = msg.bitrate_switch
             else:
                 result = ZCAN_Transmit_Data_1()
-                data = ZCAN_Transmit_Data()
-                data.frame.can_dlc = msg.dlc
-            data.transmit_type = trans_type
+                result[0].frame.can_dlc = msg.dlc
+            result[0].transmit_type = trans_type
 
-            data.frame.can_id = msg.arbitration_id
-            data.frame.err = msg.is_error_frame
-            data.frame.rtr = msg.is_remote_frame
-            data.frame.eff = msg.is_extended_id
-            data.frame.data = (ctypes.c_ubyte * msg.dlc)(*msg.data)
-            result[0] = data
+            result[0].frame.can_id = msg.arbitration_id
+            result[0].frame.err = msg.is_error_frame
+            result[0].frame.rtr = msg.is_remote_frame
+            result[0].frame.eff = msg.is_extended_id
+            result[0].frame.data = (ctypes.c_ubyte * msg.dlc)(*msg.data)
             return result
         else:
             channel = kwargs.get('channel', None)
             assert channel is not None, 'channel required when merge send recv.'
-            result = ZCANDataOb_1()
-            data = ZCANDataObj()
-            data.dataType = 1                     # can device always equal 1
+            result = ZCANDataObj_1()
+            result[0].dataType = 1                     # can device always equal 1
             assert channel is not None
-            data.chnl = channel
-            data.data.zcanCANFDData.frame.can_id = msg.arbitration_id
-            data.data.zcanCANFDData.frame.err = msg.is_error_frame
-            data.data.zcanCANFDData.frame.rtr = msg.is_remote_frame
-            data.data.zcanCANFDData.frame.eff = msg.is_extended_id
+            result[0].chnl = channel
+            result[0].data.zcanCANFDData.frame.can_id = msg.arbitration_id
+            result[0].data.zcanCANFDData.frame.err = msg.is_error_frame
+            result[0].data.zcanCANFDData.frame.rtr = msg.is_remote_frame
+            result[0].data.zcanCANFDData.frame.eff = msg.is_extended_id
 
-            data.data.zcanCANFDData.flag.transmitType = trans_type
+            result[0].data.zcanCANFDData.flag.transmitType = trans_type
             echo = kwargs.get('is_echo', False)
-            data.data.zcanCANFDData.flag.txEchoRequest = echo
+            result[0].data.zcanCANFDData.flag.txEchoRequest = echo
             delay = kwargs.get('delay_mode', 0)
             if delay:
-                data.data.zcanCANFDData.flag.txDelay = delay
-                data.data.zcanCANFDData.timeStamp = kwargs['delay_time']
-            result[0] = data
+                result[0].data.zcanCANFDData.flag.txDelay = delay
+                result[0].data.zcanCANFDData.timeStamp = kwargs['delay_time']
             return result
     elif isinstance(msg, ZCAN_Receive_Data):                        # 接收CAN报文转换
         channel = kwargs.get('channel', None)
@@ -170,7 +165,7 @@ class ZCanBus(BusABC):
 
         cfg_length = len(configs)
         if cfg_length == 0:
-            raise CanInitializationError('ZLG-CAN: Configuration dict of list or tuple is required.')
+            raise CanInitializationError('ZLG-CAN: Configuration list or tuple of dict is required.')
 
         self.rx_queue = collections.deque(
             maxlen=rx_queue_size
@@ -224,8 +219,8 @@ class ZCanBus(BusABC):
             if 'canfd_abit_baud_rate' not in config.keys():
                 raise CanInitializationError('ZLG-CAN: canfd_abit_baud_rate is required.')
 
-            self.device.InitCAN(channel, **init_config)
             self.device.SetValue(channel, **config)
+            self.device.InitCAN(channel, **init_config)
             self.device.StartCAN(channel)
             self.available.append(channel)
 
@@ -293,5 +288,11 @@ class ZCanBus(BusABC):
         super().shutdown()
         self.device.CloseDevice()
 
-
+    def clear_rx_buffer(self, channel=None):
+        if channel:
+            assert channel in self.available
+            self.device.ClearBuffer(channel)
+        else:
+            for channel in self.available:
+                self.device.ClearBuffer(channel)
 

@@ -233,12 +233,12 @@ typedef struct tagZCANFD_AUTO_TRANSMIT_OBJ{
     ZCAN_TransmitFD_Data obj;
 }ZCANFD_AUTO_TRANSMIT_OBJ, *PZCANFD_AUTO_TRANSMIT_OBJ;
 
-//ÓÃÓÚÉèÖÃ¶¨Ê±·¢ËÍ¶îÍâµÄ²ÎÊý, Ä¿Ç°Ö»Ö§³ÖUSBCANFD-X00UÏµÁÐÉè±¸
+//ç”¨äºŽè®¾ç½®å®šæ—¶å‘é€é¢å¤–çš„å‚æ•°, ç›®å‰åªæ”¯æŒUSBCANFD-X00Uç³»åˆ—è®¾å¤‡
 typedef struct tagZCAN_AUTO_TRANSMIT_OBJ_PARAM
 {
-    USHORT index;                           // ¶¨Ê±·¢ËÍÖ¡µÄË÷Òý
-    USHORT type;                            // ²ÎÊýÀàÐÍ£¬Ä¿Ç°ÀàÐÍÖ»ÓÐ1£º±íÊ¾Æô¶¯ÑÓÊ±
-    UINT   value;                           // ²ÎÊýÊýÖµ
+    USHORT index;                           // å®šæ—¶å‘é€å¸§çš„ç´¢å¼•
+    USHORT type;                            // å‚æ•°ç±»åž‹ï¼Œç›®å‰ç±»åž‹åªæœ‰1ï¼šè¡¨ç¤ºå¯åŠ¨å»¶æ—¶
+    UINT   value;                           // å‚æ•°æ•°å€¼
 }ZCAN_AUTO_TRANSMIT_OBJ_PARAM, *PZCAN_AUTO_TRANSMIT_OBJ_PARAM;
 
 //for zlg cloud
@@ -307,18 +307,18 @@ typedef struct tagTxTimeStamp
 {
     UINT64* pTxTimeStampBuffer;             //allocated by user, size:nBufferTimeStampCount * 8,unit:1us
     UINT    nBufferTimeStampCount;          //buffer timestamp count
-    int     nWaitTime;                      //Wait Time ms, -1±íÊ¾µÈµ½ÓÐÊý¾Ý²Å·µ»Ø
+    int     nWaitTime;                      //Wait Time ms, -1è¡¨ç¤ºç­‰åˆ°æœ‰æ•°æ®æ‰è¿”å›ž
 }TxTimeStamp;
 
 // Bus usage
 typedef struct tagBusUsage
 {
-    UINT64  nTimeStampBegin;                //²âÁ¿ÆðÊ¼Ê±¼ä´Á£¬µ¥Î»us
-    UINT64  nTimeStampEnd;                  //²âÁ¿½áÊøÊ±¼ä´Á£¬µ¥Î»us
-    BYTE    nChnl;                          //Í¨µÀ
-    BYTE    nReserved;                      //±£Áô
-    USHORT  nBusUsage;                      //×ÜÏßÀûÓÃÂÊ(%),×ÜÏßÀûÓÃÂÊ*100Õ¹Ê¾¡£È¡Öµ0~10000£¬Èç8050±íÊ¾80.50%
-    UINT    nFrameCount;                    //Ö¡ÊýÁ¿
+    UINT64  nTimeStampBegin;                //æµ‹é‡èµ·å§‹æ—¶é—´æˆ³ï¼Œå•ä½us
+    UINT64  nTimeStampEnd;                  //æµ‹é‡ç»“æŸæ—¶é—´æˆ³ï¼Œå•ä½us
+    BYTE    nChnl;                          //é€šé“
+    BYTE    nReserved;                      //ä¿ç•™
+    USHORT  nBusUsage;                      //æ€»çº¿åˆ©ç”¨çŽ‡(%),æ€»çº¿åˆ©ç”¨çŽ‡*100å±•ç¤ºã€‚å–å€¼0~10000ï¼Œå¦‚8050è¡¨ç¤º80.50%
+    UINT    nFrameCount;                    //å¸§æ•°é‡
 }BusUsage;
 
 //LIN
@@ -346,170 +346,170 @@ typedef struct _VCI_LIN_INIT_CONFIG
 
 enum eZCANErrorDEF
 {
-    //×ÜÏß´íÎóÀàÐÍ
-    ZCAN_ERR_TYPE_NO_ERR                = 0,        //ÎÞ´íÎó
-    ZCAN_ERR_TYPE_BUS_ERR               = 1,        //×ÜÏß´íÎó
-    ZCAN_ERR_TYPE_CONTROLLER_ERR        = 2,        //¿ØÖÆÆ÷´íÎó
-    ZCAN_ERR_TYPE_DEVICE_ERR            = 3,        //ÖÕ¶ËÉè±¸´íÎó
+    //æ€»çº¿é”™è¯¯ç±»åž‹
+    ZCAN_ERR_TYPE_NO_ERR                = 0,        //æ— é”™è¯¯
+    ZCAN_ERR_TYPE_BUS_ERR               = 1,        //æ€»çº¿é”™è¯¯
+    ZCAN_ERR_TYPE_CONTROLLER_ERR        = 2,        //æŽ§åˆ¶å™¨é”™è¯¯
+    ZCAN_ERR_TYPE_DEVICE_ERR            = 3,        //ç»ˆç«¯è®¾å¤‡é”™è¯¯
 
-    //½Úµã×´Ì¬
-    ZCAN_NODE_STATE_ACTIVE              = 1,        //×ÜÏß»ý¼«
-    ZCAN_NODE_STATE_WARNNING            = 2,        //×ÜÏß¸æ¾¯
-    ZCAN_NODE_STATE_PASSIVE             = 3,        //×ÜÏßÏû¼«
-    ZCAN_NODE_STATE_BUSOFF              = 4,        //×ÜÏß¹Ø±Õ
+    //èŠ‚ç‚¹çŠ¶æ€
+    ZCAN_NODE_STATE_ACTIVE              = 1,        //æ€»çº¿ç§¯æž
+    ZCAN_NODE_STATE_WARNNING            = 2,        //æ€»çº¿å‘Šè­¦
+    ZCAN_NODE_STATE_PASSIVE             = 3,        //æ€»çº¿æ¶ˆæž
+    ZCAN_NODE_STATE_BUSOFF              = 4,        //æ€»çº¿å…³é—­
 
-    //×ÜÏß´íÎó×ÓÀàÐÍ, errType = ZCAN_ERR_TYPE_BUS_ERR
-    ZCAN_BUS_ERR_NO_ERR                 = 0,        //ÎÞ´íÎó
-    ZCAN_BUS_ERR_BIT_ERR                = 1,        //Î»´íÎó
-    ZCAN_BUS_ERR_ACK_ERR                = 2,        //Ó¦´ð´íÎó
-    ZCAN_BUS_ERR_CRC_ERR                = 3,        //CRC´íÎó
-    ZCAN_BUS_ERR_FORM_ERR               = 4,        //¸ñÊ½´íÎó
-    ZCAN_BUS_ERR_STUFF_ERR              = 5,        //Ìî³ä´íÎó
-    ZCAN_BUS_ERR_OVERLOAD_ERR           = 6,        //³¬ÔØ´íÎó
-    ZCAN_BUS_ERR_ARBITRATION_LOST       = 7,        //ÖÙ²Ã¶ªÊ§
+    //æ€»çº¿é”™è¯¯å­ç±»åž‹, errType = ZCAN_ERR_TYPE_BUS_ERR
+    ZCAN_BUS_ERR_NO_ERR                 = 0,        //æ— é”™è¯¯
+    ZCAN_BUS_ERR_BIT_ERR                = 1,        //ä½é”™è¯¯
+    ZCAN_BUS_ERR_ACK_ERR                = 2,        //åº”ç­”é”™è¯¯
+    ZCAN_BUS_ERR_CRC_ERR                = 3,        //CRCé”™è¯¯
+    ZCAN_BUS_ERR_FORM_ERR               = 4,        //æ ¼å¼é”™è¯¯
+    ZCAN_BUS_ERR_STUFF_ERR              = 5,        //å¡«å……é”™è¯¯
+    ZCAN_BUS_ERR_OVERLOAD_ERR           = 6,        //è¶…è½½é”™è¯¯
+    ZCAN_BUS_ERR_ARBITRATION_LOST       = 7,        //ä»²è£ä¸¢å¤±
 
-    //¿ØÖÆÆ÷´íÎó, errType = ZCAN_ERR_TYPE_CONTROLLER_ERR
-    ZCAN_CONTROLLER_RX_FIFO_OVERFLOW    = 1,        //¿ØÖÆÆ÷½ÓÊÕFIFOÒç³ö
-    ZCAN_CONTROLLER_DRIVER_RX_BUFFER_OVERFLOW  = 2, //Çý¶¯½ÓÊÕ»º´æÒç³ö
-    ZCAN_CONTROLLER_DRIVER_TX_BUFFER_OVERFLOW  = 3, //Çý¶¯·¢ËÍ»º´æÒç³ö
-    ZCAN_CONTROLLER_INTERNAL_ERROR      = 4,        //¿ØÖÆÆ÷ÄÚ²¿´íÎó
+    //æŽ§åˆ¶å™¨é”™è¯¯, errType = ZCAN_ERR_TYPE_CONTROLLER_ERR
+    ZCAN_CONTROLLER_RX_FIFO_OVERFLOW    = 1,        //æŽ§åˆ¶å™¨æŽ¥æ”¶FIFOæº¢å‡º
+    ZCAN_CONTROLLER_DRIVER_RX_BUFFER_OVERFLOW  = 2, //é©±åŠ¨æŽ¥æ”¶ç¼“å­˜æº¢å‡º
+    ZCAN_CONTROLLER_DRIVER_TX_BUFFER_OVERFLOW  = 3, //é©±åŠ¨å‘é€ç¼“å­˜æº¢å‡º
+    ZCAN_CONTROLLER_INTERNAL_ERROR      = 4,        //æŽ§åˆ¶å™¨å†…éƒ¨é”™è¯¯
 
-    //ÖÕ¶ËÉè±¸´íÎó, errType = ZCAN_ERR_TYPE_DEVICE_ERR
-    ZCAN_DEVICE_APP_RX_BUFFER_OVERFLOW = 1,         //ÖÕ¶ËÓ¦ÓÃ½ÓÊÕ»º´æÒç³ö
-    ZCAN_DEVICE_APP_TX_BUFFER_OVERFLOW = 2,         //ÖÕ¶ËÓ¦ÓÃ·¢ËÍ»º´æÒç³ö
-    ZCAN_DEVICE_APP_AUTO_SEND_FAILED   = 3,         //¶¨Ê±·¢ËÍÊ§°Ü
-    ZCAN_CONTROLLER_TX_FRAME_INVALID   = 4,         //·¢ËÍ±¨ÎÄÎÞÐ§
+    //ç»ˆç«¯è®¾å¤‡é”™è¯¯, errType = ZCAN_ERR_TYPE_DEVICE_ERR
+    ZCAN_DEVICE_APP_RX_BUFFER_OVERFLOW = 1,         //ç»ˆç«¯åº”ç”¨æŽ¥æ”¶ç¼“å­˜æº¢å‡º
+    ZCAN_DEVICE_APP_TX_BUFFER_OVERFLOW = 2,         //ç»ˆç«¯åº”ç”¨å‘é€ç¼“å­˜æº¢å‡º
+    ZCAN_DEVICE_APP_AUTO_SEND_FAILED   = 3,         //å®šæ—¶å‘é€å¤±è´¥
+    ZCAN_CONTROLLER_TX_FRAME_INVALID   = 4,         //å‘é€æŠ¥æ–‡æ— æ•ˆ
 };
 
 enum eZCANDataDEF
 {
-    //Êý¾ÝÀàÐÍ
-    ZCAN_DT_ZCAN_CAN_CANFD_DATA     = 1,            // CAN/CANFDÊý¾Ý
-    ZCAN_DT_ZCAN_ERROR_DATA         = 2,            // ´íÎóÊý¾Ý
-    ZCAN_DT_ZCAN_GPS_DATA           = 3,            // GPSÊý¾Ý
-    ZCAN_DT_ZCAN_LIN_DATA           = 4,            // LINÊý¾Ý
+    //æ•°æ®ç±»åž‹
+    ZCAN_DT_ZCAN_CAN_CANFD_DATA     = 1,            // CAN/CANFDæ•°æ®
+    ZCAN_DT_ZCAN_ERROR_DATA         = 2,            // é”™è¯¯æ•°æ®
+    ZCAN_DT_ZCAN_GPS_DATA           = 3,            // GPSæ•°æ®
+    ZCAN_DT_ZCAN_LIN_DATA           = 4,            // LINæ•°æ®
 
-    //·¢ËÍÑÓÊ±µ¥Î»
-    ZCAN_TX_DELAY_NO_DELAY          = 0,            // ÎÞ·¢ËÍÑÓÊ±
-    ZCAN_TX_DELAY_UNIT_MS           = 1,            // ·¢ËÍÑÓÊ±µ¥Î»ºÁÃë
-    ZCAN_TX_DELAY_UNIT_100US        = 2,            // ·¢ËÍÑÓÊ±µ¥Î»100Î¢Ãë(0.1ºÁÃë)
+    //å‘é€å»¶æ—¶å•ä½
+    ZCAN_TX_DELAY_NO_DELAY          = 0,            // æ— å‘é€å»¶æ—¶
+    ZCAN_TX_DELAY_UNIT_MS           = 1,            // å‘é€å»¶æ—¶å•ä½æ¯«ç§’
+    ZCAN_TX_DELAY_UNIT_100US        = 2,            // å‘é€å»¶æ—¶å•ä½100å¾®ç§’(0.1æ¯«ç§’)
 
 };
 
-// CAN/CANFDÊý¾Ý
+// CAN/CANFDæ•°æ®
 typedef struct tagZCANCANFDData
 {
-    UINT64          timeStamp;                      // Ê±¼ä´Á,Êý¾Ý½ÓÊÕÊ±µ¥Î»Î¢Ãë(us),¶ÓÁÐÑÓÊ±·¢ËÍÊ±,Êý¾Ýµ¥Î»È¡¾öÓÚflag.unionVal.txDelay
+    UINT64          timeStamp;                      // æ—¶é—´æˆ³,æ•°æ®æŽ¥æ”¶æ—¶å•ä½å¾®ç§’(us),é˜Ÿåˆ—å»¶æ—¶å‘é€æ—¶,æ•°æ®å•ä½å–å†³äºŽflag.unionVal.txDelay
     union
     {
         struct{
-            UINT    frameType : 2;                  // Ö¡ÀàÐÍ, 0:CANÖ¡, 1:CANFDÖ¡
-            UINT    txDelay : 2;                    // ¶ÓÁÐ·¢ËÍÑÓÊ±, ·¢ËÍÓÐÐ§. 0:ÎÞ·¢ËÍÑÓÊ±, 1:·¢ËÍÑÓÊ±µ¥Î»ms, 2:·¢ËÍÑÓÊ±µ¥Î»100us. ÆôÓÃ¶ÓÁÐ·¢ËÍÑÓÊ±£¬ÑÓÊ±Ê±¼ä´æ·ÅÔÚtimeStamp×Ö¶Î
-            UINT    transmitType : 4;               // ·¢ËÍÀàÐÍ, ·¢ËÍÓÐÐ§. 0:Õý³£·¢ËÍ, 1:µ¥´Î·¢ËÍ, 2:×Ô·¢×ÔÊÕ, 3:µ¥´Î×Ô·¢×ÔÊÕ. ËùÓÐÉè±¸Ö§³ÖÕý³£·¢ËÍ£¬ÆäËûÀàÐÍÇë²Î¿¼¾ßÌåÊ¹ÓÃÊÖ²á
-            UINT    txEchoRequest : 1;              // ·¢ËÍ»ØÏÔÇëÇó, ·¢ËÍÓÐÐ§. Ö§³Ö·¢ËÍ»ØÏÔµÄÉè±¸,·¢ËÍÊý¾ÝÊ±½«´ËÎ»ÖÃ1,Éè±¸¿ÉÒÔÍ¨¹ý½ÓÊÕ½Ó¿Ú½«·¢ËÍ³öÈ¥µÄÊý¾ÝÖ¡·µ»Ø,½ÓÊÕµ½µÄ·¢ËÍÊý¾ÝÊ¹ÓÃtxEchoedÎ»±ê¼Ç
-            UINT    txEchoed : 1;                   // ±¨ÎÄÊÇ·ñÊÇ»ØÏÔ±¨ÎÄ, ½ÓÊÕÓÐÐ§. 0:Õý³£×ÜÏß½ÓÊÕ±¨ÎÄ, 1:±¾Éè±¸·¢ËÍ»ØÏÔ±¨ÎÄ.
-            UINT    reserved : 22;                  // ±£Áô
+            UINT    frameType : 2;                  // å¸§ç±»åž‹, 0:CANå¸§, 1:CANFDå¸§
+            UINT    txDelay : 2;                    // é˜Ÿåˆ—å‘é€å»¶æ—¶, å‘é€æœ‰æ•ˆ. 0:æ— å‘é€å»¶æ—¶, 1:å‘é€å»¶æ—¶å•ä½ms, 2:å‘é€å»¶æ—¶å•ä½100us. å¯ç”¨é˜Ÿåˆ—å‘é€å»¶æ—¶ï¼Œå»¶æ—¶æ—¶é—´å­˜æ”¾åœ¨timeStampå­—æ®µ
+            UINT    transmitType : 4;               // å‘é€ç±»åž‹, å‘é€æœ‰æ•ˆ. 0:æ­£å¸¸å‘é€, 1:å•æ¬¡å‘é€, 2:è‡ªå‘è‡ªæ”¶, 3:å•æ¬¡è‡ªå‘è‡ªæ”¶. æ‰€æœ‰è®¾å¤‡æ”¯æŒæ­£å¸¸å‘é€ï¼Œå…¶ä»–ç±»åž‹è¯·å‚è€ƒå…·ä½“ä½¿ç”¨æ‰‹å†Œ
+            UINT    txEchoRequest : 1;              // å‘é€å›žæ˜¾è¯·æ±‚, å‘é€æœ‰æ•ˆ. æ”¯æŒå‘é€å›žæ˜¾çš„è®¾å¤‡,å‘é€æ•°æ®æ—¶å°†æ­¤ä½ç½®1,è®¾å¤‡å¯ä»¥é€šè¿‡æŽ¥æ”¶æŽ¥å£å°†å‘é€å‡ºåŽ»çš„æ•°æ®å¸§è¿”å›ž,æŽ¥æ”¶åˆ°çš„å‘é€æ•°æ®ä½¿ç”¨txEchoedä½æ ‡è®°
+            UINT    txEchoed : 1;                   // æŠ¥æ–‡æ˜¯å¦æ˜¯å›žæ˜¾æŠ¥æ–‡, æŽ¥æ”¶æœ‰æ•ˆ. 0:æ­£å¸¸æ€»çº¿æŽ¥æ”¶æŠ¥æ–‡, 1:æœ¬è®¾å¤‡å‘é€å›žæ˜¾æŠ¥æ–‡.
+            UINT    reserved : 22;                  // ä¿ç•™
         }unionVal;
-        UINT    rawVal;                             // Ö¡±êÖ¾Î»rawÊý¾Ý
-    }flag;                                          // CAN/CANFDÖ¡±êÖ¾Î»
-    BYTE        extraData[4];                       // ¶îÍâÊý¾Ý,ÔÝÎ´Ê¹ÓÃ
-    canfd_frame frame;                              // can/canfdÖ¡ID+Êý¾Ý
+        UINT    rawVal;                             // å¸§æ ‡å¿—ä½rawæ•°æ®
+    }flag;                                          // CAN/CANFDå¸§æ ‡å¿—ä½
+    BYTE        extraData[4];                       // é¢å¤–æ•°æ®,æš‚æœªä½¿ç”¨
+    canfd_frame frame;                              // can/canfdå¸§ID+æ•°æ®
 }ZCANCANFDData;
 
-// ´íÎóÊý¾Ý
+// é”™è¯¯æ•°æ®
 typedef struct tagZCANErrorData
 {
-    UINT64  timeStamp;                              // Ê±¼ä´Á, µ¥Î»Î¢Ãë(us)
-    BYTE    errType;                                // ´íÎóÀàÐÍ, ²Î¿¼eZCANErrorDEFÖÐ ×ÜÏß´íÎóÀàÐÍ ²¿·ÖÖµ¶¨Òå
-    BYTE    errSubType;                             // ´íÎó×ÓÀàÐÍ, ²Î¿¼eZCANErrorDEFÖÐ ×ÜÏß´íÎó×ÓÀàÐÍ ²¿·ÖÖµ¶¨Òå
-    BYTE    nodeState;                              // ½Úµã×´Ì¬, ²Î¿¼eZCANErrorDEFÖÐ ½Úµã×´Ì¬ ²¿·ÖÖµ¶¨Òå
-    BYTE    rxErrCount;                             // ½ÓÊÕ´íÎó¼ÆÊý
-    BYTE    txErrCount;                             // ·¢ËÍ´íÎó¼ÆÊý
-    BYTE    errData;                                // ´íÎóÊý¾Ý, ºÍµ±Ç°´íÎóÀàÐÍÒÔ¼°´íÎó×ÓÀàÐÍ¶¨ÒåµÄ¾ßÌå´íÎóÏà¹Ø, ¾ßÌåÇë²Î¿¼Ê¹ÓÃÊÖ²á
-    BYTE    reserved[2];                            // ±£Áô
+    UINT64  timeStamp;                              // æ—¶é—´æˆ³, å•ä½å¾®ç§’(us)
+    BYTE    errType;                                // é”™è¯¯ç±»åž‹, å‚è€ƒeZCANErrorDEFä¸­ æ€»çº¿é”™è¯¯ç±»åž‹ éƒ¨åˆ†å€¼å®šä¹‰
+    BYTE    errSubType;                             // é”™è¯¯å­ç±»åž‹, å‚è€ƒeZCANErrorDEFä¸­ æ€»çº¿é”™è¯¯å­ç±»åž‹ éƒ¨åˆ†å€¼å®šä¹‰
+    BYTE    nodeState;                              // èŠ‚ç‚¹çŠ¶æ€, å‚è€ƒeZCANErrorDEFä¸­ èŠ‚ç‚¹çŠ¶æ€ éƒ¨åˆ†å€¼å®šä¹‰
+    BYTE    rxErrCount;                             // æŽ¥æ”¶é”™è¯¯è®¡æ•°
+    BYTE    txErrCount;                             // å‘é€é”™è¯¯è®¡æ•°
+    BYTE    errData;                                // é”™è¯¯æ•°æ®, å’Œå½“å‰é”™è¯¯ç±»åž‹ä»¥åŠé”™è¯¯å­ç±»åž‹å®šä¹‰çš„å…·ä½“é”™è¯¯ç›¸å…³, å…·ä½“è¯·å‚è€ƒä½¿ç”¨æ‰‹å†Œ
+    BYTE    reserved[2];                            // ä¿ç•™
 }ZCANErrorData;
 
-// GPSÊý¾Ý
+// GPSæ•°æ®
 typedef struct tagZCANGPSData
 {
     struct {
-        USHORT  year;                               // Äê
-        USHORT  mon;                                // ÔÂ
-        USHORT  day;                                // ÈÕ
-        USHORT  hour;                               // Ê±
-        USHORT  min;                                // ·Ö
-        USHORT  sec;                                // Ãë
-        USHORT  milsec;                             // ºÁÃë
-    }           time;                               // UTCÊ±¼ä
+        USHORT  year;                               // å¹´
+        USHORT  mon;                                // æœˆ
+        USHORT  day;                                // æ—¥
+        USHORT  hour;                               // æ—¶
+        USHORT  min;                                // åˆ†
+        USHORT  sec;                                // ç§’
+        USHORT  milsec;                             // æ¯«ç§’
+    }           time;                               // UTCæ—¶é—´
     union{
         struct{
-            USHORT timeValid : 1;                   // Ê±¼äÊý¾ÝÊÇ·ñÓÐÐ§
-            USHORT latlongValid : 1;                // ¾­Î³¶ÈÊý¾ÝÊÇ·ñÓÐÐ§
-            USHORT altitudeValid : 1;               // º£°ÎÊý¾ÝÊÇ·ñÓÐÐ§
-            USHORT speedValid : 1;                  // ËÙ¶ÈÊý¾ÝÊÇ·ñÓÐÐ§
-            USHORT courseAngleValid : 1;            // º½Ïò½ÇÊý¾ÝÊÇ·ñÓÐÐ§
-            USHORT reserved:13;                     // ±£Áô
+            USHORT timeValid : 1;                   // æ—¶é—´æ•°æ®æ˜¯å¦æœ‰æ•ˆ
+            USHORT latlongValid : 1;                // ç»çº¬åº¦æ•°æ®æ˜¯å¦æœ‰æ•ˆ
+            USHORT altitudeValid : 1;               // æµ·æ‹”æ•°æ®æ˜¯å¦æœ‰æ•ˆ
+            USHORT speedValid : 1;                  // é€Ÿåº¦æ•°æ®æ˜¯å¦æœ‰æ•ˆ
+            USHORT courseAngleValid : 1;            // èˆªå‘è§’æ•°æ®æ˜¯å¦æœ‰æ•ˆ
+            USHORT reserved:13;                     // ä¿ç•™
         }unionVal;
         USHORT rawVal;
-    }flag;                                          // ±êÖ¾ÐÅÏ¢
-    double latitude;                                // Î³¶È ÕýÊý±íÊ¾±±Î³, ¸ºÊý±íÊ¾ÄÏÎ³
-    double longitude;                               // ¾­¶È ÕýÊý±íÊ¾¶«¾­, ¸ºÊý±íÊ¾Î÷¾­
-    double altitude;                                // º£°Î µ¥Î»: Ã×
-    double speed;                                   // ËÙ¶È µ¥Î»: km/h
-    double courseAngle;                             // º½Ïò½Ç
+    }flag;                                          // æ ‡å¿—ä¿¡æ¯
+    double latitude;                                // çº¬åº¦ æ­£æ•°è¡¨ç¤ºåŒ—çº¬, è´Ÿæ•°è¡¨ç¤ºå—çº¬
+    double longitude;                               // ç»åº¦ æ­£æ•°è¡¨ç¤ºä¸œç», è´Ÿæ•°è¡¨ç¤ºè¥¿ç»
+    double altitude;                                // æµ·æ‹” å•ä½: ç±³
+    double speed;                                   // é€Ÿåº¦ å•ä½: km/h
+    double courseAngle;                             // èˆªå‘è§’
 } ZCANGPSData;
 
-// LINÊý¾Ý
+// LINæ•°æ®
 typedef struct tagZCANLINData
 {
-    UINT64          timeStamp;                      // Ê±¼ä´Á£¬µ¥Î»Î¢Ãë(us)
+    UINT64          timeStamp;                      // æ—¶é—´æˆ³ï¼Œå•ä½å¾®ç§’(us)
     union {
         struct {
-            BYTE    ID:6;                           // Ö¡ID
-            BYTE    Parity:2;                       // Ö¡IDÐ£Ñé
+            BYTE    ID:6;                           // å¸§ID
+            BYTE    Parity:2;                       // å¸§IDæ ¡éªŒ
         }unionVal;
-        BYTE    rawVal;                             // ÊÜ±£»¤µÄIDÔ­Ê¼Öµ
-    }       PID;                                    // ÊÜ±£»¤µÄID
-    BYTE    dataLen;                                // Êý¾Ý³¤¶È
+        BYTE    rawVal;                             // å—ä¿æŠ¤çš„IDåŽŸå§‹å€¼
+    }       PID;                                    // å—ä¿æŠ¤çš„ID
+    BYTE    dataLen;                                // æ•°æ®é•¿åº¦
     union{
         struct{
-            USHORT tx : 1;                          // ¿ØÖÆÆ÷·¢ËÍÔÚ×ÜÏßÉÏµÄÏûÏ¢, ½ÓÊÕÓÐÐ§
-            USHORT rx : 1;                          // ¿ØÖÆÆ÷½ÓÊÕ×ÜÏßÉÏµÄÏûÏ¢, ½ÓÊÕÓÐÐ§
-            USHORT noData : 1;                      // ÎÞÊý¾ÝÇø
-            USHORT chkSumErr : 1;                   // Ð£ÑéºÍ´íÎó
-            USHORT parityErr : 1;                   // ÆæÅ¼Ð£Ñé´íÎó£¬ ´ËÊ±ÏûÏ¢ÖÐµÄ chksum ÎÞÐ§
-            USHORT syncErr : 1;                     // Í¬²½¶Î´íÎó 
-            USHORT bitErr : 1;                      // ·¢ËÍÊ±Î»´íÎó 
-            USHORT wakeUp : 1;                      // ÊÕµ½»½ÐÑÖ¡£¬ ´ËÊ±ÏûÏ¢ ID¡¢Êý¾Ý³¤¶È¡¢Êý¾ÝÓò¡¢Ð£ÑéÖµÎÞÐ§
-            USHORT reserved : 8;                    // ±£Áô
-        }unionVal;                                  // LINÊý¾Ý±êÖ¾Î»(°´Î»±íÊ¾)
-        USHORT rawVal;                              // LINÊý¾Ý±êÖ¾Î»
-    }flag;                                          // ±êÖ¾ÐÅÏ¢
-    BYTE    chkSum;                                 // Êý¾ÝÐ£Ñé, ²¿·ÖÉè±¸²»Ö§³ÖÐ£ÑéÊý¾ÝµÄ»ñÈ¡
-    BYTE    reserved[3];                            // ±£Áô
-    BYTE    data[8];                                // Êý¾Ý
+            USHORT tx : 1;                          // æŽ§åˆ¶å™¨å‘é€åœ¨æ€»çº¿ä¸Šçš„æ¶ˆæ¯, æŽ¥æ”¶æœ‰æ•ˆ
+            USHORT rx : 1;                          // æŽ§åˆ¶å™¨æŽ¥æ”¶æ€»çº¿ä¸Šçš„æ¶ˆæ¯, æŽ¥æ”¶æœ‰æ•ˆ
+            USHORT noData : 1;                      // æ— æ•°æ®åŒº
+            USHORT chkSumErr : 1;                   // æ ¡éªŒå’Œé”™è¯¯
+            USHORT parityErr : 1;                   // å¥‡å¶æ ¡éªŒé”™è¯¯ï¼Œ æ­¤æ—¶æ¶ˆæ¯ä¸­çš„ chksum æ— æ•ˆ
+            USHORT syncErr : 1;                     // åŒæ­¥æ®µé”™è¯¯ 
+            USHORT bitErr : 1;                      // å‘é€æ—¶ä½é”™è¯¯ 
+            USHORT wakeUp : 1;                      // æ”¶åˆ°å”¤é†’å¸§ï¼Œ æ­¤æ—¶æ¶ˆæ¯ IDã€æ•°æ®é•¿åº¦ã€æ•°æ®åŸŸã€æ ¡éªŒå€¼æ— æ•ˆ
+            USHORT reserved : 8;                    // ä¿ç•™
+        }unionVal;                                  // LINæ•°æ®æ ‡å¿—ä½(æŒ‰ä½è¡¨ç¤º)
+        USHORT rawVal;                              // LINæ•°æ®æ ‡å¿—ä½
+    }flag;                                          // æ ‡å¿—ä¿¡æ¯
+    BYTE    chkSum;                                 // æ•°æ®æ ¡éªŒ, éƒ¨åˆ†è®¾å¤‡ä¸æ”¯æŒæ ¡éªŒæ•°æ®çš„èŽ·å–
+    BYTE    reserved[3];                            // ä¿ç•™
+    BYTE    data[8];                                // æ•°æ®
 }ZCANLINData;
 
-// ºÏ²¢½ÓÊÕÊý¾ÝÊý¾Ý½á¹¹£¬Ö§³ÖCAN/CANFD/LIN/GPS/´íÎóµÈ²»Í¬ÀàÐÍÊý¾Ý
+// åˆå¹¶æŽ¥æ”¶æ•°æ®æ•°æ®ç»“æž„ï¼Œæ”¯æŒCAN/CANFD/LIN/GPS/é”™è¯¯ç­‰ä¸åŒç±»åž‹æ•°æ®
 typedef struct tagZCANDataObj
 {
-    BYTE        dataType;                           // Êý¾ÝÀàÐÍ, ²Î¿¼eZCANDataDEFÖÐ Êý¾ÝÀàÐÍ ²¿·Ö¶¨Òå
-    BYTE        chnl;                               // Êý¾ÝÍ¨µÀ
+    BYTE        dataType;                           // æ•°æ®ç±»åž‹, å‚è€ƒeZCANDataDEFä¸­ æ•°æ®ç±»åž‹ éƒ¨åˆ†å®šä¹‰
+    BYTE        chnl;                               // æ•°æ®é€šé“
     union{
         struct{
-            USHORT reserved : 16;                   // ±£Áô
+            USHORT reserved : 16;                   // ä¿ç•™
         }unionVal;
         USHORT rawVal;
-    }flag;                                          // ±êÖ¾ÐÅÏ¢, ÔÝÎ´Ê¹ÓÃ
-    BYTE        extraData[4];                       // ¶îÍâÊý¾Ý, ÔÝÎ´Ê¹ÓÃ
+    }flag;                                          // æ ‡å¿—ä¿¡æ¯, æš‚æœªä½¿ç”¨
+    BYTE        extraData[4];                       // é¢å¤–æ•°æ®, æš‚æœªä½¿ç”¨
     union
     {
-        ZCANCANFDData           zcanCANFDData;      // CAN/CANFDÊý¾Ý
-        ZCANErrorData           zcanErrData;        // ´íÎóÊý¾Ý
-        ZCANGPSData             zcanGPSData;        // GPSÊý¾Ý
-        ZCANLINData             zcanLINData;        // LINÊý¾Ý
-        BYTE                    raw[92];            // RAWÊý¾Ý
-    } data;                                         // Êµ¼ÊÊý¾Ý, ÁªºÏÌå£¬ÓÐÐ§³ÉÔ±¸ù¾Ý dataType ×Ö¶Î¶ø¶¨
+        ZCANCANFDData           zcanCANFDData;      // CAN/CANFDæ•°æ®
+        ZCANErrorData           zcanErrData;        // é”™è¯¯æ•°æ®
+        ZCANGPSData             zcanGPSData;        // GPSæ•°æ®
+        ZCANLINData             zcanLINData;        // LINæ•°æ®
+        BYTE                    raw[92];            // RAWæ•°æ®
+    } data;                                         // å®žé™…æ•°æ®, è”åˆä½“ï¼Œæœ‰æ•ˆæˆå‘˜æ ¹æ® dataType å­—æ®µè€Œå®š
 }ZCANDataObj;
 
 #pragma pack(pop)

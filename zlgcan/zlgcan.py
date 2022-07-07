@@ -526,11 +526,11 @@ if _is_windows:
                     ("interval", c_uint),
                     ("obj", ZCAN_TransmitFD_Data)]
 
-    # auto_send delay
-    class ZCANFD_AUTO_TRANSMIT_OBJ_PARAM(Structure):    # ZCANFD_AUTO_TRANSMIT_OBJ_PARAM
-        _fields_ = [("index", c_ushort),
-                    ("type", c_ushort),
-                    ("value", c_uint)]
+    # 用于设置定时发送额外的参数, 目前只支持USBCANFD-X00U系列设备
+    class ZCAN_AUTO_TRANSMIT_OBJ_PARAM(Structure):      # ZCANFD_AUTO_TRANSMIT_OBJ_PARAM
+        _fields_ = [("index", c_ushort),                # 定时发送帧的索引
+                    ("type", c_ushort),                 # 参数类型，目前类型只有1：表示启动延时
+                    ("value", c_uint)]                  # 参数数值
 
     class ZCLOUD_CHNINFO(Structure):                       # ZCLOUD_CHNINFO
         _fields_ = [("enable", c_ubyte),                    # // 0:CAN, 1:ISO CANFD, 2:Non-ISO CANFD
@@ -885,27 +885,23 @@ class ZCAN(object):
             _filter = ZCAN_FILTER_TABLE()
             if filters is None:
                 _filter.size = sizeof(ZCAN_FILTER) * 2
-                std_table = ZCAN_FILTER()
-                std_table.type = 0
-                std_table.sid = 0x0
-                std_table.eid = 0xffffffff
-                ext_table = ZCAN_FILTER()
-                ext_table.type = 1
-                ext_table.sid = 0x0
-                ext_table.eid = 0xffffffff
-                _filter.table[0] = std_table
-                _filter.table[1] = ext_table
+                _filter.table[0].type = 0
+                _filter.table[0].sid = 0x0
+                _filter.table[0].eid = 0xffffffff
+                _filter.table[1].type = 1
+                _filter.table[1].sid = 0x0
+                _filter.table[1].eid = 0xffffffff
             else:
+                if len(filters) > 64:
+                    filters = filters[:64]
                 _filter.size = sizeof(ZCAN_FILTER) * len(filters)
                 for index, item in enumerate(filters):
                     mode = item[0]
                     start = item[1]
                     end = item[2]
-                    table = ZCAN_FILTER()
-                    table.type = mode
-                    table.sid = start
-                    table.eid = end
-                    _filter.table[index] = table
+                    _filter.table[index].type = mode
+                    _filter.table[index].sid = start
+                    _filter.table[index].eid = end
             _library_check_run('VCI_SetReference',
                                self._dev_index, channel, CMD_CAN_FILTER, byref(_filter))
 
@@ -1130,49 +1126,94 @@ class ZCAN(object):
             return can_msgs, ret
 
     def TransmitInterval(self, channel, interval_msgs=None):
-        if _is_linux:
-            msgs = ZCAN_TTX_TABLE()
-            if interval_msgs:
-                if len(interval_msgs) > 8:
-                    interval_msgs = interval_msgs[:8]
-                msgs.size = len(interval_msgs)
-                for index, interval_msg in enumerate(interval_msgs):
-                    table = ZCAN_TTX()
-                    for key, value in interval_msg.items():
-                        setattr(table, key, value)
-                    msgs.table[index] = table
-                _library_check_run('VCI_SetReference',
-                                   self._dev_type, self._dev_index, channel, CMD_CAN_SKD_SEND, byref(msgs))
-                _library_check_run('VCI_SetReference',
-                                   self._dev_type, self._dev_index, channel, CMD_CAN_SKD_SEND_STATUS,
-                                   byref(c_int32(1)))      # TODO 不使用结构体行不行
-            else:
-                # TODO 清空自动发送列表(怎么做)
-                _library_check_run('VCI_SetReference',
-                                   self._dev_type, self._dev_index, channel, CMD_CAN_SKD_SEND_STATUS,
-                                   byref(c_int32(0)))      # TODO 不使用结构体行不行
-        elif _is_windows:
+        """
+        定时发送消息
+        :param channel: 通道号, 从0开始
+        :param interval_msgs: 周期消息, 以字典列表的形式传入, 最大长度8, 超过8的截取前8个
+            Windows下:
+                字典内容为:
+                    enable: [可选, 默认值0] 0-此帧禁用定时发送, 1-此帧使能定时发送
+                    index: [可选, 自动根据列表顺序编号]定时发送帧索引, 即第几条定时发送报文
+                    interval: [可选, 默认值0] 发送间隔, 单位ms
+                    trans_type: [可选, 默认值0] 0=正常发送, 1=单次发送, 2=自发自收, 3=单次自发自收
+                    msg: [必须] ZCAN_CANFD_FRAME|ZCAN_CAN_FRAME
+                    delay: [可选, 默认值None], 延迟发送时间, 单位ms
+            Linux下:
+                字典内容为:
+                    enable: [可选, 默认值0] 0-此帧禁用定时发送, 1-此帧使能定时发送
+                    index: [可选, 自动根据列表顺序编号]定时发送帧索引, 即第几条定时发送报文
+                    interval: [可选, 默认值0] 发送间隔, 单位0.1ms
+                    repeat: [可选, 默认值0] 发送次数, 0则表示无限次数
+                    msg: [必须] ZCAN_CANFD_FRAME 报文内容
+        :return: None
+        """
+        if _is_windows:
             prop = self.GetIProperty()
             func = CFUNCTYPE(c_uint, c_char_p, c_char_p)(prop.contents.SetValue)
+            func1 = CFUNCTYPE(c_uint, c_char_p, c_void_p)(prop.contents.SetValue)
             try:
                 ret = func(c_char_p(f'{channel}/clear_auto_send'.encode("utf-8")), c_char_p('0'.encode('utf-8')))
                 if ret != ZCAN_STATUS_OK:
                     raise ZCANException(f'ZLG: Set {channel}/clear_auto_send failed!')
                 if interval_msgs:
-                        func1 = CFUNCTYPE(c_uint, c_char_p, c_void_p)(prop.contents.SetValue)
-                        for msg, delay in interval_msgs.items():
-                            ret = func1(c_char_p(f'{channel}/auto_send'.encode("utf-8")), cast(byref(msg), c_void_p))
+                    if len(interval_msgs) > 8:
+                        interval_msgs = interval_msgs[:8]
+                    for index, msg_dict in enumerate(interval_msgs):
+                        is_fd = False
+                        msg = msg_dict.get('msg')
+                        if isinstance(msg, ZCAN_Transmit_Data):
+                            data = ZCAN_AUTO_TRANSMIT_OBJ()
+                        elif isinstance(msg, ZCAN_TransmitFD_Data):
+                            data = ZCANFD_AUTO_TRANSMIT_OBJ()
+                            is_fd = True
+                        else:
+                            raise ZCANException(f'ZLG: Unsupported message type {type(msg)}')
+                        data.enable = msg_dict.get('enable', 0)
+                        data.index = msg_dict.get('index', index)
+                        data.interval = msg_dict.get('interval', 0)
+                        data.obj.transmit_type = msg_dict.get('trans_type', 0)
+                        data.obj.frame = msg
+                        ret = func1(c_char_p(f'{channel}/auto_send{"fd" if is_fd else ""}'.encode("utf-8")),
+                                    cast(byref(data), c_void_p))
+                        if ret != ZCAN_STATUS_OK:
+                            raise ZCANException(f'ZLG: Set {channel} auto transmit object failed!')
+                        delay = msg_dict.get('delay', None)
+                        if delay:
+                            delay_param = ZCAN_AUTO_TRANSMIT_OBJ_PARAM()
+                            delay_param.index = msg_dict.get('index', index)
+                            delay_param.type = 1
+                            delay_param.value = delay
+                            ret = func1(c_char_p(f'{channel}/auto_send_param'.encode("utf-8")),
+                                        cast(byref(delay_param), c_void_p))
                             if ret != ZCAN_STATUS_OK:
-                                raise ZCANException(f'ZLG: Set {channel} auto transmit object failed!')
-                            if delay:
-                                ret = func1(c_char_p(f'{channel}/auto_send_param'.encode("utf-8")), cast(byref(delay), c_void_p))
-                                if ret != ZCAN_STATUS_OK:
-                                    raise ZCANException(f'ZLG: Set {channel} auto transmit object param failed!')
+                                raise ZCANException(f'ZLG: Set {channel} auto transmit object param failed!')
+
                         ret = func(c_char_p(f'{channel}/apply_auto_send'.encode("utf-8")), c_char_p('0'.encode('utf-8')))
                         if ret != ZCAN_STATUS_OK:
                             raise ZCANException(f'ZLG: Set {channel}/apply_auto_send failed!')
             finally:
                 self.ReleaseIProperty(prop)
+        elif _is_linux:
+            # TODO 清空自动发送列表(怎么做)
+            _library_check_run('VCI_SetReference',
+                               self._dev_type, self._dev_index, channel, CMD_CAN_SKD_SEND_STATUS,
+                               byref(c_int32(0)))           # TODO 不使用结构体行不行
+            if interval_msgs:
+                if len(interval_msgs) > 8:
+                    interval_msgs = interval_msgs[:8]
+                table = ZCAN_TTX_TABLE()
+                table.size = len(interval_msgs)
+                for index, msg_dict in enumerate(interval_msgs):
+                    table.table[index].msg = msg_dict['msg']
+                    table.table[index].flags = msg_dict.get('enable', 0)
+                    table.table[index].index = msg_dict.get('index', index)
+                    table.table[index].interval = msg_dict.get('interval', 0)
+                    table.table[index].repeat = msg_dict.get('repeat', 0)
+                _library_check_run('VCI_SetReference',
+                                   self._dev_type, self._dev_index, channel, CMD_CAN_SKD_SEND, byref(table))
+                _library_check_run('VCI_SetReference',
+                                   self._dev_type, self._dev_index, channel, CMD_CAN_SKD_SEND_STATUS,
+                                   byref(c_int32(1)))       # TODO 不使用结构体行不行
 
     if _is_linux:
         def Debug(self, level):
