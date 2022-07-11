@@ -11,7 +11,7 @@ pip install python-can
    1. 一般不用虚拟环境安装则在python安装路径下Lib/site-packages
    2. 使用虚拟环境则在虚拟环境下Lib/site-packages
 
-3. 修改python-can路径下的can/interfaces/\__init__.py文件, 在BACKENDS字典中添加一行:
+3. 修改python-can路径下的can/interfaces/\_\_init__.py文件, 在BACKENDS字典中添加一行:
 
    ```python
    	"zlgcan": ("can.interfaces.zlgcan", "ZCanBus"),
@@ -23,9 +23,9 @@ pip install python-can
 6. 使用:
 
    ```python
+   import can
    import time
    
-   import can
    from zlgcan import ZCANDeviceType, ZCANCanTransType
    
    with can.Bus(bustype='zlgcan', device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
