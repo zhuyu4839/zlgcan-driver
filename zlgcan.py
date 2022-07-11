@@ -109,7 +109,7 @@ def _convert_msg(msg, **kwargs):                        # channel=None, trans_ty
             timestamp=msg.timestamp,
             arbitration_id=msg.frame.can_id,
             is_extended_id=msg.frame.eff,
-            is_remote_frame=msg.frame.efr,
+            is_remote_frame=msg.frame.rtr,
             is_error_frame=msg.frame.err,
             channel=channel,
             dlc=msg.frame.can_dlc,
@@ -122,7 +122,7 @@ def _convert_msg(msg, **kwargs):                        # channel=None, trans_ty
             timestamp=msg.timestamp,
             arbitration_id=msg.frame.can_id,
             is_extended_id=msg.frame.eff,
-            is_remote_frame=msg.frame.efr,
+            is_remote_frame=msg.frame.rtr,
             is_error_frame=msg.frame.err,
             channel=channel,
             dlc=msg.frame.len,
@@ -138,7 +138,7 @@ def _convert_msg(msg, **kwargs):                        # channel=None, trans_ty
             timestamp=data.timeStamp,
             arbitration_id=data.frame.can_id,
             is_extended_id=data.frame.eff,
-            is_remote_frame=data.frame.efr,
+            is_remote_frame=data.frame.rtr,
             is_error_frame=data.frame.err,
             channel=msg.chnl,
             dlc=data.frame.len,
@@ -224,8 +224,8 @@ class ZCanBus(BusABC):
             self.device.StartCAN(channel)
             self.available.append(channel)
 
-    def _apply_filters(self, filters: Optional[can.typechecking.CanFilters]) -> None:
-        pass
+    # def _apply_filters(self, filters: Optional[can.typechecking.CanFilters]) -> None:
+    #     pass
 
     def _recv_from_queue(self) -> Tuple[Message, bool]:
         """Return a message from the internal receive queue"""
@@ -233,19 +233,19 @@ class ZCanBus(BusABC):
 
         return _convert_msg(raw_msg, channel=channel), False
 
-    def poll_received_messages(self):
+    def poll_received_messages(self, timeout):
         for channel in self.available:
             can_num = self.device.GetReceiveNum(channel, ZCANMessageType.CAN)
-            canfd_num = self.device.GetReceiveNum(channel, ZCANMessageType.CAN)
+            canfd_num = self.device.GetReceiveNum(channel, ZCANMessageType.CANFD)
             if can_num:
                 LOG.debug(f'ZLG-CAN: can message received: {can_num}.')
                 self.rx_queue.extend(
-                    (channel, raw_msg) for raw_msg in self.device.Receive(channel, can_num, 10)
+                    (channel, raw_msg) for raw_msg in self.device.Receive(channel, can_num, timeout)
                 )
             if canfd_num:
                 LOG.debug(f'ZLG-CAN: canfd message received: {canfd_num}.')
                 self.rx_queue.extend(
-                    (channel, raw_msg) for raw_msg in self.device.ReceiveFD(channel, canfd_num, 10)
+                    (channel, raw_msg) for raw_msg in self.device.ReceiveFD(channel, canfd_num, timeout)
                 )
 
     def _recv_internal(self, timeout: Optional[float]) -> Tuple[Optional[Message], bool]:
@@ -258,7 +258,7 @@ class ZCanBus(BusABC):
             if deadline is None and timeout is not None:
                 deadline = time.time() + timeout
 
-            self.poll_received_messages()
+            self.poll_received_messages(timeout)
 
             if self.rx_queue:
                 return self._recv_from_queue()

@@ -1078,12 +1078,14 @@ class ZCAN(object):
             can_msgs = (ZCAN_ReceiveFD_Data * size)()
             ret = _library.ZCAN_ReceiveFD(handler, byref(can_msgs), size, timeout)
             self._logger.debug(f'ZLG: Receive ZCAN_ReceiveFD_Data expect: {size}, actual: {ret}')
-            return can_msgs, ret
+            for i in range(ret):
+                yield can_msgs[i]
         elif _is_linux:
             can_msgs = (ZCAN_CANFD_FRAME * size)()
             ret = _library.VCI_ReceiveFD(self._dev_type, self._dev_index, channel, byref(can_msgs), size)
             self._logger.debug(f'ZLG: Receive ZCAN_CANFD_FRAME expect: {size}, actual: {ret}')
-            return can_msgs, ret
+            for i in range(ret):
+                yield can_msgs[i]
 
     # # UINT FUNC_CALL ZCAN_Transmit(CHANNEL_HANDLE channel_handle, ZCAN_Transmit_Data* pTransmit, UINT len);
     def Transmit(self, channel, msgs, size=None):
@@ -1119,11 +1121,13 @@ class ZCAN(object):
             handler = self._get_channel_handler('CAN', channel)
             can_msgs = (ZCAN_Receive_Data * size)()
             ret = _library.ZCAN_Receive(handler, byref(can_msgs), size, timeout)
-            return can_msgs, ret
+            for i in range(ret):
+                yield can_msgs[i]
         elif _is_linux:
             can_msgs = (ZCAN_CAN_FRAME * size)()
             ret = _library.VCI_Receive(self._dev_type, self._dev_index, channel, byref(can_msgs), size)
-            return can_msgs, ret
+            for i in range(ret):
+                yield can_msgs[i]
 
     def TransmitInterval(self, channel, interval_msgs=None):
         """
