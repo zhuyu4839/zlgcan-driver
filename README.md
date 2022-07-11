@@ -23,14 +23,25 @@ pip install python-can
 6. 使用:
 
    ```python
-   import can
-   from can.interfaces.zlgcan import ZCANDeviceType
+   import time
    
-   with can.Bus(bustype='zlgcan', device_type=ZCANDeviceType.ZCAN_USBCANFD_200U, 
-                configs=[{'canfd_abit_baud_rate': 500000, 'initenal_resistance':1}, 	# 1通道配置
-                         {'canfd_abit_baud_rate': 500000, 'initenal_resistance':1}]	# 2通道配置
-               ) as bus:
-       msg = bus.recv()
+   import can
+   from zlgcan import ZCANDeviceType, ZCANCanTransType
+   
+   with can.Bus(bustype='zlgcan', device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
+                configs=[{'canfd_abit_baud_rate': 500000, 'initenal_resistance': 1}]  # 1通道配置
+                ) as bus:
+       while True:
+           msg = can.Message(
+               arbitration_id=0x01,
+               is_extended_id=False,
+               channel=0,
+               data=[0x01, 0x02, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02, ],
+               is_rx=False,
+           )
+           bus.send(msg, trans_type=ZCANCanTransType.SELF_SR)
+           time.sleep(0.05)
+           print(bus.recv())
    ```
 
    
