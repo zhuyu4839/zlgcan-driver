@@ -2,9 +2,9 @@
 
 1. 安装python-can
 
-```shell
-pip install python-can
-```
+    ```shell
+    pip install python-can
+    ```
 
 2. 找到python-can安装路径
 
@@ -13,8 +13,9 @@ pip install python-can
 
 3. 修改python-can路径下的can/interfaces/\_\_init__.py文件, 在BACKENDS字典中添加一行:
 
-   ```python
+   ```
    	"zlgcan": ("can.interfaces.zlgcan", "ZCanBus"),
+   ```
 
 4. 把zlgcan文件夹拷贝到site-packages文件夹
 
@@ -22,27 +23,53 @@ pip install python-can
 
 6. 使用:
 
-   ```python
-   import can
-   import time
-   
-   from zlgcan import ZCANDeviceType, ZCANCanTransType
-   
-   with can.Bus(bustype='zlgcan', device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
-                configs=[{'canfd_abit_baud_rate': 500000, 'initenal_resistance': 1}]  # 1通道配置
-                ) as bus:
-       while True:
-           msg = can.Message(
-               arbitration_id=0x01,
-               is_extended_id=False,
-               channel=0,
-               data=[0x01, 0x02, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02, ],
-               is_rx=False,
-           )
-           bus.send(msg, trans_type=ZCANCanTransType.SELF_SR)
-           time.sleep(0.05)
-           print(bus.recv())
-   ```
+   - Windows下使用:
 
-   
+     ```python
+     import can
+     import time
+     
+     from zlgcan import ZCANDeviceType, ZCANCanTransType
+     
+     with can.Bus(bustype='zlgcan', device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
+                  configs=[{'canfd_abit_baud_rate': 500000, 'initenal_resistance': 1}]  # 1通道配置
+                  ) as bus:
+         while True:
+             msg = can.Message(
+                 arbitration_id=0x01,
+                 is_extended_id=False,
+                 channel=0,
+                 data=[0x01, 0x02, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02, ],
+                 is_rx=False,
+             )
+             bus.send(msg, trans_type=ZCANCanTransType.SELF_SR)
+             time.sleep(0.05)
+             print(bus.recv())
+     ```
+
+   - Linux下使用:
+
+     ```python
+     import can
+     import time
+     
+     from zlgcan import ZCANDeviceType, ZCANCanTransType
+     
+     with can.Bus(bustype='zlgcan', device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
+                  configs=[{'clock': 60_000_000, 'arb_seg1': 7, 'arb_seg2': 0, 'arb_brp': 11, 'arb_sjw': 0}]  # 1通道配置
+                  ) as bus:
+         while True:
+             msg = can.Message(
+                 arbitration_id=0x01,
+                 is_extended_id=False,
+                 channel=0,
+                 data=[0x01, 0x02, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02, ],
+                 is_rx=False,
+             )
+             bus.send(msg, trans_type=ZCANCanTransType.SELF_SR)
+             time.sleep(0.05)
+             print(bus.recv())
+     ```
+
+     
 

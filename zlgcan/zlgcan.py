@@ -780,7 +780,7 @@ class ZCAN(object):
         config = ZCAN_CHANNEL_INIT_CONFIG()
         if _is_windows:
             assert self._dev_is_canfd is not None, f'The device{self._dev_index} is not opened!'
-            clock = kwargs.get('clock', None)
+            # clock = kwargs.get('clock', None)
             # if clock:
             #     self.SetValue()
             config.can_type = ZCANCanType.CANFD if self._dev_is_canfd else ZCANCanType.CAN
@@ -814,29 +814,27 @@ class ZCAN(object):
             clock = kwargs.get('clock', None)
             arb_seg1 = kwargs.get('arb_seg1', None)
             arb_seg2 = kwargs.get('arb_seg2', None)
-            arb_swj = kwargs.get('arb_swj', None)
-            arb_smp = kwargs.get('arb_smp', None)
+            arb_sjw = kwargs.get('arb_sjw', None)
+            arb_smp = kwargs.get('arb_smp', 0)
             arb_brp = kwargs.get('arb_brp', None)
-            data_seg1 = kwargs.get('data_seg1', None)
-            data_seg2 = kwargs.get('data_seg2', None)
-            data_swj = kwargs.get('data_swj', None)
-            data_smp = kwargs.get('data_smp', None)
-            data_brp = kwargs.get('data_brp', None)
+            data_seg1 = kwargs.get('data_seg1', arb_seg1)
+            data_seg2 = kwargs.get('data_seg2', arb_seg2)
+            data_sjw = kwargs.get('data_sjw', arb_sjw)
+            data_smp = kwargs.get('data_smp', arb_smp)
+            data_brp = kwargs.get('data_brp', arb_brp)
             assert clock is not None \
-                and arb_seg1 is not None and arb_seg2 is not None and arb_swj is not None and arb_smp is not None \
-                and arb_brp is not None \
-                and data_seg1 is not None and data_seg2 is not None and data_swj is not None and data_smp is not None \
-                and data_brp is not None
+                and arb_seg1 is not None and arb_seg2 is not None and arb_sjw is not None and arb_smp is not None \
+                and arb_brp is not None
             config.mode = mode
             config.clk = clock
             config.aset.tseg1 = arb_seg1
             config.aset.tseg2 = arb_seg2
-            config.aset.sjw = arb_swj
+            config.aset.sjw = arb_sjw
             config.aset.smp = arb_smp
             config.aset.brp = arb_brp
             config.dset.tseg1 = data_seg1
             config.dset.tseg2 = data_seg2
-            config.dset.sjw = data_swj
+            config.dset.sjw = data_sjw
             config.dset.smp = data_smp
             config.dset.brp = data_brp
         return config
@@ -978,6 +976,9 @@ class ZCAN(object):
         """
         config = self._get_can_init_config(mode, filter, **kwargs)
         if _is_windows:
+            clock = kwargs.get('clock', None)
+            if clock:
+                self.SetValue(channel, clock=clock)
             ret = _library.ZCAN_InitCAN(self._dev_handler, channel, byref(config))
             if ret == INVALID_CHANNEL_HANDLE:
                 raise ZCANException('ZLG: ZCAN_InitCAN failed!')
