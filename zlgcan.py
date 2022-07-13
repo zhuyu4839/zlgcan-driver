@@ -59,7 +59,7 @@ ZCAN_TransmitFD_Data_1 = (ZCAN_TransmitFD_Data * 1)
 ZCANDataObj_1 = (ZCANDataObj * 1)
 
 
-def _convert_msg(msg, **kwargs):                        # channel=None, trans_type=0, is_merge=False, **kwargs):
+def zlg_convert_msg(msg, **kwargs):                        # channel=None, trans_type=0, is_merge=False, **kwargs):
 
     if isinstance(msg, Message):                        # 发送报文转换
         is_merge = kwargs.get('is_merge', None)
@@ -232,7 +232,7 @@ class ZCanBus(BusABC):
         """Return a message from the internal receive queue"""
         channel, raw_msg = self.rx_queue.popleft()
 
-        return _convert_msg(raw_msg, channel=channel), False
+        return zlg_convert_msg(raw_msg, channel=channel), False
 
     def poll_received_messages(self, timeout):
         for channel in self.available:
@@ -272,11 +272,11 @@ class ZCanBus(BusABC):
             raise CanOperationError(f'Channel: {channel} not in {self.available}')
         is_merge = self.device.MergeEnabled() if hasattr(self.device, 'MergeEnabled') else False
         if is_merge:
-            return self.device.TransmitData(_convert_msg(msg, channel=channel, is_merge=is_merge, **kwargs), 1)
+            return self.device.TransmitData(zlg_convert_msg(msg, channel=channel, is_merge=is_merge, **kwargs), 1)
         else:
             if msg.is_fd:
-                return self.device.TransmitFD(channel, _convert_msg(msg, channel=channel, is_merge=is_merge, **kwargs), 1)
-            return self.device.Transmit(channel, _convert_msg(msg, channel=channel, is_merge=is_merge, **kwargs), 1)
+                return self.device.TransmitFD(channel, zlg_convert_msg(msg, channel=channel, is_merge=is_merge, **kwargs), 1)
+            return self.device.Transmit(channel, zlg_convert_msg(msg, channel=channel, is_merge=is_merge, **kwargs), 1)
 
     @staticmethod
     def _detect_available_configs():                    # -> List[can.typechecking.AutoDetectedConfig]:
