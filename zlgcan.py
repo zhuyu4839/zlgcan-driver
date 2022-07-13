@@ -71,16 +71,17 @@ def _convert_msg(msg, **kwargs):                        # channel=None, trans_ty
                 result = ZCAN_TransmitFD_Data_1()
                 result[0].frame.len = msg.dlc
                 result[0].frame.brs = msg.bitrate_switch
+                result[0].frame.data = (ctypes.c_ubyte * 64)(*msg.data)
             else:
                 result = ZCAN_Transmit_Data_1()
                 result[0].frame.can_dlc = msg.dlc
+                result[0].frame.data = (ctypes.c_ubyte * msg.dlc)(*msg.data)
             result[0].transmit_type = trans_type
 
             result[0].frame.can_id = msg.arbitration_id
             result[0].frame.err = msg.is_error_frame
             result[0].frame.rtr = msg.is_remote_frame
             result[0].frame.eff = msg.is_extended_id
-            result[0].frame.data = (ctypes.c_ubyte * msg.dlc)(*msg.data)
             return result
         else:
             channel = kwargs.get('channel', None)
