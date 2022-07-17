@@ -1,6 +1,7 @@
 import collections
 import ctypes
 import logging
+import platform
 import time
 import warnings
 
@@ -162,6 +163,41 @@ class ZCanBus(BusABC):
                  configs: Union[list, tuple] = None,
                  can_filters: Optional[can.typechecking.CanFilters] = None,
                  **kwargs: object):
+        """
+        Init ZLG CAN Bus device.
+        :param device_type: The device type in ZCANDeviceType.
+        :param channel: A channel list(such as [0, 1]) or str split by ","(such as "0, 1") index cont from 0.
+        :param device_index: The ZLG device index, default 0.
+        :param rx_queue_size: The size of received queue.
+        :param configs: The channel configs, is a list of dict:
+            The index 0 is configuration for channel 0, index 1 is configuration for channel 1, and so on.
+            When the system is Windows, the config key is:
+                clock: [Optional] The clock of channel.
+                canfd_abit_baud_rate: [Must] The arbitration phase baudrate.
+                canfd_dbit_baud_rate: [Optional] The data phase baudrate, default is canfd_abit_baud_rate.
+                mode: [Optional] The can mode, defined in ZCANCanMode, default is NORMAL
+                filter: [Optional] The filter mode, defined in ZCANCanFilter, default is DOUBLE
+                acc_code: [Optional] The frame filter acceptance code of SJA1000.
+                acc_mask: [Optional] The frame mask code of SJA1000.
+                brp: [Optional] The bit rate prescaler
+                abit_timing: [Optional] The arbitration phase timing, ignored.
+                dbit_timing: [Optional] The data phase timing, ignored.
+                Other property value: please see: https://manual.zlg.cn/web/#/152/6364->设备属性, with out head "n/".
+            When the system is Linux, the config key is:
+                clock: [Must] The clock of channel.
+                arb_tseg1: [Must] The phase buffer time segment1 of arbitration phase.
+                arb_tseg2: [Must] The phase buffer time segment2 of arbitration phase.
+                arb_sjw: [Must] The synchronization jump width of arbitration phase.
+                arb_smp: [Optional] Sample rate of arbitration phase, default is 0, Ignored.
+                arb_brp: [Must] The bit rate prescaler of arbitration phase.
+                data_tseg1: [Optional] The phase buffer time segment1 of data phase, default is arb_tseg1.
+                data_tseg2: [Optional] The phase buffer time segment2 of data phase, default is arb_tseg2.
+                data_sjw: [Optional] The synchronization jump width of data phase, default is arb_sjw.
+                data_smp: [Optional] Sample rate of data phase, default is arb_smp, Ignored.
+                data_brp: [Optional] The bit rate prescaler of data phase, default is arb_brp.
+        :param can_filters: Not used.
+        :param kwargs: Not used.
+        """
         super().__init__(channel=channel, can_filters=can_filters, **kwargs)
 
         cfg_length = len(configs)
@@ -184,43 +220,43 @@ class ZCanBus(BusABC):
             try:
                 config: dict = configs[index]
             except IndexError:
-                LOG.warn(f'ZLG-CAN: channel{channel} not initialized.')
+                LOG.warn(f'ZLG-CAN: channel:{channel} not initialized.')
                 return
             init_config = {}
+            if platform.system().lower() == 'windows':
+                mode = config.get('mode', None)
+                if mode:
+                    init_config['mode'] = mode
+                    del config['mode']
+                filter = config.get('filter', None)
+                if filter:
+                    init_config['filter'] = filter
+                    del config['filter']
+                acc_code = config.get('acc_code', None)
+                if acc_code:
+                    init_config['acc_code'] = acc_code
+                    del config['acc_code']
+                acc_mask = config.get('acc_mask', None)
+                if acc_mask:
+                    init_config['acc_mask'] = acc_mask
+                    del config['acc_mask']
+                brp = config.get('brp', None)
+                if brp:
+                    init_config['brp'] = brp
+                    del config['brp']
+                abit_timing = config.get('dbit_timing', None)
+                if abit_timing:
+                    init_config['abit_timing'] = abit_timing
+                    del config['abit_timing']
+                dbit_timing = config.get('dbit_timing', None)
+                if dbit_timing:
+                    init_config['dbit_timing'] = dbit_timing
+                    del config['dbit_timing']
 
-            mode = config.get('mode', None)
-            if mode:
-                init_config['mode'] = mode
-                del config['mode']
-            filter = config.get('filter', None)
-            if mode:
-                init_config['filter'] = filter
-                del config['filter']
-            acc_code = config.get('acc_code', None)
-            if mode:
-                init_config['acc_code'] = acc_code
-                del config['acc_code']
-            acc_mask = config.get('acc_mask', None)
-            if mode:
-                init_config['acc_mask'] = acc_mask
-                del config['acc_mask']
-            brp = config.get('brp', None)
-            if mode:
-                init_config['brp'] = brp
-                del config['brp']
-            abit_timing = config.get('dbit_timing', None)
-            if mode:
-                init_config['abit_timing'] = abit_timing
-                del config['abit_timing']
-            dbit_timing = config.get('dbit_timing', None)
-            if mode:
-                init_config['dbit_timing'] = dbit_timing
-                del config['dbit_timing']
+                if 'canfd_abit_baud_rate' not in config.keys():
+                    raise CanInitializationError('ZLG-CAN: canfd_abit_baud_rate is required.')
 
-            if 'canfd_abit_baud_rate' not in config.keys():
-                raise CanInitializationError('ZLG-CAN: canfd_abit_baud_rate is required.')
-
-            self.device.SetValue(channel, **config)
+                self.device.SetValue(channel, **config)
             self.device.InitCAN(channel, **init_config)
             self.device.StartCAN(channel)
             self.available.append(channel)

@@ -7,7 +7,8 @@ import platform
 import warnings
 from ctypes import *
 
-_curr_path = os.path.split(os.path.realpath(__file__))[0]
+# _curr_path = os.path.split(os.path.realpath(__file__))[0]
+_curr_path = os.path.dirname(__file__)
 _arch, _os = platform.architecture()
 _is_windows, _is_linux = False, False
 if 'windows' in _os.lower():
@@ -812,28 +813,28 @@ class ZCAN(object):
                 config.config.can.mode = mode
         elif _is_linux:
             clock = kwargs.get('clock', None)
-            arb_seg1 = kwargs.get('arb_seg1', None)
-            arb_seg2 = kwargs.get('arb_seg2', None)
+            arb_tseg1 = kwargs.get('arb_tseg1', None)
+            arb_tseg2 = kwargs.get('arb_tseg2', None)
             arb_sjw = kwargs.get('arb_sjw', None)
             arb_smp = kwargs.get('arb_smp', 0)
             arb_brp = kwargs.get('arb_brp', None)
-            data_seg1 = kwargs.get('data_seg1', arb_seg1)
-            data_seg2 = kwargs.get('data_seg2', arb_seg2)
+            data_tseg1 = kwargs.get('data_tseg1', arb_tseg1)
+            data_tseg2 = kwargs.get('data_tseg2', arb_tseg2)
             data_sjw = kwargs.get('data_sjw', arb_sjw)
             data_smp = kwargs.get('data_smp', arb_smp)
             data_brp = kwargs.get('data_brp', arb_brp)
             assert clock is not None \
-                and arb_seg1 is not None and arb_seg2 is not None and arb_sjw is not None and arb_smp is not None \
+                and arb_tseg1 is not None and arb_tseg2 is not None and arb_sjw is not None and arb_smp is not None \
                 and arb_brp is not None
             config.mode = mode
             config.clk = clock
-            config.aset.tseg1 = arb_seg1
-            config.aset.tseg2 = arb_seg2
+            config.aset.tseg1 = arb_tseg1
+            config.aset.tseg2 = arb_tseg2
             config.aset.sjw = arb_sjw
             config.aset.smp = arb_smp
             config.aset.brp = arb_brp
-            config.dset.tseg1 = data_seg1
-            config.dset.tseg2 = data_seg2
+            config.dset.tseg1 = data_tseg1
+            config.dset.tseg2 = data_tseg2
             config.dset.sjw = data_sjw
             config.dset.smp = data_smp
             config.dset.brp = data_brp
