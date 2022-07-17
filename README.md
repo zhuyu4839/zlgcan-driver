@@ -56,7 +56,7 @@
      from zlgcan import ZCANDeviceType, ZCANCanTransType
      
      with can.Bus(bustype='zlgcan', device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
-                  configs=[{'clock': 60_000_000, 'arb_seg1': 7, 'arb_seg2': 0, 'arb_brp': 11, 'arb_sjw': 0}]  # 1通道配置
+                  configs=[{'clock': 60_000_000, 'arb_tseg1': 7, 'arb_tseg2': 0, 'arb_brp': 11, 'arb_sjw': 0}]  # 1通道配置
                   ) as bus:
          while True:
              msg = can.Message(
