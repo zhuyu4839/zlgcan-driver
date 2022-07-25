@@ -333,3 +333,19 @@ class ZCanBus(BusABC):
             for channel in self.available:
                 self.device.ClearBuffer(channel)
 
+    def set_hardware_filters(self, channel, filters: Optional[can.typechecking.CanFilters]):
+        assert channel in self.available, f'channel: {channel} is not initialized!'
+        _filters = []
+        for flt in filters:
+            can_id = flt.get('can_id')
+            can_mask = flt.get('can_mask')
+            extended = False
+            if isinstance(flt, can.typechecking.CanFilterExtended):
+                extended = flt.get('extended')
+            end = ~(can_id ^ can_mask)
+            if end < 0:
+                end = -end
+            LOG.debug(f'~(can_id ^ can_mask): {bin(end)}')
+            _filters.append((1 if extended else 0, can_id, end))
+
+        self.device.SetFilters(channel, _filters)
