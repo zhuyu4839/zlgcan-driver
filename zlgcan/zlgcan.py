@@ -813,16 +813,16 @@ class ZCAN(object):
                 config.config.can.mode = mode
         elif _is_linux:
             clock = kwargs.get('clock', None)
-            arb_tseg1 = kwargs.get('arb_tseg1', None)
-            arb_tseg2 = kwargs.get('arb_tseg2', None)
-            arb_sjw = kwargs.get('arb_sjw', None)
-            arb_smp = kwargs.get('arb_smp', 0)
-            arb_brp = kwargs.get('arb_brp', None)
-            data_tseg1 = kwargs.get('data_tseg1', arb_tseg1)
-            data_tseg2 = kwargs.get('data_tseg2', arb_tseg2)
-            data_sjw = kwargs.get('data_sjw', arb_sjw)
-            data_smp = kwargs.get('data_smp', arb_smp)
-            data_brp = kwargs.get('data_brp', arb_brp)
+            arb_tseg1 = kwargs.get('tseg1_abr', None)
+            arb_tseg2 = kwargs.get('tseg2_abr', None)
+            arb_sjw = kwargs.get('sjw_abr', None)
+            arb_smp = kwargs.get('smp_abr', 0)
+            arb_brp = kwargs.get('brp_abr', None)
+            data_tseg1 = kwargs.get('tseg1_dbr', arb_tseg1)
+            data_tseg2 = kwargs.get('tseg2_dbr', arb_tseg2)
+            data_sjw = kwargs.get('sjw_dbr', arb_sjw)
+            data_smp = kwargs.get('smp_dbr', arb_smp)
+            data_brp = kwargs.get('brp_dbr', arb_brp)
             assert clock is not None \
                 and arb_tseg1 is not None and arb_tseg2 is not None and arb_sjw is not None and arb_smp is not None \
                 and arb_brp is not None
@@ -1075,6 +1075,8 @@ class ZCAN(object):
 
     # UINT FUNC_CALL ZCAN_ReceiveFD(CHANNEL_HANDLE channel_handle, ZCAN_ReceiveFD_Data* pReceive, UINT len, int timeout DEF(-1));
     def ReceiveFD(self, channel, size=1, timeout=-1):
+        if timeout is not None:
+            timeout = int(timeout)
         if _is_windows:
             handler = self._get_channel_handler('CAN', channel)
             can_msgs = (ZCAN_ReceiveFD_Data * size)()
@@ -1119,6 +1121,8 @@ class ZCAN(object):
         :param timeout: 缓冲区无数据, 函数阻塞等待时间, 单位毫秒, 若为-1 则表示一直等待
         :return: 消息内容及消息实际长度
         """
+        if timeout is not None:
+            timeout = int(timeout)
         if _is_windows:
             handler = self._get_channel_handler('CAN', channel)
             can_msgs = (ZCAN_Receive_Data * size)()
@@ -1332,6 +1336,8 @@ class ZCAN(object):
             """
             # warnings.warn('ZLG: Library not support.', DeprecationWarning, 2)
             # self.zlg_get_property()
+            if timeout is not None:
+                timeout = int(timeout)
             self._merge_support()
             if not self.MergeEnabled():
                 raise ZCANException('ZLG: device merge receive is not enable!')
@@ -1397,6 +1403,8 @@ class ZCAN(object):
 
         # UINT FUNC_CALL ZCLOUD_ReceiveGPS(DEVICE_HANDLE device_handle, ZCLOUD_GPS_FRAME* pReceive, UINT len, int wait_time DEF(-1));
         def ReceiveGPS(self, size=1, timeout=-1):
+            if timeout is not None:
+                timeout = int(timeout)
             msgs = (ZCLOUD_GPS_FRAME * size)()
             ret = _library.ZCLOUD_ReceiveGPS(self._dev_handler, byref(msgs), size, timeout)
             self._logger.debug(f'ZLG: Master Transmit ZCLOUD_GPS_FRAME expect: {size}, actual: {ret}')
@@ -1429,6 +1437,8 @@ class ZCAN(object):
 
         # UINT FUNC_CALL ZCAN_ReceiveLIN(CHANNEL_HANDLE channel_handle, PZCAN_LIN_MSG pReceive, UINT Len,int WaitTime);
         def ReceiveLIN(self, channel, size=1, timeout=-1):
+            if timeout is not None:
+                timeout = int(timeout)
             msgs = (ZCAN_LIN_MSG * size)()
             handler = self._get_channel_handler('LIN', channel)
             ret = _library.ZCAN_ReceiveLIN(handler, byref(msgs), size, c_int(timeout))
