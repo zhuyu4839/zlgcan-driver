@@ -64,6 +64,12 @@
 				<option type="int32" value="65" desc="CANFDDTU400-UDP" />
 				<option type="int32" value="66" desc="CANFDWIFI200U-TCP" />
 				<option type="int32" value="67" desc="CANFDWIFI200U-UDP" />
+				<option type="int32" value="68" desc="CANFDDTU800ER-TCP" />
+				<option type="int32" value="69" desc="CANFDDTU800ER-UDP" />
+				<option type="int32" value="70" desc="CANFDDTU800EWGR-TCP" />
+				<option type="int32" value="71" desc="CANFDDTU800EWGR-UDP" />
+			    <option type="int32" value="72" desc="CANFDDTU600EWGR-TCP" />
+				<option type="int32" value="73" desc="CANFDDTU600EWGR-UDP" />
 			</options>
 		</meta>
 		<PCI5121 stream="PCI5121" case="parent-value=1">
@@ -278,7 +284,7 @@
 
 		<USBCAN-E-U stream="USBCAN-E-U" case="parent-value=20">
 			<include_file>
-				<value>pci-5010-u.xml</value>
+				<value>usbcan-e-u.xml</value>
 				<meta>
 					<type>string</type>
 					<desc>USBCAN-E-U config file</desc>
@@ -288,7 +294,7 @@
 
 		<USBCAN-2E-U stream="USBCAN-2E-U" case="parent-value=21">
 			<include_file>
-				<value>pci-5020-u.xml</value>
+				<value>usbcan-2e-u.xml</value>
 				<meta>
 					<type>string</type>
 					<desc>USBCAN-2E-U config file</desc>
@@ -625,5 +631,59 @@
 				</meta>
 			</include_file>
 		</CANFDWIFI200U-UDP>
+		<CANFDDTU800ER-TCP stream="CANFDDTU800ER-TCP" case="parent-value=68">
+			<include_file>
+				<value>canfdnet800u-tcp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANFDDTU800ER-tcp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDDTU800ER-TCP>
+		<CANFDDTU800ER-UDP stream="CANFDDTU800ER-UDP" case="parent-value=69">
+			<include_file>
+				<value>canfdnet800u-udp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANFDDTU800ER-udp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDDTU800ER-UDP>
+		<CANFDDTU800EWGR-TCP stream="CANFDDTU800EWGR-TCP" case="parent-value=70">
+			<include_file>
+				<value>canfdnet800u-tcp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANFDDTU800EWGR-tcp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDDTU800EWGR-TCP>
+		<CANFDDTU800EWGR-UDP stream="CANFDDTU800EWGR-UDP" case="parent-value=71">
+			<include_file>
+				<value>canfdnet800u-udp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANFDDTU800EWGR-udp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDDTU800EWGR-UDP>
+		<CANFDDTU600EWGR-TCP stream="CANFDDTU600EWGR-TCP" case="parent-value=72">
+			<include_file>
+				<value>canfdnet600u-tcp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANFDDTU600EWGR-tcp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDDTU600EWGR-TCP>
+		<CANFDDTU600EWGR-UDP stream="CANFDDTU600EWGR-UDP" case="parent-value=73">
+			<include_file>
+				<value>canfdnet600u-udp.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANFDDTU600EWGR-udp config file</desc>
+				</meta>
+			</include_file>
+		</CANFDDTU600EWGR-UDP>
 	</DeviceType>
 </info>

@@ -1,0 +1,23 @@
+bitrate:
+  500_000:
+    clock: 60_000_000
+    arb_tseg1: 2
+    arb_tseg2: 0
+    arb_sjw: 80
+    arb_smp: 0
+    arb_brp: 23
+  1_000_000:
+    clock: 60_000_000
+    arb_tseg1: 7
+    arb_tseg2: 0
+    arb_sjw: 90
+    arb_smp: 0
+    arb_brp: 5
+data_bitrate:
+#  500_000:
+#    data_tseg1: 1
+#    data_tseg2: 0
+#    data_sjw: 75
+#    data_smp: 0
+#    data_brp: 2
+

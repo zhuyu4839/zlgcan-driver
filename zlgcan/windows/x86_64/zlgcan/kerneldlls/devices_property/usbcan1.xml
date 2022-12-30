@@ -68,7 +68,6 @@
 						<option type="int32" value="50000" desc="50kbps"></option>
 						<option type="int32" value="20000" desc="20kbps"></option>
 						<option type="int32" value="10000" desc="10kbps"></option>
-						<option type="int32" value="5000" desc="5kbps"></option>
 						<option type="int32" value="0" desc="custom"></option>
 					</options>
 				</meta>
@@ -76,7 +75,7 @@
 			<baud_rate_custom flag="0x0044" at_initcan="pre">
 				<value>56</value>
 				<meta>
-					<visible>$/info/channel/channel_0/baud_rate == 10</visible>
+					<visible>$/info/channel/channel_0/baud_rate == 9</visible>
 					<type>string</type>
 					<desc>自定义波特率</desc>
 				</meta>
@@ -128,7 +127,7 @@
 					<desc></desc>
 				</meta>
 			</filter_batch>
-			<get_card_parent_instance_id flag="0x0065" >
+			<get_card_parent_instance_id flag="0x0065">
 				<value></value>
 				<meta>
 					<type>string</type>

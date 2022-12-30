@@ -7,7 +7,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <pthread.h>
-#include "../zcan.h"
+#include "zcan.h"
 
 #define msleep(ms)  usleep((ms)*1000)
 #define min(a,b)  (((a) < (b)) ? (a) : (b))
@@ -312,8 +312,15 @@ int test()
 
     // terminal resistor
     U32 on = 1;
+    // EXTERN_C U32 ZCAN_API VCI_SetReference(U32 Type, U32 Card, U32 Port, U32 Ref, void *pData);
     if (!VCI_SetReference(gDevType, gDevIdx, 0, CMD_CAN_TRES, &on)) {
         printf("CMD_CAN_TRES failed\n");
+    }
+    
+    U32 res = 0;
+    // EXTERN_C U32 ZCAN_API VCI_GetReference(U32 Type, U32 Card, U32 Port, U32 Ref, void *pData);
+    if (!VCI_GetReference(gDevType, gDevIdx, 0, CMD_CAN_TRES, &res)) {
+        printf("CMD_CAN_TRES result: %d\n", res);
     }
 
 #if 0

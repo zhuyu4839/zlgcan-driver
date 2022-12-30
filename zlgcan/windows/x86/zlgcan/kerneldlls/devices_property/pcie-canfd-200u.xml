@@ -107,7 +107,6 @@
 					<desc>数据域波特率</desc>
 					<visible>$/info/channel/channel_0/canfd_abit_baud_rate != 5 &amp;&amp; $/info/channel/channel_0/protocol != 0&amp;&amp;$/info/channel/channel_0/canfd_exp!=0</visible>
 					<options>
-						<option type="int32" value="8000000" desc="8Mbps 80%"></option>
 						<option type="int32" value="5000000" desc="5Mbps 75%"></option>
 						<option type="int32" value="4000000" desc="4Mbps 80%"></option>
 						<option type="int32" value="2000000" desc="2Mbps 80%"></option>
@@ -341,7 +340,6 @@
 					<desc>数据域波特率</desc>
 					<visible>$/info/channel/channel_1/canfd_abit_baud_rate != 5 &amp;&amp; $/info/channel/channel_1/protocol != 0&amp;&amp;$/info/channel/channel_1/canfd_exp!=0</visible>
 					<options>
-						<option type="int32" value="8000000" desc="8Mbps 80%"></option>
 						<option type="int32" value="5000000" desc="5Mbps 75%"></option>
 						<option type="int32" value="4000000" desc="4Mbps 80%"></option>
 						<option type="int32" value="2000000" desc="2Mbps 80%"></option>

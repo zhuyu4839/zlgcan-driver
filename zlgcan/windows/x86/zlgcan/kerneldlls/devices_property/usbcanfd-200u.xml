@@ -90,7 +90,7 @@
 				</meta>
 			</canfd_exp>
 			<canfd_abit_baud_rate flag="0x0046" at_initcan="pre">
-				<value>500000</value>
+				<value>1000000</value>
 				<meta>
 					<type>options.int32</type>
 					<desc>仲裁域波特率</desc>
@@ -107,7 +107,7 @@
 				</meta>
 			</canfd_abit_baud_rate>
 			<canfd_dbit_baud_rate flag="0x0047" at_initcan="pre">
-				<value>1000000</value>
+				<value>5000000</value>
 				<meta>
 					<type>options.int32</type>
 					<desc>数据域波特率</desc>
@@ -188,7 +188,7 @@
 				</meta>
 			</apply_auto_send>
 			<set_cn flag="0x000C">
-				<value>A001</value>
+				<value>1</value>
 				<meta>
 					<visible>false</visible>
 					<type>string</type>
@@ -397,7 +397,7 @@
 				</meta>
 			</get_send_mode>
 			<set_device_recv_merge flag="0x0020">
-				<value>1</value>
+				<value>0</value>
 				<meta>
 					<visible>false</visible>
 					<type>uint32</type>
@@ -466,7 +466,7 @@
 				</meta>
 			</canfd_exp>
 			<canfd_abit_baud_rate flag="0x0146" at_initcan="pre">
-				<value>500000</value>
+				<value>1000000</value>
 				<meta>
 					<type>options.int32</type>
 					<desc>仲裁域波特率</desc>
@@ -564,7 +564,7 @@
 				</meta>
 			</apply_auto_send>
 			<set_cn flag="0x010C">
-				<value>A002</value>
+				<value>1</value>
 				<meta>
 					<visible>false</visible>
 					<type>string</type>

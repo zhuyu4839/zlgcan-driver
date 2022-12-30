@@ -89,7 +89,7 @@
 				</meta>
 			</canfd_exp>
 			<canfd_abit_baud_rate flag="0x0046" at_initcan="pre">
-				<value>250000</value>
+				<value>1000000</value>
 				<meta>
 					<type>options.int32</type>
 					<desc>仲裁域波特率</desc>
@@ -106,7 +106,7 @@
 				</meta>
 			</canfd_abit_baud_rate>
 			<canfd_dbit_baud_rate flag="0x0047" at_initcan="pre">
-				<value>250000</value>
+				<value>5000000</value>
 				<meta>
 					<type>options.int32</type>
 					<desc>数据域波特率</desc>
@@ -155,7 +155,7 @@
 				</meta>
 			</initenal_resistance>
 			<auto_send flag="0x0034">
-				<value>&#01;</value>
+				<value>0</value>
 				<meta>
 					<visible>false</visible>
 					<type>string</type>
@@ -171,7 +171,7 @@
 				</meta>
 			</auto_send_canfd>
 			<clear_auto_send flag="0x0036">
-				<value>0</value>
+				<value>1</value>
 				<meta>
 					<visible>false</visible>
 					<type>string</type>
@@ -179,7 +179,7 @@
 				</meta>
 			</clear_auto_send>
 			<apply_auto_send flag="0x0048">
-				<value>0</value>
+				<value>1</value>
 				<meta>
 					<visible>false</visible>
 					<type>string</type>
@@ -267,7 +267,7 @@
 				</meta>
 			</filter_clear>
 			<filter_mode flag="0x0031" at_initcan="post">
-				<value>1</value>
+				<value>0</value>
 				<meta>
 					<type>options.int32</type>
 					<desc>滤波模式</desc>
@@ -280,7 +280,7 @@
 				</meta>
 			</filter_mode>
 			<filter_start flag="0x0032" hex="1" at_initcan="post">
-				<value>0</value>
+				<value>ffbdd8</value>
 				<meta>
 					<type>uint32</type>
 					<desc>滤波起始帧</desc>
@@ -288,7 +288,7 @@
 				</meta>
 			</filter_start>
 			<filter_end flag="0x0033" hex="1" at_initcan="post">
-				<value>0x1FFFFFFF</value>
+				<value>ffbe28</value>
 				<meta>
 					<type>uint32</type>
 					<desc>滤波结束帧</desc>
@@ -344,7 +344,7 @@
 				</meta>
 			</ctrl_mode>
 			<auto_send_param flag="0x0057">
-				<value>0</value>
+				<value>1</value>
 				<meta>
 					<visible>false</visible>
 					<type>string</type>

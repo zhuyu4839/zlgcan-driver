@@ -77,6 +77,12 @@
 #define ZCAN_CANFDDTU_400_UDP               65
 #define ZCAN_CANFDWIFI_200U_TCP             66
 #define ZCAN_CANFDWIFI_200U_UDP             67
+#define ZCAN_CANFDDTU_800ER_TCP             68
+#define ZCAN_CANFDDTU_800ER_UDP             69
+#define ZCAN_CANFDDTU_800EWGR_TCP           70
+#define ZCAN_CANFDDTU_800EWGR_UDP           71
+#define ZCAN_CANFDDTU_600EWGR_TCP           72
+#define ZCAN_CANFDDTU_600EWGR_UDP           73
 
 #define ZCAN_OFFLINE_DEVICE                 98
 #define ZCAN_VIRTUAL_DEVICE                 99
@@ -134,13 +140,11 @@
 typedef void * DEVICE_HANDLE;
 typedef void * CHANNEL_HANDLE;
 
-#pragma pack(push, 1)
-
 typedef struct tagZCAN_DEVICE_INFO {
-    USHORT hw_Version;
-    USHORT fw_Version;
-    USHORT dr_Version;
-    USHORT in_Version;
+    USHORT hw_Version;                      //硬件版本
+    USHORT fw_Version;                      //固件版本
+    USHORT dr_Version;                      //驱动版本
+    USHORT in_Version;                      //动态库版本
     USHORT irq_Num;
     BYTE   can_Num;
     UCHAR  str_Serial_Num[20];
@@ -395,6 +399,8 @@ enum eZCANDataDEF
     ZCAN_TX_DELAY_UNIT_100US        = 2,            // 发送延时单位100微秒(0.1毫秒)
 
 };
+
+#pragma pack(push, 1)
 
 // CAN/CANFD数据
 typedef struct tagZCANCANFDData
