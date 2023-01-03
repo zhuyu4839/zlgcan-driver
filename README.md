@@ -8,8 +8,9 @@
 
 2. 找到python-can安装路径
 
-   1. 一般不用虚拟环境安装则在python安装路径下Lib/site-packages
-   2. 使用虚拟环境则在虚拟环境下Lib/site-packages
+   1. windows下一般不用虚拟环境安装则在python安装路径下Lib/site-packages
+   2. linux下一般不用虚拟环境安装则在用户home目录./locals/lib/PythonVersion/Lib目录下
+   3. 使用虚拟环境则在虚拟环境下Lib/site-packages
 
 3. 修改python-can路径下的can/interfaces/\_\_init__.py文件, 在BACKENDS字典中添加一行:
 
@@ -45,31 +46,7 @@
              bus.send(msg, trans_type=ZCANCanTransType.SELF_SR)
              time.sleep(0.05)
              print(bus.recv())
-     ```
 
-   - Linux下使用:
-
-     ```python
-     import can
-     import time
-     
-     from zlgcan import ZCANDeviceType, ZCANCanTransType
-     
-     with can.Bus(bustype='zlgcan', device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
-                  configs=[{'clock': 60_000_000, 'tseg1_abr': 7, 'tseg2_abr': 0, 'brp_abr': 11, 'sjw_abr': 0}]  # 1通道配置
-                  ) as bus:
-         while True:
-             msg = can.Message(
-                 arbitration_id=0x01,
-                 is_extended_id=False,
-                 channel=0,
-                 data=[0x01, 0x02, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02, ],
-                 is_rx=False,
-             )
-             bus.send(msg, trans_type=ZCANCanTransType.SELF_SR)
-             time.sleep(0.05)
-             print(bus.recv())
-     ```
 
      
 
