@@ -339,13 +339,13 @@ class IProperty(Structure):  # IProperty
 
 class _ZCANWindows(_ZLGCAN):
 
-    def __init__(self):
+    def __init__(self, resend):
         if _library is None:
             raise ZCANException(
                         "The ZLG-CAN driver could not be loaded. "
                         "Check that you are using 32-bit/64bit Python on Windows."
                     )
-        super().__init__()
+        super().__init__(resend)
 
     def _get_can_init_config(self, mode, filter, **kwargs):
         config = ZCAN_CHANNEL_INIT_CONFIG()
@@ -645,10 +645,10 @@ class _ZCANWindows(_ZLGCAN):
     def CloseDevice(self):
         can_channels = self._channel_handlers['CAN']
         lin_channels = self._channel_handlers['LIN']
-        for channel, hdl in can_channels.items():
-            self.ResetCAN(hdl)
-        for channel, hdl in lin_channels.items():
-            self.ResetLIN(hdl)
+        for channel, _ in can_channels.items():
+            self.ResetCAN(channel)
+        for channel, _ in lin_channels.items():
+            self.ResetLIN(channel)
         _library_check_run(_library, 'ZCAN_CloseDevice', self._dev_handler)
         self._dev_handler = None
         can_channels.clear()

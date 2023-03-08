@@ -283,13 +283,18 @@ class ZCAN_DEVICE_INFO(Structure):  # ZCAN_DEVICE_INFO
 
 class _ZLGCAN(object):
 
-    def __init__(self):
+    def __init__(self, resend):
+        """
+        Create ZLG-CAN object
+        :param resend: true if retry to send a frame until success else false 
+        """
         # if _library is None:
         #     raise ZCANException(
         #         "The ZLG-CAN driver could not be loaded. "
         #         "Check that you are using 32-bit/64bit Python on Windows or 64bit Python on Linux."
         #     )
         self._logger = logging.getLogger(self.__class__.__name__)
+        self._resend = resend
         self._dev_index = None
         self._dev_type = None
         # self._dev_type_name = None
@@ -311,6 +316,10 @@ class _ZLGCAN(object):
     @property
     def channels(self) -> tuple:
         return self._channels
+
+    @property
+    def resend(self):
+        return self._resend
 
     def _get_channel_handler(self, chl_type, channel):
         channels = self._channel_handlers[chl_type]

@@ -132,13 +132,13 @@ class ZCAN_CHANNEL_INIT_CONFIG(Structure):       # ZCAN_CHANNEL_INIT_CONFIG
 
 class _ZCANLinux(_ZLGCAN):
 
-    def __init__(self):
+    def __init__(self, resend):
         if _library is None:
             raise ZCANException(
                         "The ZLG-CAN driver could not be loaded. "
                         "Check that you are using 64bit Python on Linux."
                     )
-        super().__init__()
+        super().__init__(resend)
 
     def _get_can_init_config(self, mode, filter, **kwargs):
         # print(mode, filter, kwargs)
@@ -235,8 +235,8 @@ class _ZCANLinux(_ZLGCAN):
     def CloseDevice(self):
         can_channels = self._channel_handlers['CAN']
         lin_channels = self._channel_handlers['LIN']
-        for channel, hdl in can_channels.items():
-            self.ResetCAN(hdl)
+        for channel, _ in can_channels.items():
+            self.ResetCAN(channel)
         # for channel in lin_channels:
         #     self.ResetLIN(channel)
         _library_check_run(_library, 'VCI_CloseDevice', self._dev_type, self._dev_index)

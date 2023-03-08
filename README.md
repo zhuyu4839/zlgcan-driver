@@ -32,7 +32,7 @@
      
      from zlgcan import ZCANDeviceType, ZCANCanTransType
      
-     with can.Bus(bustype='zlgcan', device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
+     with can.Bus(bustype='zlgcan', device_type=ZCANDeviceType.ZCAN_USBCANFD_200U, resend=True,
                   configs=[{'bitrate': 500000, 'initenal_resistance': 1}]  # 1通道配置
                   ) as bus:
          while True:
