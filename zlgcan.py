@@ -34,6 +34,8 @@ def zlg_convert_msg(msg, **kwargs):
 def _zlg_convert_msg_linux(msg, **kwargs):
     from zlgcan.linux import ZCAN_CAN_FRAME, ZCAN_CANFD_FRAME, ZCAN_MSG_HEADER, ZCAN_MSG_INFO
     if isinstance(msg, Message):
+        channnel = kwargs.get('channel')
+        assert channel is not None or msg.channel is not None, 'channel is required!'
         trans_type = kwargs.get('trans_type', ZCANCanTransType.NORMAL if kwargs.get('resend', False) else ZCANCanTransType.SINGLE)
         if msg.is_fd:
             result = (ZCAN_CANFD_FRAME * 1)()
@@ -53,7 +55,7 @@ def _zlg_convert_msg_linux(msg, **kwargs):
         header = ZCAN_MSG_HEADER()
         header.id = msg.arbitration_id
         header.info = info
-        header.channel = msg.channel
+        header.channel = msg.channel or channel
         header.dlc = msg.dlc
 
         result[0].header = header
@@ -61,6 +63,8 @@ def _zlg_convert_msg_linux(msg, **kwargs):
         return result
     elif isinstance(msg, (ZCAN_CAN_FRAME, ZCAN_CANFD_FRAME)):
         header = msg.header
+        channnel = kwargs.get('channel')
+        assert channel is not None or header.channel is not None, 'channel is required!'
         info = header.info
         return Message(
             timestamp=header.timestamp / 1000,
@@ -68,7 +72,7 @@ def _zlg_convert_msg_linux(msg, **kwargs):
             is_extended_id=bool(info.is_extend),
             is_remote_frame=bool(info.is_remote),
             is_error_frame=bool(info.is_error),
-            channel=header.channel,
+            channel=header.channel or channel,
             dlc=header.dlc,
             data=bytes(msg.data),
             is_fd=bool(info.is_fd),
