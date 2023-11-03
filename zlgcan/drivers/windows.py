@@ -44,8 +44,11 @@ class _ZCANWindows(_ZLGCAN):
                         _prog_path: str = win32api.RegEnumValue(_key, i)[1]
                         if _name in _prog_path:
                             _prog_path = _prog_path.replace(_name, "")
-                            self._library = windll.LoadLibrary(os.path.join(_prog_path, 'zlgcan.dll'))
-                            break
+                            try:
+                                self._library = windll.LoadLibrary(os.path.join(_prog_path, 'zlgcan.dll'))
+                                break
+                            except OSError:
+                                break
 
                     win32api.RegCloseKey(_key)
                 except pywintypes.error:    # ZCANPRO is not installed
