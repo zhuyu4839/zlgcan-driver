@@ -1,0 +1,55 @@
+USBCAN: &USBCAN
+  bitrate:
+    100_000:
+      timing0: 0x04
+      timing1: 0x1c
+    125_000:
+      timing0: 0x03
+      timing1: 0x1c
+    200_000:
+      timing0: 0x81
+      timing1: 0xfa
+    250_000:
+      timing0: 0x01
+      timing1: 0x1c
+    400_000:
+      timing0: 0x80
+      timing1: 0xfa
+    500_000:
+      timing0: 0x00
+      timing1: 0x1c
+    800_000:
+      timing0: 0x00
+      timing1: 0x16
+    1_000_000:
+      timing0: 0x00
+      timing1: 0x14
+USBCANFD: &USBCANFD
+  bitrate:
+    500_000:
+      clock: 60_000_000
+      arb_tseg1: 2
+      arb_tseg2: 0
+      arb_sjw: 80
+      arb_smp: 0
+      arb_brp: 23
+    1_000_000:
+      clock: 60_000_000
+      arb_tseg1: 7
+      arb_tseg2: 0
+      arb_sjw: 90
+      arb_smp: 0
+      arb_brp: 5
+  data_bitrate:
+  #  500_000:
+  #    data_tseg1: 1
+  #    data_tseg2: 0
+  #    data_sjw: 75
+  #    data_smp: 0
+  #    data_brp: 2
+
+3: *USBCAN  # USBCAN1
+4: *USBCAN  # USBCAN2
+41: *USBCANFD # USBCANFD_200U
+42: *USBCANFD # USBCANFD_100U
+43: *USBCANFD # USBCANFD_MINI

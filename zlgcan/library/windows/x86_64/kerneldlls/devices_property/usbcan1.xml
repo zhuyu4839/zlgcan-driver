@@ -54,7 +54,7 @@
 		</meta>
 		<channel_0 stream="channel_0" case="parent-value=0">
 			<baud_rate flag="0x0046" at_initcan="pre">
-				<value>1000000</value>
+				<value>500000</value>
 				<meta>
 					<type>options.int32</type>
 					<desc>波特率</desc>
