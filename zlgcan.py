@@ -1,3 +1,4 @@
+      
 import collections
 import ctypes
 import logging
@@ -299,14 +300,24 @@ class ZCanBus(BusABC):
                     if bitrate is None:
                         raise CanInitializationError('ZLG-CAN - bitrate is required.')
                     del config['bitrate']
-                    config['canfd_abit_baud_rate'] = bitrate
 
-                    data_bitrate = config.get('data_bitrate', None)
-                    if data_bitrate is None:
-                        config['canfd_dbit_baud_rate'] = bitrate
+                    if self.device.device_is_canfd:
+                        config['canfd_abit_baud_rate'] = bitrate
+
+                        data_bitrate = config.get('data_bitrate', None)
+                        if data_bitrate is None:
+                            config['canfd_dbit_baud_rate'] = bitrate
+                        else:
+                            del config['data_bitrate']
+                            config['canfd_dbit_baud_rate'] = data_bitrate
                     else:
-                        del config['data_bitrate']
-                        config['canfd_dbit_baud_rate'] = data_bitrate
+                        init_config['bitrate'] = bitrate
+
+                    initenal_resistance = config.get("initenal_resistance", None)
+                    if initenal_resistance is not None:
+                        init_config['initenal_resistance'] = initenal_resistance
+                        del config['initenal_resistance']
+
                     if hasattr(self.device, 'SetValue'):
                         # try:
                         #     self.device.SetValue(channel, **config)
@@ -422,3 +433,5 @@ class ZCanBus(BusABC):
             _filters.append((1 if extended else 0, can_id, end))
 
         self.device.SetFilters(channel, _filters)
+
+    
