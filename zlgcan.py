@@ -330,6 +330,7 @@ class ZCanBus(BusABC):
                 self.device.StartCAN(channel)
                 self.available.append(channel)
         except ZCANException as e:
+            self.shutdown()
             raise CanInitializationError(str(e))
 
     # def _apply_filters(self, filters: Optional[can.typechecking.CanFilters]) -> None:
