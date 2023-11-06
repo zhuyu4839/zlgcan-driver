@@ -27,9 +27,7 @@ class _ZCANWindows(_ZLGCAN):
             import yaml  # load baud-rate configuration file
             with open(os.path.join(_current_path, 'baudrate.conf.yaml'), 'r', encoding='utf-8') as stream:
                 self._baudrate_config = yaml.full_load(stream)
-        except ImportError as e:
-            raise ZCANException(e)
-        except (FileNotFoundError, PermissionError, ValueError, yaml.YAMLError) as e:
+        except (ImportError, FileNotFoundError, PermissionError, ValueError, yaml.YAMLError) as e:
             raise ZCANException(e)
 
         if _system_bit == "32bit":
@@ -37,24 +35,25 @@ class _ZCANWindows(_ZLGCAN):
                 import win32api
                 import win32con
                 import pywintypes
-                _name = "ZCANPRO.exe"
-                _reg = rf"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{_name}"
-                _key = win32api.RegOpenKey(win32con.HKEY_LOCAL_MACHINE, _reg, 0, win32con.KEY_READ)
-                _info = win32api.RegQueryInfoKey(_key)
-                for i in range(_info[1]):
-                    _prog_path: str = win32api.RegEnumValue(_key, i)[1]
-                    if _name in _prog_path:
-                        _prog_path = _prog_path.replace(_name, "")
-                        try:
-                            self._library = windll.LoadLibrary(os.path.join(_prog_path, 'zlgcan.dll'))
-                            break
-                        except OSError:
-                            break
+                try:
+                    _name = "ZCANPRO.exe"
+                    _reg = rf"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{_name}"
+                    _key = win32api.RegOpenKey(win32con.HKEY_LOCAL_MACHINE, _reg, 0, win32con.KEY_READ)
+                    _info = win32api.RegQueryInfoKey(_key)
+                    for i in range(_info[1]):
+                        _prog_path: str = win32api.RegEnumValue(_key, i)[1]
+                        if _name in _prog_path:
+                            _prog_path = _prog_path.replace(_name, "")
+                            try:
+                                self._library = windll.LoadLibrary(os.path.join(_prog_path, 'zlgcan.dll'))
+                                break
+                            except OSError:
+                                break
 
-                win32api.RegCloseKey(_key)
-            except ImportError:       # pywin32 is not installed
-                pass
-            except pywintypes.error:  # ZCANPRO is not installed
+                    win32api.RegCloseKey(_key)
+                except pywintypes.error:    # ZCANPRO is not installed
+                    pass
+            except ImportError:     # pywin32 is not installed
                 pass
 
             if self._library is None:
