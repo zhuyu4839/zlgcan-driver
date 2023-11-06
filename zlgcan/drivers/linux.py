@@ -225,9 +225,9 @@ class _ZCANLinux(_ZLGCAN):
 
         config = self._get_can_init_config(mode, filter, **_arb_cfg, **_data_cfg)
         _library_run(self._library, 'VCI_InitCAN', self._dev_type, self._dev_index, channel, byref(config))
-        self.ResistanceStatus(channel, kwargs.get('initenal_resistance', 1))
 
         self._channel_handlers['CAN'][channel] = channel
+        self.ResistanceStatus(channel, kwargs.get('initenal_resistance', 1))
 
     # EXTERN_C U32 ZCAN_API VCI_StartCAN(U32 Type, U32 Card, U32 Port);
     def StartCAN(self, channel):
