@@ -425,9 +425,9 @@ class _ZCANWindows(_ZLGCAN):
         ret = self._library.ZCAN_InitCAN(self._dev_handler, channel, byref(config))
         if ret == DeviceHandle.INVALID_CHANNEL_HANDLE:
             raise ZCANException('ZLG: ZCAN_InitCAN failed!')
-        self.ResistanceStatus(channel, kwargs.get('initenal_resistance', 1))
 
         self._channel_handlers['CAN'][channel] = ret
+        self.ResistanceStatus(channel, kwargs.get('initenal_resistance', 1))
 
     # UINT FUNC_CALL ZCAN_StartCAN(CHANNEL_HANDLE channel_handle);
     def StartCAN(self, channel):
