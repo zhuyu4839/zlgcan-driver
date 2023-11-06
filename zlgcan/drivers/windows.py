@@ -24,10 +24,13 @@ class _ZCANWindows(_ZLGCAN):
         super().__init__(dev_index, dev_type, resend, derive, **kwargs)
 
         try:
-            import yaml  # load baud-rate configuration file
-            with open(os.path.join(_current_path, 'baudrate.conf.yaml'), 'r', encoding='utf-8') as stream:
-                self._baudrate_config = yaml.full_load(stream)
-        except (ImportError, FileNotFoundError, PermissionError, ValueError, yaml.YAMLError) as e:
+            try:
+                import yaml  # load baud-rate configuration file
+                with open(os.path.join(_current_path, 'baudrate.conf.yaml'), 'r', encoding='utf-8') as stream:
+                    self._baudrate_config = yaml.full_load(stream)
+            except (FileNotFoundError, PermissionError, ValueError, yaml.YAMLError) as e:
+                raise ZCANException(e)
+        except ImportError as e:
             raise ZCANException(e)
 
         if _system_bit == "32bit":
