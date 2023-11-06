@@ -7,7 +7,7 @@ from ..structs import *
 from ..structs.linux.can import *
 from ..types import *
 from ..exceptions import ZCANException
-from ..utils import _library_path, _current_path, _library_run, _system_bit
+from ..utils import _library_path, _library_run, _system_bit
 from .zlgcan import _ZLGCAN
 
 _LINUX_CAN = (ZCANDeviceType.ZCAN_USBCAN1, ZCANDeviceType.ZCAN_USBCAN2, )
@@ -36,12 +36,6 @@ class _ZCANLinux(_ZLGCAN):
                         "The ZLG-CAN driver could not be loaded. "
                         "Check that you are using 64bit Python on Linux."
                     )
-        try:
-            import yaml     # load baud-rate configuration file
-            with open(os.path.join(_current_path, 'baudrate.conf.yaml'), 'r', encoding='utf-8') as stream:
-                self._baudrate_config = yaml.full_load(stream)
-        except (ImportError, FileNotFoundError, PermissionError, ValueError, yaml.YAMLError) as e:
-            raise ZCANException(e)
 
         if self._dev_type in _LINUX_CAN:
             self._library = cdll.LoadLibrary(os.path.join(_library_path, 'linux/x86_64/libusbcan.so'))

@@ -1,7 +1,8 @@
 import logging
+import os.path
 
-from zlgcan.types import *
-from zlgcan.utils import ZCANException
+from ..types import *
+from ..utils import ZCANException, _current_path
 
 
 class _ZLGCAN(object):
@@ -24,6 +25,16 @@ class _ZLGCAN(object):
         self._dev_handler = None
         self._library = None
         self.kwargs = kwargs
+
+        try:
+            import yaml  # load baud-rate configuration file
+            try:
+                with open(os.path.join(_current_path, 'baudrate.conf.yaml'), 'r', encoding='utf-8') as stream:
+                    self._baudrate_config = yaml.full_load(stream)
+            except (FileNotFoundError, PermissionError, ValueError, yaml.YAMLError) as e:
+                raise ZCANException(e)
+        except ImportError:
+            raise ZCANException("package 'pyyaml' required!")
 
     @property
     def device_index(self):

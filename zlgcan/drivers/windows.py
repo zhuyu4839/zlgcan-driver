@@ -11,7 +11,7 @@ from ..structs.windows.gps import *
 from ..structs.windows.lin import *
 from ..types import *
 from ..exceptions import *
-from ..utils import _library_run, _library_path, _current_path, _system_bit
+from ..utils import _library_run, _library_path, _system_bit
 from .zlgcan import _ZLGCAN
 
 
@@ -22,16 +22,6 @@ class _ZCANWindows(_ZLGCAN):
 
     def __init__(self, dev_index: int, dev_type: int, resend: bool, derive: bool = False, **kwargs):
         super().__init__(dev_index, dev_type, resend, derive, **kwargs)
-
-        try:
-            try:
-                import yaml  # load baud-rate configuration file
-                with open(os.path.join(_current_path, 'baudrate.conf.yaml'), 'r', encoding='utf-8') as stream:
-                    self._baudrate_config = yaml.full_load(stream)
-            except (FileNotFoundError, PermissionError, ValueError, yaml.YAMLError) as e:
-                raise ZCANException(e)
-        except ImportError as e:
-            raise ZCANException(e)
 
         if _system_bit == "32bit":
             try:
