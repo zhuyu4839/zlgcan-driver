@@ -1,4 +1,3 @@
-      
 import collections
 import ctypes
 import logging
@@ -17,7 +16,7 @@ from can.exceptions import (
 )
 from typing import Optional, Tuple, Sequence, Union, Deque, Any
 from can import BusABC, Message
-from zlgcan import ZCAN, ZCANDeviceType, ZCANException, ZCANMessageType, ZCANCanTransType
+from zlgcan import ZCAN, ZCANDeviceType, ZCANException, ZCANMessageType, ZCANCanTransType, ZUSBCAN_I_II_TYPE
 
 logger = logging.getLogger(__name__)
 _os = platform.system()
@@ -36,11 +35,21 @@ def _zlg_convert_msg_linux(msg, **kwargs):
     from zlgcan.structs.linux.can import ZCAN_CAN_FRAME, ZCAN_CANFD_FRAME, ZCAN_CAN_FRAME_I_II
     if isinstance(msg, Message):
         trans_type = kwargs.get('trans_type', ZCANCanTransType.NORMAL if kwargs.get('resend', False) else ZCANCanTransType.SINGLE)
+        dev_type = kwargs.get("dev_type")
         channel = kwargs.get("channel")
         assert channel is not None or msg.channel is not None, 'channel required that from message or key words!'
         if msg.is_fd:
             result = (ZCAN_CANFD_FRAME * 1)()
             result[0].data = (ctypes.c_ubyte * 64)(*msg.data)
+        elif dev_type in ZUSBCAN_I_II_TYPE:
+            result = (ZCAN_CAN_FRAME_I_II * 1)()
+            result[0].id = msg.arbitration_id
+            result[0].mode = trans_type
+            result[0].is_remote = int(msg.is_remote_frame)
+            result[0].is_extend = int(msg.is_extended_id)
+            result[0].dlc = msg.dlc
+            result[0].data = (ctypes.c_ubyte * msg.dlc)(*msg.data)
+            return result
         else:
             result = (ZCAN_CAN_FRAME * 1)()
             result[0].data = (ctypes.c_ubyte * msg.dlc)(*msg.data)
@@ -341,7 +350,7 @@ class ZCanBus(BusABC):
         channel, raw_msg = self.rx_queue.popleft()
         msg = zlg_convert_msg(raw_msg, channel=channel)
 
-        return zlg_convert_msg(raw_msg, channel=channel), False
+        return msg, False
 
     def poll_received_messages(self, timeout):
         try:
@@ -394,7 +403,7 @@ class ZCanBus(BusABC):
             else:
                 if msg.is_fd:
                     return self.device.TransmitFD(channel, zlg_convert_msg(msg, resend=self.device.resend, channel=channel, is_merge=is_merge, **kwargs), 1)
-                return self.device.Transmit(channel, zlg_convert_msg(msg, resend=self.device.resend, channel=channel, is_merge=is_merge, **kwargs), 1)
+                return self.device.Transmit(channel, zlg_convert_msg(msg, dev_type=self.device.device_type, resend=self.device.resend, channel=channel, is_merge=is_merge, **kwargs), 1)
         except ZCANException as e:
             raise CanOperationError(str(e))
 
@@ -434,5 +443,3 @@ class ZCanBus(BusABC):
             _filters.append((1 if extended else 0, can_id, end))
 
         self.device.SetFilters(channel, _filters)
-
-    

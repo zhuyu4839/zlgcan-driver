@@ -41,6 +41,10 @@ class _ZLGCAN(object):
         return self._dev_index
 
     @property
+    def device_type(self):
+        return self._dev_type
+
+    @property
     def device_is_canfd(self):
         return self._dev_is_canfd
 
