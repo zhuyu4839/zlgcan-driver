@@ -407,8 +407,8 @@ class _ZCANWindows(_ZLGCAN):
 
         :return: None
         """
-        if "bitrate" not in kwargs:
-            raise ZCANException("'bitrate' is required in config")
+        # if "bitrate" not in kwargs:
+        #     raise ZCANException("'bitrate' is required in config")
 
         clock = kwargs.get('clock', None)
         if clock:
