@@ -166,11 +166,12 @@ class _ZCANLinux(_ZLGCAN):
         can_channels = self._channel_handlers['CAN']
         lin_channels = self._channel_handlers['LIN']
         if not self._dev_derive:
-            try:
-                for channel, _ in can_channels.items():
+            for channel, _ in can_channels.items():
+                try:
                     self.ResetCAN(channel)
-            except ZCANException:
-                raise ZCANException("can't reset can channel, consider set derive as True")
+                except ZCANException as e:
+                    self._logger.warning(e)
+                    # raise ZCANException("can't reset can channel, consider set derive as True")
         # for channel in lin_channels:      # TODO for LIN
         #     self.ResetLIN(channel)
         _library_run(self._library, 'VCI_CloseDevice', self._dev_type, self._dev_index)
