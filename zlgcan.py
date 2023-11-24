@@ -32,53 +32,64 @@ def zlg_convert_msg(msg, **kwargs):
 
 
 def _zlg_convert_msg_linux(msg, **kwargs):
-    from zlgcan.linux import ZCAN_CAN_FRAME, ZCAN_CANFD_FRAME, ZCAN_MSG_HEADER, ZCAN_MSG_INFO
+    from zlgcan.linux import ZCAN_CAN_FRAME, ZCAN_CANFD_FRAME, ZCAN_CAN_FRAME_I_II
     if isinstance(msg, Message):
-        channnel = kwargs.get('channel')
+        channel = kwargs.get('channel')
         assert channel is not None or msg.channel is not None, 'channel is required!'
         trans_type = kwargs.get('trans_type', ZCANCanTransType.NORMAL if kwargs.get('resend', False) else ZCANCanTransType.SINGLE)
         if msg.is_fd:
             result = (ZCAN_CANFD_FRAME * 1)()
-            result[0].data = (ctypes.c_ubyte * 64)(*msg.data)
         else:
             result = (ZCAN_CAN_FRAME * 1)()
-            result[0].data = (ctypes.c_ubyte * msg.dlc)(*msg.data)
-        info = ZCAN_MSG_INFO()
-        info.mode = trans_type
-        info.is_fd = int(msg.is_fd)
-        info.is_remote = int(msg.is_remote_frame)
-        info.is_extend = int(msg.is_extended_id)
-        info.is_error = int(msg.is_error_frame)
-        info.bitrate_switch = int(msg.bitrate_switch)
-        info.error_status = int(msg.error_state_indicator)
 
-        header = ZCAN_MSG_HEADER()
-        header.id = msg.arbitration_id
-        header.info = info
-        header.channel = msg.channel or channel
-        header.dlc = msg.dlc
+        result[0].hdr.inf.txm = trans_type
+        result[0].hdr.inf.fmt = int(msg.is_fd)
+        result[0].hdr.inf.sdf = int(msg.is_remote_frame)
+        result[0].hdr.inf.sef = int(msg.is_extended_id)
+        result[0].hdr.inf.err = int(msg.is_error_frame)
+        result[0].hdr.inf.brs = int(msg.bitrate_switch)
+        result[0].hdr.inf.est = int(msg.error_state_indicator)
 
-        result[0].header = header
+        result[0].hdr.id = msg.arbitration_id
+        result[0].hdr.chn = msg.channel or channel
+        result[0].hdr.len = msg.dlc
+        for _idx, _val in enumerate(msg.data):
+            result[0].dat[_idx] = _val
 
         return result
     elif isinstance(msg, (ZCAN_CAN_FRAME, ZCAN_CANFD_FRAME)):
-        header = msg.header
-        channnel = kwargs.get('channel')
-        assert channel is not None or header.channel is not None, 'channel is required!'
-        info = header.info
+        channel = kwargs.get('channel')
+        assert channel is not None or msg.hdr.chn is not None, 'channel is required!'
         return Message(
-            timestamp=header.timestamp / 1000,
-            arbitration_id=header.id,
-            is_extended_id=bool(info.is_extend),
-            is_remote_frame=bool(info.is_remote),
-            is_error_frame=bool(info.is_error),
-            channel=header.channel or channel,
-            dlc=header.dlc,
-            data=bytes(msg.data),
-            is_fd=bool(info.is_fd),
-            is_rx=True,
-            bitrate_switch=bool(info.bitrate_switch),
-            error_state_indicator=bool(info.error_status),
+            timestamp=msg.hdr.ts / 1000,
+            arbitration_id=msg.hdr.id,
+            is_extended_id=bool(msg.hdr.inf.sdf),
+            is_remote_frame=bool(msg.hdr.inf.sef),
+            is_error_frame=bool(msg.hdr.inf.err),
+            channel=msg.hdr.chn or channel,
+            dlc=msg.hdr.len,
+            data=bytes(msg.dat),
+            is_fd=bool(msg.hdr.inf.fmt),
+            is_rx=kwargs.get("is_rx", False),
+            bitrate_switch=bool(msg.hdr.inf.brs),
+            error_state_indicator=bool(msg.hdr.inf.est),
+        )
+    elif isinstance(msg, ZCAN_CAN_FRAME_I_II):
+        channel = kwargs.get('channel')
+        assert channel is not None, 'channel is required!'
+        return Message(
+            timestamp=msg.TimeStamp / 1000,
+            arbitration_id=msg.ID,
+            is_extended_id=bool(msg.ExternFlag),
+            is_remote_frame=bool(msg.RemoteFlag),
+            is_error_frame=False,
+            channel=channel,
+            dlc=msg.DataLen,
+            data=bytes(msg.Data),
+            is_fd=False,
+            is_rx=kwargs.get("is_rx", False),
+            bitrate_switch=False,
+            error_state_indicator=False,
         )
     else:
         raise ZCANException(f'Unknown message type: {type(msg)}')
@@ -119,7 +130,7 @@ def _zlg_convert_msg_win(msg, **kwargs):                        # channel=None, 
             result = ZCANDataObj_1()
             result[0].dataType = 1                     # can device always equal 1
             assert channel is not None
-            result[0].chnl = channel
+            result[0].chn = channel
             result[0].data.zcanCANFDData.frame.can_id = msg.arbitration_id
             result[0].data.zcanCANFDData.frame.err = msg.is_error_frame
             result[0].data.zcanCANFDData.frame.rtr = msg.is_remote_frame
@@ -145,6 +156,7 @@ def _zlg_convert_msg_win(msg, **kwargs):                        # channel=None, 
             channel=channel,
             dlc=msg.frame.can_dlc,
             data=bytes(msg.frame.data),
+            is_rx=True,
         )
     elif isinstance(msg, ZCAN_ReceiveFD_Data):                          # 接收CANFD报文转换
         channel = kwargs.get('channel', None)
@@ -159,7 +171,7 @@ def _zlg_convert_msg_win(msg, **kwargs):                        # channel=None, 
             dlc=msg.frame.len,
             data=bytes(msg.frame.data),
             is_fd=True,
-            # is_rx=True,
+            is_rx=True,
             bitrate_switch=msg.frame.brs,
             error_state_indicator=msg.frame.esi,
         )
@@ -171,10 +183,11 @@ def _zlg_convert_msg_win(msg, **kwargs):                        # channel=None, 
             is_extended_id=data.frame.eff,
             is_remote_frame=data.frame.rtr,
             is_error_frame=data.frame.err,
-            channel=msg.chnl,
+            channel=msg.chn,
             dlc=data.frame.len,
             data=bytes(data.frame.data),
             is_fd=data.flag.frameType,
+            is_rx=True,
             bitrate_switch=data.frame.brs,
             error_state_indicator=data.frame.esi,
         ), data.flag.txEchoed
@@ -189,6 +202,7 @@ class ZCanBus(BusABC):
                  resend: bool = False,
                  device_type: ZCANDeviceType,
                  device_index: int = 0,
+                 derive: bool = False,
                  rx_queue_size: Optional[int] = None,
                  configs: Union[list, tuple] = None,
                  can_filters: Optional[can.typechecking.CanFilters] = None,
@@ -241,7 +255,7 @@ class ZCanBus(BusABC):
             maxlen=rx_queue_size
         )  # type: Deque[Tuple[int, Any]]               # channel, raw_msg
         try:
-            self.device = ZCAN(resend)
+            self.device = ZCAN(device_index, device_type, resend, derive)
             self.device.OpenDevice(device_type, device_index)
             self.channels = self.device.channels
             self.available = []
@@ -312,14 +326,11 @@ class ZCanBus(BusABC):
         except ZCANException as e:
             raise CanInitializationError(str(e))
 
-    # def _apply_filters(self, filters: Optional[can.typechecking.CanFilters]) -> None:
-    #     pass
-
     def _recv_from_queue(self) -> Tuple[Message, bool]:
         """Return a message from the internal receive queue"""
         channel, raw_msg = self.rx_queue.popleft()
 
-        return zlg_convert_msg(raw_msg, channel=channel), False
+        return zlg_convert_msg(raw_msg, channel=channel, is_rx=True), False
 
     def poll_received_messages(self, timeout):
         try:

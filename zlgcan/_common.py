@@ -3,11 +3,14 @@ by zhuyu4839@gmail.com
 """
 import logging
 import os.path
-import platform as _platform
+import platform
+import yaml
 from ctypes import *
 
+_os_name = platform.system()
+_system_bit, _ = platform.architecture()
 _curr_path = os.path.dirname(__file__)
-_arch, _ = _platform.architecture()
+_bd_cfg_filename = "baudrate.conf.yaml"
 
 
 class ZCANException(Exception):
@@ -283,7 +286,7 @@ class ZCAN_DEVICE_INFO(Structure):  # ZCAN_DEVICE_INFO
 
 class _ZLGCAN(object):
 
-    def __init__(self, resend):
+    def __init__(self, dev_index: int, dev_type: ZCANDeviceType, resend: bool, derive: bool, **kwargs):
         """
         Create ZLG-CAN object
         :param resend: true if retry to send a frame until success else false 
@@ -295,15 +298,22 @@ class _ZLGCAN(object):
         #     )
         self._logger = logging.getLogger(self.__class__.__name__)
         self._resend = resend
-        self._dev_index = None
-        self._dev_type = None
-        # self._dev_type_name = None
+        self._dev_index = dev_index
+        self._dev_type = dev_type
+        self._dev_derive = derive
         self._dev_info = None
         self._dev_is_canfd = None
         self._channels = ()
         # {'CAN': {chl_obj: is_canfd}, 'LIN': {chl_obj: is_master}}
         self._channel_handlers = {'CAN': {}, 'LIN': {}}     # "CAN": {channel: channel_handler}
         self._dev_handler = None
+        self._library = None
+        self.kwargs = kwargs
+        try:
+            with open(os.path.join(_curr_path, _bd_cfg_filename), 'r', encoding='utf-8') as stream:
+                self._bd_cfg = yaml.full_load(stream)
+        except (FileNotFoundError, PermissionError, ValueError, yaml.YAMLError) as e:
+            raise ZCANException(e)
 
     @property
     def device_index(self):
@@ -350,7 +360,7 @@ class _ZLGCAN(object):
         pass
 
     # DEVICE_HANDLE FUNC_CALL ZCAN_OpenDevice(UINT device_type, UINT device_index, UINT reserved);
-    def OpenDevice(self, dev_type: ZCANDeviceType, dev_index=0, reserved=0):
+    def OpenDevice(self, reserved=0):
         pass
 
     # UINT FUNC_CALL ZCAN_CloseDevice(DEVICE_HANDLE device_handle);
@@ -418,6 +428,14 @@ class _ZLGCAN(object):
 
     # UINT FUNC_CALL ZCAN_TransmitFD(CHANNEL_HANDLE channel_handle, ZCAN_TransmitFD_Data* pTransmit, UINT len);
     def TransmitFD(self, channel, msgs, size=None):
+        """
+        发送CANFD报文
+        :param channel: 通道号, 范围 0 ~ 通道数-1
+        :param msgs: 消息报文
+        :param size: 报文大小
+        :param timeout: send timeout value
+        :return: 实际发送报文长度
+        """
         pass
 
     # UINT FUNC_CALL ZCAN_ReceiveFD(CHANNEL_HANDLE channel_handle, ZCAN_ReceiveFD_Data* pReceive, UINT len, int timeout DEF(-1));
@@ -431,6 +449,7 @@ class _ZLGCAN(object):
         :param channel: 通道号, 范围 0 ~ 通道数-1
         :param msgs: 消息报文
         :param size: 报文大小
+        :param timeout: send timeout value
         :return: 实际发送报文长度
         """
         pass

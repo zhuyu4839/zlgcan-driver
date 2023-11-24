@@ -4,18 +4,11 @@ reference: https://manual.zlg.cn/web/#/188/6982
 config: https://manual.zlg.cn/web/#/42/1710
 """
 import os
-import yaml
 
 from ctypes import *
-from ._common import _ZLGCAN, _library_check_run, ZCANDeviceType, ZCANCanMode, ZCANCanFilter, ZCANMessageType, ZCAN_DEVICE_INFO, ZCANException, \
-    _arch, _curr_path
-
-if _arch == '64bit':
-    _lib_path = os.path.join(_curr_path, 'linux/x86_64/zlgcan/libusbcanfd.so')
-else:
-    _lib_path = None
-if _lib_path:
-    _library = cdll.LoadLibrary(_lib_path)
+from ._common import _ZLGCAN, _library_check_run, ZCANDeviceType, ZCANCanMode, ZCANCanFilter, ZCANMessageType, \
+    ZCAN_DEVICE_INFO, ZUSBCAN_I_II_TYPE, ZCANException, \
+    _curr_path, _bd_cfg_filename
 
 ON = c_int(1)
 OFF = c_int(0)
@@ -25,11 +18,11 @@ CMD_CAN_SKD_SEND_STATUS = 0x17
 CMD_CAN_RES = 0x18
 CMD_CAN_TIMEOUT = 0x44
 
-try:
-    with open(os.path.join(_curr_path, 'linux/baudrate.conf.yaml'), 'r', encoding='utf-8') as stream:
-        _baudrate_config = yaml.full_load(stream)
-except (FileNotFoundError, PermissionError, ValueError, yaml.YAMLError) as e:
-    raise ZCANException(e)
+_LINUX_CAN_4E_U = (ZCANDeviceType.ZCAN_USBCAN_4E_U, )
+_LINUX_CAN_8E_U = (ZCANDeviceType.ZCAN_USBCAN_8E_U, )
+_LINUX_CANFD = (ZCANDeviceType.ZCAN_USBCANFD_200U, ZCANDeviceType.ZCAN_USBCANFD_100U, ZCANDeviceType.ZCAN_USBCANFD_MINI)
+_LINUX_CANFD_800U = (ZCANDeviceType.ZCAN_USBCANFD_800U, )
+_LINUX_PCI_E = ()           # socketcan TODO
 
 class ZCANInitSet(Structure):
     _fields_ = [('tseg1', c_ubyte),
@@ -40,35 +33,35 @@ class ZCANInitSet(Structure):
 
 class ZCAN_MSG_INFO(Structure):
     _pack_ = 1
-    _fields_ = [('mode', c_uint, 4),  # 发送方式，0为正常模式，2为自发自收（仅用于自测）
-                ('is_fd', c_uint, 4),  # 0-CAN帧，1-CANFD帧
-                ('is_remote', c_uint, 1),  # 0-数据帧，1-远程帧
-                ('is_extend', c_uint, 1),  # 0-标准帧，1-扩展帧
-                ('is_error', c_uint, 1),  # 0-正常帧，1-错误帧
-                ('bitrate_switch', c_uint, 1),  # 0-CANFD不加速，1-CANFD加速
-                ('error_status', c_uint, 1),  # 错误状态，0-积极错误，1-消极错误
+    _fields_ = [('txm', c_uint, 4),  # 发送方式，0为正常模式，2为自发自收（仅用于自测）
+                ('fmt', c_uint, 4),  # 0-CAN帧，1-CANFD帧
+                ('sdf', c_uint, 1),  # 0-数据帧，1-远程帧
+                ('sef', c_uint, 1),  # 0-标准帧，1-扩展帧
+                ('err', c_uint, 1),  # 0-正常帧，1-错误帧
+                ('brs', c_uint, 1),  # 0-CANFD不加速，1-CANFD加速
+                ('est', c_uint, 1),  # 错误状态，0-积极错误，1-消极错误
                 ('pad', c_uint, 19)]
 
 class ZCAN_MSG_HEADER(Structure):
-    _fields_ = [('timestamp', c_uint),  # timestamp
+    _fields_ = [('ts', c_uint),  # timestamp
                 ('id', c_uint),  # can id
-                ('info', ZCAN_MSG_INFO),  # msg info
+                ('inf', ZCAN_MSG_INFO),  # msg info
                 ('pad', c_ushort),  # reversed
-                ('channel', c_ubyte),  # channel
-                ('dlc', c_ubyte)]  # dlc
+                ('chn', c_ubyte),  # channel
+                ('len', c_ubyte)]  # dlc
 
     def __repr__(self):
-        return f'timestamp     : {self.timestamp} \n' \
+        return f'timestamp     : {self.ts} \n' \
                f'msg_id        : {"0x%04X" % self.id} \n' \
-               f'mode          : {self.info.mode} \n' \
-               f'is_fd         : {bool(self.info.is_fd)} \n' \
-               f'is_remote     : {bool(self.info.is_remote)} \n' \
-               f'is_extend     : {bool(self.info.is_extend)} \n' \
-               f'is_error      : {bool(self.info.is_error)} \n' \
-               f'bitrate_switch: {bool(self.info.bitrate_switch)} \n' \
-               f'error_status  : {self.info.error_status} \n' \
-               f'channel       : {self.channel} \n' \
-               f'length        : {self.dlc} \n'
+               f'mode          : {self.inf.txm} \n' \
+               f'is_fd         : {bool(self.inf.fmt)} \n' \
+               f'is_remote     : {bool(self.inf.sdf)} \n' \
+               f'is_extend     : {bool(self.inf.sef)} \n' \
+               f'is_error      : {bool(self.inf.err)} \n' \
+               f'bitrate_switch: {bool(self.inf.brs)} \n' \
+               f'error_status  : {self.inf.est} \n' \
+               f'channel       : {self.chn} \n' \
+               f'length        : {self.len} \n'
 
 class ZCAN_FILTER(Structure):
     _fields_ = [('type', c_ubyte),  # /**< 0-std_frame, 1-ext_frame */
@@ -81,26 +74,40 @@ class ZCAN_FILTER_TABLE(Structure):
                 ('table', ZCAN_FILTER * 64)]
 
 class ZCAN_CAN_FRAME(Structure):               # ZCAN_CAN_FRAME
-    _fields_ = [('header', ZCAN_MSG_HEADER),
-                ('data', c_ubyte * 8)]
+    _fields_ = [('hdr', ZCAN_MSG_HEADER),
+                ('dat', c_ubyte * 8)]
 
     def __repr__(self):
-        return str(self.header) + \
+        return str(self.hdr) + \
                'data          : ' + \
-               ' '.join('%02X' % i for i in self.data)
+               ' '.join('%02X' % i for i in self.dat)
 
 class ZCAN_CANFD_FRAME(Structure):             # ZCAN_CANFD_FRAME
-    _fields_ = [('header', ZCAN_MSG_HEADER),
-                ('data', c_ubyte * 64)]
+    _fields_ = [('hdr', ZCAN_MSG_HEADER),
+                ('dat', c_ubyte * 64)]
 
     def __repr__(self):
-        return str(self.header) + \
+        return str(self.hdr) + \
                'data          : ' + \
-               ' '.join('%02X' % self.data[i] for i in range(self.header.dlc))
+               ' '.join('%02X' % self.dat[i] for i in range(self.hdr.len))
 
 class ZCAN_CHANNEL_ERR_INFO(Structure):           # ZCAN_CHANNEL_ERR_INFO
-    _fields_ = [('header', ZCAN_MSG_HEADER),
-                ('data', c_ubyte * 8)]
+    _fields_ = [('hdr', ZCAN_MSG_HEADER),
+                ('dat', c_ubyte * 8)]
+
+class ZCAN_CAN_FRAME_I_II(Structure):
+    _fields_ = [('ID', c_uint),  # can id
+                ('TimeStamp', c_uint),  # timestamp
+                ('TimeFlag', c_byte),
+                ('SendType', c_byte),
+                ('RemoteFlag', c_byte),  # 是否是远程帧
+                ('ExternFlag', c_byte),  # 是否是扩展帧
+                ('DataLen', c_byte),
+                ('Data', c_byte * 8),
+                ('Reserved', c_byte * 3)]
+
+    def __repr__(self):
+        return f"ID: {hex(self.ID)} Data: {' '.join('%02X' % self.Data[i] for i in range(self.DataLen))}"
 
 class ZCAN_CHANNEL_STATUS(Structure):         # ZCAN_CHANNEL_STATUS
     _fields_ = [('IR', c_ubyte),                    # /**< not used(for backward compatibility) */
@@ -124,52 +131,94 @@ class ZCAN_TTX_TABLE(Structure):
     _fields_ = [('size', c_uint),
                 ('table', ZCAN_TTX * 8)]
 
-class ZCAN_CHANNEL_INIT_CONFIG(Structure):       # ZCAN_CHANNEL_INIT_CONFIG
+class ZCAN_CHANNEL_CANFD_INIT_CONFIG(Structure):       # ZCAN_CHANNEL_INIT_CONFIG
     _fields_ = [('clock', c_uint),
                 ('mode', c_uint),
                 ('aset', ZCANInitSet),
                 ('dset', ZCANInitSet)]
 
+class ZCAN_CHANNEL_CAN_INIT_CONFIG(Structure):     # ZCAN_CHANNEL_CAN_INIT_CONFIG
+    _fields_ = [("acc_code", c_uint),
+                ("acc_mask", c_uint),
+                ("reserved", c_uint),
+                ("filter", c_ubyte),
+                ("timing0", c_ubyte),
+                ("timing1", c_ubyte),
+                ("mode", c_ubyte)]
+
 class _ZCANLinux(_ZLGCAN):
 
-    def __init__(self, resend):
-        if _library is None:
-            raise ZCANException(
-                        "The ZLG-CAN driver could not be loaded. "
-                        "Check that you are using 64bit Python on Linux."
-                    )
-        super().__init__(resend)
+    def __init__(self, dev_index: int, dev_type: ZCANDeviceType, resend: bool, derive: bool, **kwargs):
+        super().__init__(dev_index, dev_type, resend, derive, **kwargs)
+        if self._dev_type in ZUSBCAN_I_II_TYPE:
+            self._library = cdll.LoadLibrary(os.path.join(_curr_path, 'linux/x86_64/zlgcan/libusbcan.so'))
+        elif self._dev_type in _LINUX_CAN_4E_U:
+            self._library = cdll.LoadLibrary(os.path.join(_curr_path, 'linux/x86_64/zlgcan/libusbcan-4e.so'))
+        elif self._dev_type in _LINUX_CAN_8E_U:
+            self._library = cdll.LoadLibrary(os.path.join(_curr_path, 'linux/x86_64/zlgcan/libusbcan-8e.so'))
+        elif self._dev_type in _LINUX_CANFD:
+            self._library = cdll.LoadLibrary(os.path.join(_curr_path, 'linux/x86_64/zlgcan/libusbcanfd.so'))
+        elif self._dev_type in _LINUX_CANFD_800U:
+            self._library = cdll.LoadLibrary(os.path.join(_curr_path, 'linux/x86_64/zlgcan/libusbcanfd800u.so'))
+        else:
+            raise ZCANException(f"device type: {self._dev_type} is not supported by this system!")
 
     def _get_can_init_config(self, mode, filter, **kwargs):
-        # print(mode, filter, kwargs)
-        config = ZCAN_CHANNEL_INIT_CONFIG()
-        clock = kwargs.get('clock', None)
-        arb_tseg1 = kwargs.get('arb_tseg1', None)
-        arb_tseg2 = kwargs.get('arb_tseg2', None)
-        arb_sjw = kwargs.get('arb_sjw', None)
-        arb_smp = kwargs.get('arb_smp', 0)
-        arb_brp = kwargs.get('arb_brp', None)
-        data_tseg1 = kwargs.get('data_tseg1', arb_tseg1)
-        data_tseg2 = kwargs.get('data_tseg2', arb_tseg2)
-        data_sjw = kwargs.get('data_sjw', arb_sjw)
-        data_smp = kwargs.get('data_smp', arb_smp)
-        data_brp = kwargs.get('data_brp', arb_brp)
-        assert clock is not None \
-            and arb_tseg1 is not None and arb_tseg2 is not None and arb_sjw is not None and arb_smp is not None \
-            and arb_brp is not None
-        config.mode = mode
-        config.clock = clock
-        config.aset.tseg1 = arb_tseg1
-        config.aset.tseg2 = arb_tseg2
-        config.aset.sjw = arb_sjw
-        config.aset.smp = arb_smp
-        config.aset.brp = arb_brp
-        config.dset.tseg1 = data_tseg1
-        config.dset.tseg2 = data_tseg2
-        config.dset.sjw = data_sjw
-        config.dset.smp = data_smp
-        config.dset.brp = data_brp
-        return config
+        try:
+            _dev_bd_cfg = self._bd_cfg[self._dev_type.value]
+            bitrate_cfg = _dev_bd_cfg["bitrate"].get(kwargs.get("bitrate"))
+        except KeyError:
+            raise ZCANException(f"the device baudrate info is not configured in the {_bd_cfg_filename}")
+
+        if self._dev_is_canfd:
+            config = ZCAN_CHANNEL_CANFD_INIT_CONFIG()
+            clock = bitrate_cfg.get('clock', None)
+            arb_tseg1 = bitrate_cfg.get('arb_tseg1', None)
+            arb_tseg2 = bitrate_cfg.get('arb_tseg2', None)
+            arb_sjw = bitrate_cfg.get('arb_sjw', None)
+            arb_smp = bitrate_cfg.get('arb_smp', 0)
+            arb_brp = bitrate_cfg.get('arb_brp', None)
+            assert clock is not None, "'clock' is not configured!"
+            assert arb_tseg1 is not None, "'arb_tseg1' is not configured!"
+            assert arb_tseg2 is not None, "'arb_tseg2' is not configured!"
+            assert arb_sjw is not None, "'arb_sjw' is not configured!"
+            assert arb_smp is not None, "'arb_smp' is not configured!"
+            assert arb_brp is not None, "'arb_brp' is not configured!"
+
+            data_bitrate_cfg = _dev_bd_cfg.get("data_bitrate", {})
+            data_tseg1 = data_bitrate_cfg.get('data_tseg1', arb_tseg1)
+            data_tseg2 = data_bitrate_cfg.get('data_tseg2', arb_tseg2)
+            data_sjw = data_bitrate_cfg.get('data_sjw', arb_sjw)
+            data_smp = data_bitrate_cfg.get('data_smp', arb_smp)
+            data_brp = data_bitrate_cfg.get('data_brp', arb_brp)
+
+            config.mode = mode
+            config.clock = clock
+            config.aset.tseg1 = arb_tseg1
+            config.aset.tseg2 = arb_tseg2
+            config.aset.sjw = arb_sjw
+            config.aset.smp = arb_smp
+            config.aset.brp = arb_brp
+            config.dset.tseg1 = data_tseg1
+            config.dset.tseg2 = data_tseg2
+            config.dset.sjw = data_sjw
+            config.dset.smp = data_smp
+            config.dset.brp = data_brp
+            return config
+        else:
+            config = ZCAN_CHANNEL_CAN_INIT_CONFIG()
+            config.acc_code = kwargs.get("acc_code", 0)
+            config.acc_mask = kwargs.get('acc_mask', 0xFFFFFFFF)
+            timing0 = bitrate_cfg.get("timing0", None)
+            timing1 = bitrate_cfg.get("timing1", None)
+            assert timing0 is not None, "'timing0' is not configured!"
+            assert timing1 is not None, "'timing1' is not configured!"
+            config.reserved = 0
+            config.filter = filter
+            config.timing0 = timing0
+            config.timing1 = timing1
+            config.mode = mode
+            return config
 
     def ResistanceStatus(self, channel, status=None):
         channel = self._get_channel_handler('CAN', channel)
@@ -179,7 +228,7 @@ class _ZCANLinux(_ZLGCAN):
 
     # EXTERN_C U32 ZCAN_API VCI_SetReference(U32 Type, U32 Card, U32 Port, U32 Ref, void *pData);
     def _SetReference(self, channel, ref_code, data):
-        _library_check_run(_library, 'VCI_SetReference',
+        _library_check_run(self._library, 'VCI_SetReference',
                            self._dev_type, self._dev_index, channel, ref_code, data)
 
     # EXTERN_C U32 ZCAN_API VCI_GetReference(U32 Type, U32 Card, U32 Port, U32 Ref, void *pData);
@@ -187,12 +236,12 @@ class _ZCANLinux(_ZLGCAN):
         if self._dev_type in [ZCANDeviceType.ZCAN_CANETUDP, ZCANDeviceType.ZCAN_CANETE, ZCANDeviceType.ZCAN_CANETTCP,
                               ZCANDeviceType.ZCAN_CANDTU_NET, ZCANDeviceType.ZCAN_CANDTU_NET_400]:
             result = c_int()
-            _library_check_run(_library, 'VCI_SetReference',
+            _library_check_run(self._library, 'VCI_SetReference',
                                self._dev_type, self._dev_index, channel, ref_code, cast(byref(result), c_void_p))
             return result
 
     def Debug(self, level):
-        _library_check_run(_library, 'VCI_Debug', level)
+        _library_check_run(self._library, 'VCI_Debug', level)
 
     def SetFilters(self, channel, filters=None):
         channel = self._get_channel_handler('CAN', channel)
@@ -216,13 +265,11 @@ class _ZCANLinux(_ZLGCAN):
                 _filter.table[index].type = mode
                 _filter.table[index].sid = start
                 _filter.table[index].eid = end
-        _library_check_run(_library, 'VCI_SetReference', self._dev_index, channel, CMD_CAN_FILTER, byref(_filter))
+        _library_check_run(self._library, 'VCI_SetReference', self._dev_index, channel, CMD_CAN_FILTER, byref(_filter))
 
     # EXTERN_C U32 ZCAN_API VCI_OpenDevice(U32 Type, U32 Card, U32 Reserved);
-    def OpenDevice(self, dev_type: ZCANDeviceType, dev_index=0, reserved=0):
-        self._dev_handler = _library_check_run(_library, 'VCI_OpenDevice', dev_type, dev_index, reserved)
-        self._dev_index = dev_index
-        self._dev_type = dev_type
+    def OpenDevice(self, reserved=0):
+        self._dev_handler = _library_check_run(self._library, 'VCI_OpenDevice', self._dev_type, self._dev_index, reserved)
         # matched = re.findall(r'[.](\w*?),', inspect.getframeinfo(inspect.currentframe().f_back)[3][0])
         # assert len(matched) > 0
         # self._dev_type_name = matched[0]
@@ -239,14 +286,14 @@ class _ZCANLinux(_ZLGCAN):
             self.ResetCAN(channel)
         # for channel in lin_channels:
         #     self.ResetLIN(channel)
-        _library_check_run(_library, 'VCI_CloseDevice', self._dev_type, self._dev_index)
+        _library_check_run(self._library, 'VCI_CloseDevice', self._dev_type, self._dev_index)
         can_channels.clear()
         lin_channels.clear()
 
     # EXTERN_C U32 ZCAN_API VCI_ReadBoardInfo(U32 Type, U32 Card, ZCAN_DEV_INF *pInfo);
     def GetDeviceInf(self) -> ZCAN_DEVICE_INFO:
         dev_info = ZCAN_DEVICE_INFO()
-        _library_check_run(_library, 'VCI_ReadBoardInfo',
+        _library_check_run(self._library, 'VCI_ReadBoardInfo',
                            self._dev_type, self._dev_index, byref(dev_info))
         return dev_info
 
@@ -272,33 +319,33 @@ class _ZCANLinux(_ZLGCAN):
 
         :return: None
         """
-        # config = self._get_can_init_config(mode, filter, **kwargs)
-        config = self._get_can_init_config(mode, filter, **_baudrate_config.get('bitrate').get(kwargs.get('bitrate')),
-                                           **(_baudrate_config.get('data_bitrate') or {}).get(kwargs.get('data_bitrate'), {}))
-        _library_check_run(_library, 'VCI_InitCAN', self._dev_type, self._dev_index, channel, byref(config))
+        config = self._get_can_init_config(mode, filter, **kwargs)
+        _library_check_run(self._library, 'VCI_InitCAN', self._dev_type, self._dev_index, channel, byref(config))
         self._channel_handlers['CAN'][channel] = channel
+        if self._dev_type in ZUSBCAN_I_II_TYPE: # not support internal resistance config
+            return
         self.ResistanceStatus(channel, kwargs.get('initenal_resistance', 1))
 
     # EXTERN_C U32 ZCAN_API VCI_StartCAN(U32 Type, U32 Card, U32 Port);
     def StartCAN(self, channel):
         channel = self._get_channel_handler('CAN', channel)
-        _library_check_run(_library, 'VCI_StartCAN', self._dev_type, self._dev_index, channel)
+        _library_check_run(self._library, 'VCI_StartCAN', self._dev_type, self._dev_index, channel)
 
     # EXTERN_C U32 ZCAN_API VCI_ResetCAN(U32 Type, U32 Card, U32 Port);
     def ResetCAN(self, channel):
         channel = self._get_channel_handler('CAN', channel)
-        _library_check_run(_library, 'VCI_ResetCAN', self._dev_type, self._dev_index, channel)
+        _library_check_run(self._library, 'VCI_ResetCAN', self._dev_type, self._dev_index, channel)
 
     # EXTERN_C U32 ZCAN_API VCI_ClearBuffer(U32 Type, U32 Card, U32 Port);
     def ClearBuffer(self, channel):
         channel = self._get_channel_handler('CAN', channel)
-        _library_check_run(_library, 'VCI_ClearBuffer', self._dev_type, self._dev_index, channel)
+        _library_check_run(self._library, 'VCI_ClearBuffer', self._dev_type, self._dev_index, channel)
 
     # EXTERN_C U32 ZCAN_API VCI_ReadErrInfo(U32 Type, U32 Card, U32 Port, ZCAN_ERR_MSG *pErr);
     def ReadChannelErrInfo(self, channel, chl_type='CAN'):
         channel = self._get_channel_handler(chl_type, channel)
         error_info = ZCAN_CHANNEL_ERR_INFO()
-        ret = _library.VCI_ReadErrInfo(self._dev_type, self._dev_index, channel, byref(error_info))
+        ret = self._library.VCI_ReadErrInfo(self._dev_type, self._dev_index, channel, byref(error_info))
         if ret:
             return error_info
 
@@ -306,7 +353,7 @@ class _ZCANLinux(_ZLGCAN):
     def ReadChannelStatus(self, channel, chl_type='CAN'):
         channel = self._get_channel_handler(chl_type, channel)
         status_info = ZCAN_CHANNEL_STATUS()
-        _library_check_run(_library, 'VCI_ReadCANStatus',
+        _library_check_run(self._library, 'VCI_ReadCANStatus',
                            self._dev_type, self._dev_index, channel, byref(status_info))
         return status_info
 
@@ -321,14 +368,16 @@ class _ZCANLinux(_ZLGCAN):
         channel = self._get_channel_handler('CAN', channel)
         if msg_type == ZCANMessageType.CANFD:
             channel |= 0x80000000
-        return _library.VCI_GetReceiveNum(self._dev_type, self._dev_index, channel)
+        return self._library.VCI_GetReceiveNum(self._dev_type, self._dev_index, channel)
 
     # EXTERN_C U32 ZCAN_API VCI_TransmitFD(U32 Type, U32 Card, U32 Port, ZCAN_FD_MSG *pData, U32 Count);
     def TransmitFD(self, channel, msgs, size=None):
         channel = self._get_channel_handler('CAN', channel)
         _size = size or len(msgs)
-        ret = _library.VCI_TransmitFD(self._dev_type, self._dev_index, channel, byref(msgs), _size)
+        ret = self._library.VCI_TransmitFD(self._dev_type, self._dev_index, channel, byref(msgs), _size)
         self._logger.debug(f'ZLG: Transmit ZCAN_CANFD_FRAME expect: {_size}, actual: {ret}')
+        if ret < _size:
+            raise ZCANException(f"TransmitFD failed(size: {_size}, actual: {ret})")
         return ret
 
     # EXTERN_C U32 ZCAN_API VCI_ReceiveFD(U32 Type, U32 Card, U32 Port, ZCAN_FD_MSG *pData, U32 Count, U32 Time);
@@ -337,24 +386,19 @@ class _ZCANLinux(_ZLGCAN):
         if timeout is not None:
             timeout = int(timeout)
         can_msgs = (ZCAN_CANFD_FRAME * size)()
-        ret = _library.VCI_ReceiveFD(self._dev_type, self._dev_index, channel, byref(can_msgs), size, timeout)
+        ret = self._library.VCI_ReceiveFD(self._dev_type, self._dev_index, channel, byref(can_msgs), size, timeout)
         self._logger.debug(f'ZLG: Receive ZCAN_CANFD_FRAME expect: {size}, actual: {ret}')
         for i in range(ret):
             yield can_msgs[i]
 
     # EXTERN_C U32 ZCAN_API VCI_Transmit(U32 Type, U32 Card, U32 Port, ZCAN_20_MSG *pData, U32 Count);
     def Transmit(self, channel, msgs, size=None):
-        """
-        发送CAN报文
-        :param channel: 通道号, 范围 0 ~ 通道数-1
-        :param msgs: 消息报文
-        :param size: 报文大小
-        :return: 实际发送报文长度
-        """
         channel = self._get_channel_handler('CAN', channel)
         _size = size or len(msgs)
-        ret = _library.VCI_Transmit(self._dev_type, self._dev_index, channel, byref(msgs), _size)
+        ret = self._library.VCI_Transmit(self._dev_type, self._dev_index, channel, byref(msgs), _size)
         self._logger.debug(f'ZLG: Transmit ZCAN_CAN_FRAME expect: {_size}, actual: {ret}')
+        if ret < _size:
+            raise ZCANException(f"Transmit failed(size: {_size}, actual: {ret})")
         return ret
 
     # EXTERN_C U32 ZCAN_API VCI_Receive(U32 Type, U32 Card, U32 Port, ZCAN_20_MSG *pData, U32 Count, U32 Time);
@@ -369,8 +413,12 @@ class _ZCANLinux(_ZLGCAN):
         channel = self._get_channel_handler('CAN', channel)
         if timeout is not None:
             timeout = int(timeout)
-        can_msgs = (ZCAN_CAN_FRAME * size)()
-        ret = _library.VCI_Receive(self._dev_type, self._dev_index, channel, byref(can_msgs), size, timeout)
+        if self._dev_type in ZUSBCAN_I_II_TYPE:
+            can_msgs = (ZCAN_CAN_FRAME_I_II * size)()
+        else:
+            can_msgs = (ZCAN_CAN_FRAME * size)()
+        ret = self._library.VCI_Receive(self._dev_type, self._dev_index, channel, byref(can_msgs), size, timeout)
+        self._logger.debug(f'ZLG: Receive ZCAN_CAN_FRAME expect: {size}, actual: {ret}')
         for i in range(ret):
             yield can_msgs[i]
 
@@ -398,7 +446,7 @@ class _ZCANLinux(_ZLGCAN):
         """
         # TODO 清空自动发送列表(怎么做)
         channel = self._get_channel_handler('CAN', channel)
-        _library_check_run(_library, 'VCI_SetReference',
+        _library_check_run(self._library, 'VCI_SetReference',
                            self._dev_type, self._dev_index, channel, CMD_CAN_SKD_SEND_STATUS,
                            byref(c_int(0)))           # TODO 不使用结构体行不行
         if interval_msgs:
@@ -412,9 +460,9 @@ class _ZCANLinux(_ZLGCAN):
                 table.table[index].index = msg_dict.get('index', index)
                 table.table[index].interval = msg_dict.get('interval', 0)
                 table.table[index].repeat = msg_dict.get('repeat', 0)
-            _library_check_run(_library, 'VCI_SetReference',
+            _library_check_run(self._library, 'VCI_SetReference',
                                self._dev_type, self._dev_index, channel, CMD_CAN_SKD_SEND, byref(table))
-            _library_check_run(_library, 'VCI_SetReference',
+            _library_check_run(self._library, 'VCI_SetReference',
                                self._dev_type, self._dev_index, channel, CMD_CAN_SKD_SEND_STATUS,
                                byref(c_int(1)))       # TODO 不使用结构体行不行
 

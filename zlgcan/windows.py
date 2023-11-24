@@ -3,19 +3,15 @@ by zhuyu4839@gmail.com
 reference: https://manual.zlg.cn/web/#/152/5332
 """
 import os
-import platform
 import warnings
 
 from ctypes import *
-from ._common import _ZLGCAN, ZCLOUD_MAX_DEVICES, ZCLOUD_MAX_CHANNEL, ZUSBCAN_I_II_TYPE, ZCANDeviceType, ZUSBCANFD_TYPE, ZCANCanType, ZCAN_STATUS_OK, \
-    ZCANException, ZCAN_STATUS_ONLINE, _library_check_run, INVALID_CHANNEL_HANDLE, ZCANMessageType, INVALID_DEVICE_HANDLE, ZCANCanMode, ZCANCanFilter, \
-    ZCAN_DEVICE_INFO, _arch, _curr_path
+from ._common import _ZLGCAN, ZCLOUD_MAX_DEVICES, ZCLOUD_MAX_CHANNEL, ZUSBCAN_I_II_TYPE, ZCANDeviceType, ZUSBCANFD_TYPE, \
+    ZCANCanType, ZCAN_STATUS_OK, \
+    ZCANException, ZCAN_STATUS_ONLINE, _library_check_run, INVALID_CHANNEL_HANDLE, ZCANMessageType, \
+    INVALID_DEVICE_HANDLE, ZCANCanMode, ZCANCanFilter, \
+    ZCAN_DEVICE_INFO, _system_bit, _curr_path, _bd_cfg_filename
 
-if _arch == '32bit':
-    _lib_path = os.path.join(_curr_path, 'windows/x86/zlgcan/zlgcan.dll')
-else:
-    _lib_path = os.path.join(_curr_path, 'windows/x86_64/zlgcan/zlgcan.dll')
-_library = windll.LoadLibrary(_lib_path)
 _path = lambda ch, path: f'{ch}/{path}' if ch is not None else f'{path}'
 
 class ZCAN_CAN_FRAME(Structure):               # ZCAN_CAN_FRAME
@@ -317,7 +313,7 @@ class ZCANDataObj(Structure):                    # ZCANDataObj
                                                 # 2 - 错误数据，data.zcanErrData 有效
                                                 # 3 - GPS 数据，data.zcanGPSData 有效
                                                 # 4 - LIN 数据，data.zcanLINData 有效
-                ("chnl", c_ubyte),  # 数据通道
+                ("chn", c_ubyte),  # 数据通道
                 ("flag", _ZCANDataObjFlag),     # 标志信息, 暂未使用
                 ("extraData", c_ubyte * 4),     # 额外数据, 暂未使用
                 ("data", _ZCANDataObjData)]     # 实际数据, 联合体，有效成员根据 dataType 字段而定
@@ -326,7 +322,7 @@ assert sizeof(ZCANDataObj) == 100
 # class ZlgCanDataObj(Structure):                     # from zlgcan echo demo
 #     _pack_ = 1
 #     _fields_ = [("dataType", c_ubyte),              # can/canfd frame
-#                 ("chnl", c_ubyte),                  # can_channel
+#                 ("chn", c_ubyte),                  # can_channel
 #                 ("flag", c_ushort),                 # 标志信息, 暂未使用
 #                 ("extraData", c_ubyte * 4),         # 标志信息, 暂未使用
 #                 ("zcanfddata", ZlgCanFdData),       # 88个字节
@@ -339,13 +335,44 @@ class IProperty(Structure):  # IProperty
 
 class _ZCANWindows(_ZLGCAN):
 
-    def __init__(self, resend):
-        if _library is None:
+    def __init__(self, dev_index: int, dev_type: ZCANDeviceType, resend: bool, derive: bool, **kwargs):
+        super().__init__(dev_index, dev_type, resend, derive, **kwargs)
+        if _system_bit == '32bit':
+            try:
+                import win32api
+                import win32con
+                import pywintypes
+                try:
+                    _name = "ZCANPRO.exe"
+                    _reg = rf"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{_name}"
+                    _key = win32api.RegOpenKey(win32con.HKEY_LOCAL_MACHINE, _reg, 0, win32con.KEY_READ)
+                    _info = win32api.RegQueryInfoKey(_key)
+                    for i in range(_info[1]):
+                        _prog_path: str = win32api.RegEnumValue(_key, i)[1]
+                        if _name in _prog_path:
+                            _prog_path = _prog_path.replace(_name, "")
+                            try:
+                                self._library = windll.LoadLibrary(os.path.join(_prog_path, 'zlgcan.dll'))
+                                break
+                            except OSError:
+                                break
+
+                    win32api.RegCloseKey(_key)
+                except pywintypes.error:    # ZCANPRO is not installed
+                    pass
+            except ImportError:     # pywin32 is not installed
+                pass
+
+            if self._library is None:
+                self._library = windll.LoadLibrary(os.path.join(_curr_path, 'windows/x86/zlgcan/zlgcan.dll'))
+        else:
+            self._lib_path = os.path.join(_curr_path, 'windows/x86_64/zlgcan/zlgcan.dll')
+
+        if self._library is None:
             raise ZCANException(
                         "The ZLG-CAN driver could not be loaded. "
                         "Check that you are using 32-bit/64bit Python on Windows."
                     )
-        super().__init__(resend)
 
     def _get_can_init_config(self, mode, filter, **kwargs):
         config = ZCAN_CHANNEL_INIT_CONFIG()
@@ -376,9 +403,16 @@ class _ZCANWindows(_ZLGCAN):
                 config.config.can.acc_code = acc_code
                 config.config.can.acc_mask = acc_mask
             config.config.can.filter = filter
-            if self._dev_type in ZUSBCAN_I_II_TYPE:
-                config.config.can.timing0 = kwargs.get('timing0', 0)                   # ignored
-                config.config.can.timing1 = kwargs.get('timing0', 28)                  # ignored
+            try:
+                _dev_bd_cfg = self._bd_cfg[self._dev_type.value].get("bitrate")
+            except KeyError:
+                raise ZCANException(f"the device baudrate info is not configured in the {_bd_cfg_filename}")
+            timing0 = _dev_bd_cfg.get("timing0", None)
+            timing1 = _dev_bd_cfg.get("timing1", None)
+            assert timing0 is not None, "'timing0' is not configured!"
+            assert timing1 is not None, "'timing1' is not configured!"
+            config.config.can.timing0 = timing0
+            config.config.can.timing1 = timing1
             config.config.can.mode = mode
         return config
 
@@ -474,7 +508,7 @@ class _ZCANWindows(_ZLGCAN):
         """
         self._merge_support()
         _size = size or len(msgs)
-        ret = _library.ZCAN_TransmitData(self._dev_handler, byref(msgs), _size)
+        ret = self._library.ZCAN_TransmitData(self._dev_handler, byref(msgs), _size)
         self._logger.debug(f'ZLG: Transmit ZCANDataObj expect: {_size}, actual: {ret}')
         return ret
 
@@ -494,28 +528,28 @@ class _ZCANWindows(_ZLGCAN):
         if not self.MergeEnabled():
             raise ZCANException('ZLG: device merge receive is not enable!')
         msgs = (ZCANDataObj * size)()
-        ret = _library.ZCAN_ReceiveData(self._dev_handler, byref(msgs), size, c_int(timeout))
+        ret = self._library.ZCAN_ReceiveData(self._dev_handler, byref(msgs), size, c_int(timeout))
         self._logger.debug(f'ZLG: Received {ret} ZCANDataObj messages.')
         return msgs, ret
 
     # IProperty* FUNC_CALL GetIProperty(DEVICE_HANDLE device_handle);
     def GetIProperty(self):
-        _library.GetIProperty.restype = POINTER(IProperty)
-        return _library.GetIProperty(self._dev_handler)
+        self._library.GetIProperty.restype = POINTER(IProperty)
+        return self._library.GetIProperty(self._dev_handler)
 
     # UINT FUNC_CALL ReleaseIProperty(IProperty * pIProperty);
     def ReleaseIProperty(self, prop: IProperty):
-        return _library.ReleaseIProperty(prop)
+        return self._library.ReleaseIProperty(prop)
 
     # UINT FUNC_CALL ZCAN_IsDeviceOnLine(DEVICE_HANDLE device_handle);
     def DeviceOnLine(self):
-        ret = _library.ZCAN_IsDeviceOnLine(self._dev_handler)
+        ret = self._library.ZCAN_IsDeviceOnLine(self._dev_handler)
         self._logger.debug(f'ZLG: get device is online return code: {ret}.')
         return ret == ZCAN_STATUS_ONLINE
 
     # void FUNC_CALL ZCLOUD_SetServerInfo(const char* httpSvr, unsigned short httpPort, const char* authSvr, unsigned short authPort);
     def SetServerInfo(self, auth_host: str, auth_port, data_host=None, data_post=None):
-        _library_check_run(_library, 'ZCLOUD_SetServerInfo',
+        _library_check_run(self._library, 'ZCLOUD_SetServerInfo',
                            c_char_p(auth_host.encode('utf-8')), c_ushort(auth_port),
                            c_char_p((data_host or auth_host).encode('utf-8')),
                            c_ushort(data_post or auth_port))
@@ -523,7 +557,7 @@ class _ZCANWindows(_ZLGCAN):
     # // return 0:success, 1:failure, 2:https error, 3:user login info error, 4:mqtt connection error, 5:no device
     # UINT FUNC_CALL ZCLOUD_ConnectServer(const char* username, const char* password);
     def ConnectServer(self, username, password):
-        ret = _library.ZCLOUD_ConnectServer(c_char_p(username.encode('utf-8')), c_char_p(password.encode('utf-8')))
+        ret = self._library.ZCLOUD_ConnectServer(c_char_p(username.encode('utf-8')), c_char_p(password.encode('utf-8')))
         if ret == 0:
             return
         elif ret == 1:
@@ -541,30 +575,30 @@ class _ZCANWindows(_ZLGCAN):
 
     # bool FUNC_CALL ZCLOUD_IsConnected();
     def CloudConnected(self):
-        return _library.ZCLOUD_IsConnected()
+        return self._library.ZCLOUD_IsConnected()
 
     # // return 0:success, 1:failure
     # UINT FUNC_CALL ZCLOUD_DisconnectServer();
     def DisconnectServer(self):
-        ret = _library.ZCLOUD_IsConnected()
+        ret = self._library.ZCLOUD_IsConnected()
         return ret == 0
 
     # const ZCLOUD_USER_DATA* FUNC_CALL ZCLOUD_GetUserData(int update DEF(0));
     def GetUserData(self, userid) -> ZCLOUD_USER_DATA:
-        return _library.ZCLOUD_GetUserData(userid)
+        return self._library.ZCLOUD_GetUserData(userid)
 
     # UINT FUNC_CALL ZCLOUD_ReceiveGPS(DEVICE_HANDLE device_handle, ZCLOUD_GPS_FRAME* pReceive, UINT len, int wait_time DEF(-1));
     def ReceiveGPS(self, size=1, timeout=-1):
         if timeout is not None:
             timeout = int(timeout)
         msgs = (ZCLOUD_GPS_FRAME * size)()
-        ret = _library.ZCLOUD_ReceiveGPS(self._dev_handler, byref(msgs), size, timeout)
+        ret = self._library.ZCLOUD_ReceiveGPS(self._dev_handler, byref(msgs), size, timeout)
         self._logger.debug(f'ZLG: Master Transmit ZCLOUD_GPS_FRAME expect: {size}, actual: {ret}')
         return msgs, ret
 
     # CHANNEL_HANDLE FUNC_CALL ZCAN_InitLIN(DEVICE_HANDLE device_handle, UINT can_index, PZCAN_LIN_INIT_CONFIG pLINInitConfig);
     def InitLIN(self, channel, config: ZCAN_LIN_INIT_CONFIG):
-        ret = _library.ZCAN_InitLIN(self._dev_handler, channel, byref(config))
+        ret = self._library.ZCAN_InitLIN(self._dev_handler, channel, byref(config))
         if ret == INVALID_CHANNEL_HANDLE:
             raise ZCANException('ZLG: ZCAN_InitLIN failed!')
         self._channel_handlers['LIN'][channel] = ret
@@ -572,18 +606,18 @@ class _ZCANWindows(_ZLGCAN):
     # UINT FUNC_CALL ZCAN_StartLIN(CHANNEL_HANDLE channel_handle);
     def StartLIN(self, channel):
         handler = self._get_channel_handler('LIN', channel)
-        _library_check_run(_library, 'ZCAN_StartLIN', handler)
+        _library_check_run(self._library, 'ZCAN_StartLIN', handler)
 
     # UINT FUNC_CALL ZCAN_ResetLIN(CHANNEL_HANDLE channel_handle);
     def ResetLIN(self, channel):
         handler = self._get_channel_handler('LIN', channel)
-        _library_check_run(_library, 'ZCAN_ResetLIN', handler)
+        _library_check_run(self._library, 'ZCAN_ResetLIN', handler)
 
     # UINT FUNC_CALL ZCAN_TransmitLIN(CHANNEL_HANDLE channel_handle, PZCAN_LIN_MSG pSend, UINT Len);
     def TransmitLIN(self, channel, msgs, size=None):
         handler = self._get_channel_handler('LIN', channel)
         _size = size or len(msgs)
-        ret = _library.ZCAN_TransmitLIN(handler, byref(msgs), _size)
+        ret = self._library.ZCAN_TransmitLIN(handler, byref(msgs), _size)
         self._logger.debug(f'ZLG: Master Transmit ZCAN_LIN_MSG expect: {_size}, actual: {ret}')
         return ret
 
@@ -593,21 +627,21 @@ class _ZCANWindows(_ZLGCAN):
             timeout = int(timeout)
         msgs = (ZCAN_LIN_MSG * size)()
         handler = self._get_channel_handler('LIN', channel)
-        ret = _library.ZCAN_ReceiveLIN(handler, byref(msgs), size, c_int(timeout))
+        ret = self._library.ZCAN_ReceiveLIN(handler, byref(msgs), size, c_int(timeout))
         self._logger.debug(f'ZLG: Master Received {ret} ZCAN_LIN_MSG messages')
         return msgs, ret
 
     # UINT FUNC_CALL ZCAN_SetLINSlaveMsg(CHANNEL_HANDLE channel_handle, PZCAN_LIN_MSG pSend, UINT nMsgCount);
     def SetLINSlaveMsg(self, channel, msgs):
         handler = self._get_channel_handler('LIN', channel)
-        ret = _library.ZCAN_SetLINSlaveMsg(handler, byref(msgs), len(msgs))
+        ret = self._library.ZCAN_SetLINSlaveMsg(handler, byref(msgs), len(msgs))
         self._logger.debug(f'ZLG: Slave Transmit {ret} ZCAN_LIN_MSG messages')
         return ret
 
     # UINT FUNC_CALL ZCAN_ClearLINSlaveMsg(CHANNEL_HANDLE channel_handle, BYTE* pLINID, UINT nIDCount);
     def ClearLINSlaveMsg(self, channel, lin_ids):
         handler = self._get_channel_handler('LIN', channel)
-        _library_check_run(_library, 'ZCAN_ClearLINSlaveMsg', handler, byref(lin_ids), len(lin_ids))
+        _library_check_run(self._library, 'ZCAN_ClearLINSlaveMsg', handler, byref(lin_ids), len(lin_ids))
 
     def ResistanceStatus(self, channel, status=None):
         if status is not None:
@@ -626,13 +660,11 @@ class _ZCANWindows(_ZLGCAN):
             self.SetValue(channel, filter_mode=mode, filter_start=start, filter_end=end)
 
     # DEVICE_HANDLE FUNC_CALL ZCAN_OpenDevice(UINT device_type, UINT device_index, UINT reserved);
-    def OpenDevice(self, dev_type: ZCANDeviceType, dev_index=0, reserved=0):
-        ret = _library.ZCAN_OpenDevice(dev_type, dev_index, reserved)
+    def OpenDevice(self, reserved=0):
+        ret = self._library.ZCAN_OpenDevice(self._dev_type, self._dev_index, reserved)
         if ret == INVALID_DEVICE_HANDLE:
             raise ZCANException('ZLG: ZCAN_OpenDevice failed!')
         self._dev_handler = ret
-        self._dev_index = dev_index
-        self._dev_type = dev_type
         # matched = re.findall(r'[.](\w*?),', inspect.getframeinfo(inspect.currentframe().f_back)[3][0])
         # assert len(matched) > 0
         # self._dev_type_name = matched[0]
@@ -649,7 +681,7 @@ class _ZCANWindows(_ZLGCAN):
             self.ResetCAN(channel)
         for channel, _ in lin_channels.items():
             self.ResetLIN(channel)
-        _library_check_run(_library, 'ZCAN_CloseDevice', self._dev_handler)
+        _library_check_run(self._library, 'ZCAN_CloseDevice', self._dev_handler)
         self._dev_handler = None
         can_channels.clear()
         lin_channels.clear()
@@ -657,7 +689,7 @@ class _ZCANWindows(_ZLGCAN):
     # UINT FUNC_CALL ZCAN_GetDeviceInf(DEVICE_HANDLE device_handle, ZCAN_DEVICE_INFO* pInfo);
     def GetDeviceInf(self) -> ZCAN_DEVICE_INFO:
         dev_info = ZCAN_DEVICE_INFO()
-        _library_check_run(_library, 'ZCAN_GetDeviceInf', self._dev_handler, byref(dev_info))
+        _library_check_run(self._library, 'ZCAN_GetDeviceInf', self._dev_handler, byref(dev_info))
         return dev_info
 
     # CHANNEL_HANDLE FUNC_CALL ZCAN_InitCAN(DEVICE_HANDLE device_handle, UINT can_index, ZCAN_CHANNEL_INIT_CONFIG* pInitConfig);
@@ -686,7 +718,7 @@ class _ZCANWindows(_ZLGCAN):
         clock = kwargs.get('clock', None)
         if clock:
             self.SetValue(channel, clock=clock)
-        ret = _library.ZCAN_InitCAN(self._dev_handler, channel, byref(config))
+        ret = self._library.ZCAN_InitCAN(self._dev_handler, channel, byref(config))
         if ret == INVALID_CHANNEL_HANDLE:
             raise ZCANException('ZLG: ZCAN_InitCAN failed!')
         self._channel_handlers['CAN'][channel] = ret
@@ -695,24 +727,24 @@ class _ZCANWindows(_ZLGCAN):
     # UINT FUNC_CALL ZCAN_StartCAN(CHANNEL_HANDLE channel_handle);
     def StartCAN(self, channel):
         handler = self._get_channel_handler('CAN', channel)
-        _library_check_run(_library, 'ZCAN_StartCAN', handler)
+        _library_check_run(self._library, 'ZCAN_StartCAN', handler)
 
     # UINT FUNC_CALL ZCAN_ResetCAN(CHANNEL_HANDLE channel_handle);
     def ResetCAN(self, channel):
         handler = self._get_channel_handler('CAN', channel)
-        _library_check_run(_library, 'ZCAN_ResetCAN', handler)
+        _library_check_run(self._library, 'ZCAN_ResetCAN', handler)
 
     # UINT FUNC_CALL ZCAN_ClearBuffer(CHANNEL_HANDLE channel_handle);
     def ClearBuffer(self, channel):
         handler = self._get_channel_handler('CAN', channel)
-        _library_check_run(_library, 'ZCAN_ClearBuffer', handler)
+        _library_check_run(self._library, 'ZCAN_ClearBuffer', handler)
 
     # UINT FUNC_CALL ZCAN_ReadChannelErrInfo(CHANNEL_HANDLE channel_handle, ZCAN_CHANNEL_ERR_INFO* pErrInfo);
     def ReadChannelErrInfo(self, channel, chl_type='CAN'):
         error_info = ZCAN_CHANNEL_ERR_INFO()
         handler = self._get_channel_handler(chl_type, channel)
         # TODO 统一
-        _library_check_run(_library, 'ZCAN_ReadChannelErrInfo', handler, byref(error_info))
+        _library_check_run(self._library, 'ZCAN_ReadChannelErrInfo', handler, byref(error_info))
         return error_info
 
     # UINT FUNC_CALL ZCAN_ReadChannelStatus(CHANNEL_HANDLE channel_handle, ZCAN_CHANNEL_STATUS* pCANStatus);
@@ -721,7 +753,7 @@ class _ZCANWindows(_ZLGCAN):
         status_info = ZCAN_CHANNEL_STATUS()
         handler = self._get_channel_handler(chl_type, channel)
         # TODO 统一
-        _library_check_run(_library, 'ZCAN_ReadChannelStatus', handler, byref(status_info))
+        _library_check_run(self._library, 'ZCAN_ReadChannelStatus', handler, byref(status_info))
         return status_info
 
     # UINT FUNC_CALL ZCAN_GetLINReceiveNum(CHANNEL_HANDLE channel_handle);
@@ -734,15 +766,17 @@ class _ZCANWindows(_ZLGCAN):
         :return: 消息数量
         """
         if msg_type == ZCANMessageType.LIN:
-            return _library.ZCAN_GetLINReceiveNum(self._get_channel_handler('LIN', channel))
-        return _library.ZCAN_GetReceiveNum(self._get_channel_handler('CAN', channel), msg_type)
+            return self._library.ZCAN_GetLINReceiveNum(self._get_channel_handler('LIN', channel))
+        return self._library.ZCAN_GetReceiveNum(self._get_channel_handler('CAN', channel), msg_type)
 
     # UINT FUNC_CALL ZCAN_TransmitFD(CHANNEL_HANDLE channel_handle, ZCAN_TransmitFD_Data* pTransmit, UINT len);
     def TransmitFD(self, channel, msgs, size=None):
         handler = self._get_channel_handler('CAN', channel)
         _size = size or len(msgs)
-        ret = _library.ZCAN_TransmitFD(handler, byref(msgs), _size)
+        ret = self._library.ZCAN_TransmitFD(handler, byref(msgs), _size)
         self._logger.debug(f'ZLG: Transmit ZCAN_TransmitFD_Data expect: {_size}, actual: {ret}')
+        if ret < _size:
+            raise ZCANException(f"TransmitFD failed(size: {_size}, actual: {ret})")
         return ret
 
     # UINT FUNC_CALL ZCAN_ReceiveFD(CHANNEL_HANDLE channel_handle, ZCAN_ReceiveFD_Data* pReceive, UINT len, int timeout DEF(-1));
@@ -751,7 +785,7 @@ class _ZCANWindows(_ZLGCAN):
             timeout = int(timeout)
         handler = self._get_channel_handler('CAN', channel)
         can_msgs = (ZCAN_ReceiveFD_Data * size)()
-        ret = _library.ZCAN_ReceiveFD(handler, byref(can_msgs), size, timeout)
+        ret = self._library.ZCAN_ReceiveFD(handler, byref(can_msgs), size, timeout)
         self._logger.debug(f'ZLG: Receive ZCAN_ReceiveFD_Data expect: {size}, actual: {ret}')
         for i in range(ret):
             yield can_msgs[i]
@@ -767,8 +801,10 @@ class _ZCANWindows(_ZLGCAN):
         """
         handler = self._get_channel_handler('CAN', channel)
         _size = size or len(msgs)
-        ret = _library.ZCAN_Transmit(handler, byref(msgs), _size)
+        ret = self._library.ZCAN_Transmit(handler, byref(msgs), _size)
         self._logger.debug(f'ZLG: Transmit ZCAN_Transmit_Data expect: {_size}, actual: {ret}')
+        if ret < _size:
+            raise ZCANException(f"Transmit failed(size: {_size}, actual: {ret})")
         return ret
 
     # UINT FUNC_CALL ZCAN_Receive(CHANNEL_HANDLE channel_handle, ZCAN_Receive_Data* pReceive, UINT len, int wait_time DEF(-1));
@@ -784,7 +820,7 @@ class _ZCANWindows(_ZLGCAN):
             timeout = int(timeout)
         handler = self._get_channel_handler('CAN', channel)
         can_msgs = (ZCAN_Receive_Data * size)()
-        ret = _library.ZCAN_Receive(handler, byref(can_msgs), size, timeout)
+        ret = self._library.ZCAN_Receive(handler, byref(can_msgs), size, timeout)
         for i in range(ret):
             yield can_msgs[i]
 

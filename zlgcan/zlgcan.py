@@ -1,11 +1,10 @@
 """
 by zhuyu4839@gmail.com
 """
-import platform
+from ._common import _os_name, _system_bit
 from ._common import *
 
-_os = platform.system()
-if 'windows' in _os.lower():
+if 'windows' in _os_name.lower():
     from .windows import _ZCANWindows as ZCAN
     from .windows import ZCAN_Transmit_Data
     from .windows import ZCAN_TransmitFD_Data
@@ -13,11 +12,16 @@ if 'windows' in _os.lower():
     from .windows import ZCAN_ReceiveFD_Data
     from .windows import ZCANDataObj
     from . windows import ZCAN_CHANNEL_ERR_INFO, ZCAN_CHANNEL_STATUS, ZCAN_CHANNEL_INIT_CONFIG
-elif 'linux' in _os.lower():
-    from .linux import _ZCANLinux as ZCAN
-    from .linux import ZCAN_CHANNEL_ERR_INFO, ZCAN_CHANNEL_STATUS, ZCAN_CHANNEL_INIT_CONFIG
+elif 'linux' in _os_name.lower():
+    if _system_bit == "64bit":
+        from .linux import _ZCANLinux as ZCAN
+        from .linux import ZCAN_CHANNEL_ERR_INFO, ZCAN_CHANNEL_STATUS, ZCAN_CHANNEL_CAN_INIT_CONFIG, ZCAN_CHANNEL_CANFD_INIT_CONFIG
+    else:
+        raise ZCANException(
+            "The ZLG-CAN driver only support 64bit Python on Linux."
+        )
 else:
-    raise ZCANException(f'ZLG: Unsupported platform: {_os}')
+    raise ZCANException(f'ZLG: Unsupported platform: {_os_name}')
 
 
 
