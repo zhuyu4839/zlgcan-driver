@@ -282,8 +282,12 @@ class _ZCANLinux(_ZLGCAN):
     def CloseDevice(self):
         can_channels = self._channel_handlers['CAN']
         lin_channels = self._channel_handlers['LIN']
-        for channel, _ in can_channels.items():
-            self.ResetCAN(channel)
+        if not self._dev_derive:
+            for channel, _ in can_channels.items():
+                try:
+                    self.ResetCAN(channel)
+                except ZCANException as e:
+                    self._logger.warning(e)
         # for channel in lin_channels:
         #     self.ResetLIN(channel)
         _library_check_run(self._library, 'VCI_CloseDevice', self._dev_type, self._dev_index)

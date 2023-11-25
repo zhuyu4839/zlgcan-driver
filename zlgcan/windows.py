@@ -679,9 +679,15 @@ class _ZCANWindows(_ZLGCAN):
         can_channels = self._channel_handlers['CAN']
         lin_channels = self._channel_handlers['LIN']
         for channel, _ in can_channels.items():
-            self.ResetCAN(channel)
+            try:
+                self.ResetCAN(channel)
+            except ZCANException as e:
+                self._logger.warning(e)
         for channel, _ in lin_channels.items():
-            self.ResetLIN(channel)
+            try:
+                self.ResetLIN(channel)
+            except ZCANException as e:
+                self._logger.warning(e)
         _library_check_run(self._library, 'ZCAN_CloseDevice', self._dev_handler)
         self._dev_handler = None
         can_channels.clear()
