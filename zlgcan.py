@@ -316,26 +316,39 @@ class ZCanBus(BusABC):
                     if bitrate is None:
                         raise CanInitializationError('ZLG-CAN - bitrate is required.')
                     del config['bitrate']
-                    config['canfd_abit_baud_rate'] = bitrate
 
-                    data_bitrate = config.get('data_bitrate', None)
-                    if data_bitrate is None:
-                        config['canfd_dbit_baud_rate'] = bitrate
+                    if self.device.device_is_canfd:
+                        config['canfd_abit_baud_rate'] = bitrate
+
+                        data_bitrate = config.get('data_bitrate', None)
+                        if data_bitrate is None:
+                            config['canfd_dbit_baud_rate'] = bitrate
+                        else:
+                            del config['data_bitrate']
+                            config['canfd_dbit_baud_rate'] = data_bitrate
                     else:
-                        del config['data_bitrate']
-                        config['canfd_dbit_baud_rate'] = data_bitrate
+                        init_config['bitrate'] = bitrate
+
+                    initenal_resistance = config.get("initenal_resistance", None)
+                    if initenal_resistance is not None:
+                        init_config['initenal_resistance'] = initenal_resistance
+                        del config['initenal_resistance']
+
                     if hasattr(self.device, 'SetValue'):
                         # try:
                         #     self.device.SetValue(channel, **config)
                         # except ZCANException:
                         #     pass
+                        LOG.debug(f"SetValue: {config}")
                         self.device.SetValue(channel, **config)
                 elif _os.lower() == 'linux':
                     init_config = config
+                LOG.debug(f"InitCAN: {init_config}")
                 self.device.InitCAN(channel, **init_config)
                 self.device.StartCAN(channel)
                 self.available.append(channel)
         except ZCANException as e:
+            self.shutdown()
             raise CanInitializationError(str(e))
 
     def _recv_from_queue(self) -> Tuple[Message, bool]:
