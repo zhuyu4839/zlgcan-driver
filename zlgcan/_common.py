@@ -291,11 +291,6 @@ class _ZLGCAN(object):
         Create ZLG-CAN object
         :param resend: true if retry to send a frame until success else false 
         """
-        # if _library is None:
-        #     raise ZCANException(
-        #         "The ZLG-CAN driver could not be loaded. "
-        #         "Check that you are using 32-bit/64bit Python on Windows or 64bit Python on Linux."
-        #     )
         self._logger = logging.getLogger(self.__class__.__name__)
         self._resend = resend
         self._dev_index = dev_index
@@ -427,13 +422,13 @@ class _ZLGCAN(object):
         pass
 
     # UINT FUNC_CALL ZCAN_TransmitFD(CHANNEL_HANDLE channel_handle, ZCAN_TransmitFD_Data* pTransmit, UINT len);
-    def TransmitFD(self, channel, msgs, size=None):
+    def TransmitFD(self, channel, msgs, size=None, throw=False):
         """
         发送CANFD报文
         :param channel: 通道号, 范围 0 ~ 通道数-1
         :param msgs: 消息报文
         :param size: 报文大小
-        :param timeout: send timeout value
+        :param throw: raise exception when send ret is not equal size
         :return: 实际发送报文长度
         """
         pass
@@ -443,13 +438,13 @@ class _ZLGCAN(object):
         pass
 
     # # UINT FUNC_CALL ZCAN_Transmit(CHANNEL_HANDLE channel_handle, ZCAN_Transmit_Data* pTransmit, UINT len);
-    def Transmit(self, channel, msgs, size=None):
+    def Transmit(self, channel, msgs, size=None, throw=False):
         """
         发送CAN报文
         :param channel: 通道号, 范围 0 ~ 通道数-1
         :param msgs: 消息报文
         :param size: 报文大小
-        :param timeout: send timeout value
+        :param throw: raise exception when send ret is not equal size
         :return: 实际发送报文长度
         """
         pass

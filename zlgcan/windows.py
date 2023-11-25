@@ -393,7 +393,7 @@ class _ZCANWindows(_ZLGCAN):
             config.config.canfd.brp = kwargs.get('brp', 0)
             config.config.canfd.filter = filter
             config.config.canfd.mode = mode
-            config.config.canfd.brp = kwargs.get('pad', 0)
+            config.config.canfd.pad = kwargs.get('pad', 0)
         else:
             if self._dev_type in (ZCANDeviceType.ZCAN_PCI5010U, ZCANDeviceType.ZCAN_PCI5020U,
                                   ZCANDeviceType.ZCAN_USBCAN_E_U, ZCANDeviceType.ZCAN_USBCAN_2E_U,
@@ -787,8 +787,7 @@ class _ZCANWindows(_ZLGCAN):
         can_msgs = (ZCAN_ReceiveFD_Data * size)()
         ret = self._library.ZCAN_ReceiveFD(handler, byref(can_msgs), size, timeout)
         self._logger.debug(f'ZLG: Receive ZCAN_ReceiveFD_Data expect: {size}, actual: {ret}')
-        for i in range(ret):
-            yield can_msgs[i]
+        yield from can_msgs
 
     # # UINT FUNC_CALL ZCAN_Transmit(CHANNEL_HANDLE channel_handle, ZCAN_Transmit_Data* pTransmit, UINT len);
     def Transmit(self, channel, msgs, size=None):
@@ -821,8 +820,8 @@ class _ZCANWindows(_ZLGCAN):
         handler = self._get_channel_handler('CAN', channel)
         can_msgs = (ZCAN_Receive_Data * size)()
         ret = self._library.ZCAN_Receive(handler, byref(can_msgs), size, timeout)
-        for i in range(ret):
-            yield can_msgs[i]
+        self._logger.debug(f'ZLG: Receive ZCAN_ReceiveFD_Data expect: {size}, actual: {ret}')
+        yield from can_msgs
 
     def TransmitInterval(self, channel, interval_msgs=None):
         """

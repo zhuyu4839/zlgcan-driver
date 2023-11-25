@@ -8,7 +8,7 @@ import os
 from ctypes import *
 from ._common import _ZLGCAN, _library_check_run, ZCANDeviceType, ZCANCanMode, ZCANCanFilter, ZCANMessageType, \
     ZCAN_DEVICE_INFO, ZUSBCAN_I_II_TYPE, ZCANException, \
-    _curr_path, _bd_cfg_filename
+    _curr_path, _bd_cfg_filename, ZCANCanType
 
 ON = c_int(1)
 OFF = c_int(0)
@@ -185,7 +185,7 @@ class _ZCANLinux(_ZLGCAN):
             assert arb_smp is not None, "'arb_smp' is not configured!"
             assert arb_brp is not None, "'arb_brp' is not configured!"
 
-            data_bitrate_cfg = _dev_bd_cfg.get("data_bitrate", {})
+            data_bitrate_cfg = (_dev_bd_cfg.get("data_bitrate") or {}).get(kwargs.get("bitrate"), {})
             data_tseg1 = data_bitrate_cfg.get('data_tseg1', arb_tseg1)
             data_tseg2 = data_bitrate_cfg.get('data_tseg2', arb_tseg2)
             data_sjw = data_bitrate_cfg.get('data_sjw', arb_sjw)
@@ -371,12 +371,12 @@ class _ZCANLinux(_ZLGCAN):
         return self._library.VCI_GetReceiveNum(self._dev_type, self._dev_index, channel)
 
     # EXTERN_C U32 ZCAN_API VCI_TransmitFD(U32 Type, U32 Card, U32 Port, ZCAN_FD_MSG *pData, U32 Count);
-    def TransmitFD(self, channel, msgs, size=None):
+    def TransmitFD(self, channel, msgs, size=None, throw=False):
         channel = self._get_channel_handler('CAN', channel)
         _size = size or len(msgs)
         ret = self._library.VCI_TransmitFD(self._dev_type, self._dev_index, channel, byref(msgs), _size)
         self._logger.debug(f'ZLG: Transmit ZCAN_CANFD_FRAME expect: {_size}, actual: {ret}')
-        if ret < _size:
+        if ret < _size and throw:
             raise ZCANException(f"TransmitFD failed(size: {_size}, actual: {ret})")
         return ret
 
@@ -388,16 +388,15 @@ class _ZCANLinux(_ZLGCAN):
         can_msgs = (ZCAN_CANFD_FRAME * size)()
         ret = self._library.VCI_ReceiveFD(self._dev_type, self._dev_index, channel, byref(can_msgs), size, timeout)
         self._logger.debug(f'ZLG: Receive ZCAN_CANFD_FRAME expect: {size}, actual: {ret}')
-        for i in range(ret):
-            yield can_msgs[i]
+        yield from can_msgs
 
     # EXTERN_C U32 ZCAN_API VCI_Transmit(U32 Type, U32 Card, U32 Port, ZCAN_20_MSG *pData, U32 Count);
-    def Transmit(self, channel, msgs, size=None):
+    def Transmit(self, channel, msgs, size=None, throw=False):
         channel = self._get_channel_handler('CAN', channel)
         _size = size or len(msgs)
         ret = self._library.VCI_Transmit(self._dev_type, self._dev_index, channel, byref(msgs), _size)
         self._logger.debug(f'ZLG: Transmit ZCAN_CAN_FRAME expect: {_size}, actual: {ret}')
-        if ret < _size:
+        if ret < _size and throw:
             raise ZCANException(f"Transmit failed(size: {_size}, actual: {ret})")
         return ret
 
@@ -419,8 +418,9 @@ class _ZCANLinux(_ZLGCAN):
             can_msgs = (ZCAN_CAN_FRAME * size)()
         ret = self._library.VCI_Receive(self._dev_type, self._dev_index, channel, byref(can_msgs), size, timeout)
         self._logger.debug(f'ZLG: Receive ZCAN_CAN_FRAME expect: {size}, actual: {ret}')
-        for i in range(ret):
-            yield can_msgs[i]
+        yield from can_msgs
+        # for i in range(ret):
+        #     yield can_msgs[i]
 
     def TransmitInterval(self, channel, interval_msgs=None):
         """
