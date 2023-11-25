@@ -8,7 +8,7 @@ import os
 from ctypes import *
 from ._common import _ZLGCAN, _library_check_run, ZCANDeviceType, ZCANCanMode, ZCANCanFilter, ZCANMessageType, \
     ZCAN_DEVICE_INFO, ZUSBCAN_I_II_TYPE, ZCANException, \
-    _curr_path, _bd_cfg_filename, ZCANCanType
+    _curr_path, _bd_cfg_filename, ZCANCanType, ZCAN_DEVICE_TYPE
 
 ON = c_int(1)
 OFF = c_int(0)
@@ -148,24 +148,24 @@ class ZCAN_CHANNEL_CAN_INIT_CONFIG(Structure):     # ZCAN_CHANNEL_CAN_INIT_CONFI
 
 class _ZCANLinux(_ZLGCAN):
 
-    def __init__(self, dev_index: int, dev_type: ZCANDeviceType, resend: bool, derive: bool, **kwargs):
+    def __init__(self, dev_index: int, dev_type: int, resend: bool, derive: bool, **kwargs):
         super().__init__(dev_index, dev_type, resend, derive, **kwargs)
-        if self._dev_type in ZUSBCAN_I_II_TYPE:
+        if self.device_type in ZUSBCAN_I_II_TYPE:
             self._library = cdll.LoadLibrary(os.path.join(_curr_path, 'linux/x86_64/zlgcan/libusbcan.so'))
-        elif self._dev_type in _LINUX_CAN_4E_U:
+        elif self.device_type in _LINUX_CAN_4E_U:
             self._library = cdll.LoadLibrary(os.path.join(_curr_path, 'linux/x86_64/zlgcan/libusbcan-4e.so'))
-        elif self._dev_type in _LINUX_CAN_8E_U:
+        elif self.device_type in _LINUX_CAN_8E_U:
             self._library = cdll.LoadLibrary(os.path.join(_curr_path, 'linux/x86_64/zlgcan/libusbcan-8e.so'))
-        elif self._dev_type in _LINUX_CANFD:
+        elif self.device_type in _LINUX_CANFD:
             self._library = cdll.LoadLibrary(os.path.join(_curr_path, 'linux/x86_64/zlgcan/libusbcanfd.so'))
-        elif self._dev_type in _LINUX_CANFD_800U:
+        elif self.device_type in _LINUX_CANFD_800U:
             self._library = cdll.LoadLibrary(os.path.join(_curr_path, 'linux/x86_64/zlgcan/libusbcanfd800u.so'))
         else:
-            raise ZCANException(f"device type: {self._dev_type} is not supported by this system!")
+            raise ZCANException(f"device type: {self.device_type} is not supported by this system!")
 
     def _get_can_init_config(self, mode, filter, **kwargs):
         try:
-            _dev_bd_cfg = self._bd_cfg[self._dev_type.value]
+            _dev_bd_cfg = self._bd_cfg[self.device_type]
             bitrate_cfg = _dev_bd_cfg["bitrate"].get(kwargs.get("bitrate"), {})
         except KeyError:
             raise ZCANException(f"the device baudrate info is not configured in the {_bd_cfg_filename}")
@@ -233,7 +233,7 @@ class _ZCANLinux(_ZLGCAN):
 
     # EXTERN_C U32 ZCAN_API VCI_GetReference(U32 Type, U32 Card, U32 Port, U32 Ref, void *pData);
     def _GetReference(self, channel, ref_code):
-        if self._dev_type in [ZCANDeviceType.ZCAN_CANETUDP, ZCANDeviceType.ZCAN_CANETE, ZCANDeviceType.ZCAN_CANETTCP,
+        if self.device_type in [ZCANDeviceType.ZCAN_CANETUDP, ZCANDeviceType.ZCAN_CANETE, ZCANDeviceType.ZCAN_CANETTCP,
                               ZCANDeviceType.ZCAN_CANDTU_NET, ZCANDeviceType.ZCAN_CANDTU_NET_400]:
             result = c_int()
             _library_check_run(self._library, 'VCI_SetReference',
@@ -322,7 +322,7 @@ class _ZCANLinux(_ZLGCAN):
         config = self._get_can_init_config(mode, filter, **kwargs)
         _library_check_run(self._library, 'VCI_InitCAN', self._dev_type, self._dev_index, channel, byref(config))
         self._channel_handlers['CAN'][channel] = channel
-        if self._dev_type in ZUSBCAN_I_II_TYPE: # not support internal resistance config
+        if self.device_type in ZUSBCAN_I_II_TYPE: # not support internal resistance config
             return
         self.ResistanceStatus(channel, kwargs.get('initenal_resistance', 1))
 
@@ -412,7 +412,7 @@ class _ZCANLinux(_ZLGCAN):
         channel = self._get_channel_handler('CAN', channel)
         if timeout is not None:
             timeout = int(timeout)
-        if self._dev_type in ZUSBCAN_I_II_TYPE:
+        if self.device_type in ZUSBCAN_I_II_TYPE:
             can_msgs = (ZCAN_CAN_FRAME_I_II * size)()
         else:
             can_msgs = (ZCAN_CAN_FRAME * size)()

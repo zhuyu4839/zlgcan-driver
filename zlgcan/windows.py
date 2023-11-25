@@ -385,7 +385,7 @@ class _ZCANWindows(_ZLGCAN):
         acc_mask = kwargs.get('acc_mask', 0xFFFFFFFF)
         if self._dev_is_canfd:
             # USBCANFD-100U、USBCANFD-200U、USBCANFD-MINI acc_code, acc_mask ignored
-            if self._dev_type not in ZUSBCANFD_TYPE:
+            if self.device_type not in ZUSBCANFD_TYPE:
                 config.config.canfd.acc_code = acc_code
                 config.config.canfd.acc_mask = acc_mask
             config.config.canfd.abit_timing = kwargs.get('abit_timing', 104286)     # ignored
@@ -395,7 +395,7 @@ class _ZCANWindows(_ZLGCAN):
             config.config.canfd.mode = mode
             config.config.canfd.pad = kwargs.get('pad', 0)
         else:
-            if self._dev_type in (ZCANDeviceType.ZCAN_PCI5010U, ZCANDeviceType.ZCAN_PCI5020U,
+            if self.device_type in (ZCANDeviceType.ZCAN_PCI5010U, ZCANDeviceType.ZCAN_PCI5020U,
                                   ZCANDeviceType.ZCAN_USBCAN_E_U, ZCANDeviceType.ZCAN_USBCAN_2E_U,
                                   ZCANDeviceType.ZCAN_USBCAN_4E_U, ZCANDeviceType.ZCAN_CANDTU_200UR,
                                   ZCANDeviceType.ZCAN_CANDTU_MINI, ZCANDeviceType.ZCAN_CANDTU_NET,
@@ -404,7 +404,7 @@ class _ZCANWindows(_ZLGCAN):
                 config.config.can.acc_mask = acc_mask
             config.config.can.filter = filter
             try:
-                _dev_bd_cfg = self._bd_cfg[self._dev_type.value]
+                _dev_bd_cfg = self._bd_cfg[self.device_type]
                 bitrate_cfg = _dev_bd_cfg["bitrate"].get(kwargs.get("bitrate"), {})
             except KeyError:
                 raise ZCANException(f"the device baudrate info is not configured in the {_bd_cfg_filename}")

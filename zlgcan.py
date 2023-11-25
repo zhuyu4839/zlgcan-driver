@@ -16,7 +16,7 @@ from can.exceptions import (
 )
 from typing import Optional, Tuple, Sequence, Union, Deque, Any
 from can import BusABC, Message
-from zlgcan import ZCAN, ZCANDeviceType, ZCANException, ZCANMessageType, ZCANCanTransType
+from zlgcan import ZCAN, ZCANDeviceType, ZCANException, ZCANMessageType, ZCANCanTransType, ZUSBCAN_I_II_TYPE
 
 logger = logging.getLogger(__name__)
 _os = platform.system()
@@ -37,6 +37,18 @@ def _zlg_convert_msg_linux(msg, **kwargs):
         channel = kwargs.get('channel')
         assert channel is not None or msg.channel is not None, 'channel is required!'
         trans_type = kwargs.get('trans_type', ZCANCanTransType.NORMAL if kwargs.get('resend', False) else ZCANCanTransType.SINGLE)
+        device_type = kwargs.get("device_type")
+        if device_type in ZUSBCAN_I_II_TYPE:
+            result = (ZCAN_CAN_FRAME_I_II * 1)()
+            result[0].SendType = trans_type
+            result[0].ID = msg.arbitration_id
+            result[0].RemoteFlag = int(msg.is_remote_frame)
+            result[0].ExternFlag = int(msg.is_extended_id)
+            result[0].DataLen = msg.dlc
+            for _idx, _val in enumerate(msg.data):
+                result[0].Data[_idx] = _val
+            return result
+
         if msg.is_fd:
             result = (ZCAN_CANFD_FRAME * 1)()
         else:
@@ -256,7 +268,7 @@ class ZCanBus(BusABC):
         )  # type: Deque[Tuple[int, Any]]               # channel, raw_msg
         try:
             self.device = ZCAN(device_index, device_type, resend, derive)
-            self.device.OpenDevice(device_type, device_index)
+            self.device.OpenDevice()
             self.channels = self.device.channels
             self.available = []
             self.channel_info = f"ZLG-CAN - device {device_index}, channels {self.channels}"
@@ -330,7 +342,7 @@ class ZCanBus(BusABC):
         """Return a message from the internal receive queue"""
         channel, raw_msg = self.rx_queue.popleft()
 
-        return zlg_convert_msg(raw_msg, channel=channel, is_rx=True), False
+        return zlg_convert_msg(raw_msg, channel=channel, is_rx=True, device_type=self.device.device_type), False
 
     def poll_received_messages(self, timeout):
         try:
@@ -370,9 +382,6 @@ class ZCanBus(BusABC):
     def send(self, msg: Message, timeout: Optional[float] = None, **kwargs) -> None:
         try:
             channel = msg.channel
-            # if channel not in self.available:
-            #     if len(self.available) == 0:
-            #         raise CanOperationError(f'Channel: {channel} not in {self.available}')
             if len(self.available) > 0 and channel is None:
                 channel = self.available[0]
             if channel not in self.available:
@@ -383,7 +392,7 @@ class ZCanBus(BusABC):
             else:
                 if msg.is_fd:
                     return self.device.TransmitFD(channel, zlg_convert_msg(msg, resend=self.device.resend, channel=channel, is_merge=is_merge, **kwargs), 1)
-                return self.device.Transmit(channel, zlg_convert_msg(msg, resend=self.device.resend, channel=channel, is_merge=is_merge, **kwargs), 1)
+                return self.device.Transmit(channel, zlg_convert_msg(msg, resend=self.device.resend, channel=channel, is_merge=is_merge, device_type=self.device.device_type, **kwargs), 1)
         except ZCANException as e:
             raise CanOperationError(str(e))
 

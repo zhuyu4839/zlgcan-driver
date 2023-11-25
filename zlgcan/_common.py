@@ -63,86 +63,86 @@ ZCAN_DEVICE_TYPE = c_uint
 
 
 class ZCANDeviceType:
-    ZCAN_PCI5121                       = ZCAN_DEVICE_TYPE(1)
-    ZCAN_PCI9810                       = ZCAN_DEVICE_TYPE(2)
-    ZCAN_USBCAN1                       = ZCAN_DEVICE_TYPE(3)
-    ZCAN_USBCAN2                       = ZCAN_DEVICE_TYPE(4)
-    ZCAN_PCI9820                       = ZCAN_DEVICE_TYPE(5)
-    ZCAN_CAN232                        = ZCAN_DEVICE_TYPE(6)
-    ZCAN_PCI5110                       = ZCAN_DEVICE_TYPE(7)
-    ZCAN_CANLITE                       = ZCAN_DEVICE_TYPE(8)
-    ZCAN_ISA9620                       = ZCAN_DEVICE_TYPE(9)
-    ZCAN_ISA5420                       = ZCAN_DEVICE_TYPE(10)
-    ZCAN_PC104CAN                      = ZCAN_DEVICE_TYPE(11)
-    ZCAN_CANETUDP                      = ZCAN_DEVICE_TYPE(12)
-    ZCAN_CANETE                        = ZCAN_DEVICE_TYPE(12)
-    ZCAN_DNP9810                       = ZCAN_DEVICE_TYPE(13)
-    ZCAN_PCI9840                       = ZCAN_DEVICE_TYPE(14)
-    ZCAN_PC104CAN2                     = ZCAN_DEVICE_TYPE(15)
-    ZCAN_PCI9820I                      = ZCAN_DEVICE_TYPE(16)
-    ZCAN_CANETTCP                      = ZCAN_DEVICE_TYPE(17)
-    ZCAN_PCIE_9220                     = ZCAN_DEVICE_TYPE(18)
-    ZCAN_PCI5010U                      = ZCAN_DEVICE_TYPE(19)
-    ZCAN_USBCAN_E_U                    = ZCAN_DEVICE_TYPE(20)
-    ZCAN_USBCAN_2E_U                   = ZCAN_DEVICE_TYPE(21)
-    ZCAN_PCI5020U                      = ZCAN_DEVICE_TYPE(22)
-    ZCAN_EG20T_CAN                     = ZCAN_DEVICE_TYPE(23)
-    ZCAN_PCIE9221                      = ZCAN_DEVICE_TYPE(24)
-    ZCAN_WIFICAN_TCP                   = ZCAN_DEVICE_TYPE(25)
-    ZCAN_WIFICAN_UDP                   = ZCAN_DEVICE_TYPE(26)
-    ZCAN_PCIe9120                      = ZCAN_DEVICE_TYPE(27)
-    ZCAN_PCIe9110                      = ZCAN_DEVICE_TYPE(28)
-    ZCAN_PCIe9140                      = ZCAN_DEVICE_TYPE(29)
-    ZCAN_USBCAN_4E_U                   = ZCAN_DEVICE_TYPE(31)
-    ZCAN_CANDTU_200UR                  = ZCAN_DEVICE_TYPE(32)
-    ZCAN_CANDTU_MINI                   = ZCAN_DEVICE_TYPE(33)
-    ZCAN_USBCAN_8E_U                   = ZCAN_DEVICE_TYPE(34)
-    ZCAN_CANREPLAY                     = ZCAN_DEVICE_TYPE(35)
-    ZCAN_CANDTU_NET                    = ZCAN_DEVICE_TYPE(36)
-    ZCAN_CANDTU_100UR                  = ZCAN_DEVICE_TYPE(37)
-    ZCAN_PCIE_CANFD_100U               = ZCAN_DEVICE_TYPE(38)
-    ZCAN_PCIE_CANFD_200U               = ZCAN_DEVICE_TYPE(39)
-    ZCAN_PCIE_CANFD_400U               = ZCAN_DEVICE_TYPE(40)
-    ZCAN_USBCANFD_200U                 = ZCAN_DEVICE_TYPE(41)
-    ZCAN_USBCANFD_100U                 = ZCAN_DEVICE_TYPE(42)
-    ZCAN_USBCANFD_MINI                 = ZCAN_DEVICE_TYPE(43)
-    ZCAN_CANFDCOM_100IE                = ZCAN_DEVICE_TYPE(44)
-    ZCAN_CANSCOPE                      = ZCAN_DEVICE_TYPE(45)
-    ZCAN_CLOUD                         = ZCAN_DEVICE_TYPE(46)
-    ZCAN_CANDTU_NET_400                = ZCAN_DEVICE_TYPE(47)
-    ZCAN_CANFDNET_TCP                  = ZCAN_DEVICE_TYPE(48)
-    ZCAN_CANFDNET_200U_TCP             = ZCAN_DEVICE_TYPE(48)
-    ZCAN_CANFDNET_UDP                  = ZCAN_DEVICE_TYPE(49)
-    ZCAN_CANFDNET_200U_UDP             = ZCAN_DEVICE_TYPE(49)
-    ZCAN_CANFDWIFI_TCP                 = ZCAN_DEVICE_TYPE(50)
-    ZCAN_CANFDWIFI_100U_TCP            = ZCAN_DEVICE_TYPE(50)
-    ZCAN_CANFDWIFI_UDP                 = ZCAN_DEVICE_TYPE(51)
-    ZCAN_CANFDWIFI_100U_UDP            = ZCAN_DEVICE_TYPE(51)
-    ZCAN_CANFDNET_400U_TCP             = ZCAN_DEVICE_TYPE(52)
-    ZCAN_CANFDNET_400U_UDP             = ZCAN_DEVICE_TYPE(53)
-    ZCAN_CANFDBLUE_200U                = ZCAN_DEVICE_TYPE(54)
-    ZCAN_CANFDNET_100U_TCP             = ZCAN_DEVICE_TYPE(55)
-    ZCAN_CANFDNET_100U_UDP             = ZCAN_DEVICE_TYPE(56)
-    ZCAN_CANFDNET_800U_TCP             = ZCAN_DEVICE_TYPE(57)
-    ZCAN_CANFDNET_800U_UDP             = ZCAN_DEVICE_TYPE(58)
-    ZCAN_USBCANFD_800U                 = ZCAN_DEVICE_TYPE(59)
-    ZCAN_PCIE_CANFD_100U_EX            = ZCAN_DEVICE_TYPE(60)
-    ZCAN_PCIE_CANFD_400U_EX            = ZCAN_DEVICE_TYPE(61)
-    ZCAN_PCIE_CANFD_200U_MINI          = ZCAN_DEVICE_TYPE(62)
-    ZCAN_PCIE_CANFD_200U_M2            = ZCAN_DEVICE_TYPE(63)
-    ZCAN_CANFDDTU_400_TCP              = ZCAN_DEVICE_TYPE(64)
-    ZCAN_CANFDDTU_400_UDP              = ZCAN_DEVICE_TYPE(65)
-    ZCAN_CANFDWIFI_200U_TCP            = ZCAN_DEVICE_TYPE(66)
-    ZCAN_CANFDWIFI_200U_UDP            = ZCAN_DEVICE_TYPE(67)
-    ZCAN_CANFDDTU_800ER_TCP            = ZCAN_DEVICE_TYPE(68)
-    ZCAN_CANFDDTU_800ER_UDP            = ZCAN_DEVICE_TYPE(69)
-    ZCAN_CANFDDTU_800EWGR_TCP          = ZCAN_DEVICE_TYPE(70)
-    ZCAN_CANFDDTU_800EWGR_UDP          = ZCAN_DEVICE_TYPE(71)
-    ZCAN_CANFDDTU_600EWGR_TCP          = ZCAN_DEVICE_TYPE(72)
-    ZCAN_CANFDDTU_600EWGR_UDP          = ZCAN_DEVICE_TYPE(73)
+    ZCAN_PCI5121                       = 1
+    ZCAN_PCI9810                       = 2
+    ZCAN_USBCAN1                       = 3
+    ZCAN_USBCAN2                       = 4
+    ZCAN_PCI9820                       = 5
+    ZCAN_CAN232                        = 6
+    ZCAN_PCI5110                       = 7
+    ZCAN_CANLITE                       = 8
+    ZCAN_ISA9620                       = 9
+    ZCAN_ISA5420                       = 10
+    ZCAN_PC104CAN                      = 11
+    ZCAN_CANETUDP                      = 12
+    ZCAN_CANETE                        = 12
+    ZCAN_DNP9810                       = 13
+    ZCAN_PCI9840                       = 14
+    ZCAN_PC104CAN2                     = 15
+    ZCAN_PCI9820I                      = 16
+    ZCAN_CANETTCP                      = 17
+    ZCAN_PCIE_9220                     = 18
+    ZCAN_PCI5010U                      = 19
+    ZCAN_USBCAN_E_U                    = 20
+    ZCAN_USBCAN_2E_U                   = 21
+    ZCAN_PCI5020U                      = 22
+    ZCAN_EG20T_CAN                     = 23
+    ZCAN_PCIE9221                      = 24
+    ZCAN_WIFICAN_TCP                   = 25
+    ZCAN_WIFICAN_UDP                   = 26
+    ZCAN_PCIe9120                      = 27
+    ZCAN_PCIe9110                      = 28
+    ZCAN_PCIe9140                      = 29
+    ZCAN_USBCAN_4E_U                   = 31
+    ZCAN_CANDTU_200UR                  = 32
+    ZCAN_CANDTU_MINI                   = 33
+    ZCAN_USBCAN_8E_U                   = 34
+    ZCAN_CANREPLAY                     = 35
+    ZCAN_CANDTU_NET                    = 36
+    ZCAN_CANDTU_100UR                  = 37
+    ZCAN_PCIE_CANFD_100U               = 38
+    ZCAN_PCIE_CANFD_200U               = 39
+    ZCAN_PCIE_CANFD_400U               = 40
+    ZCAN_USBCANFD_200U                 = 41
+    ZCAN_USBCANFD_100U                 = 42
+    ZCAN_USBCANFD_MINI                 = 43
+    ZCAN_CANFDCOM_100IE                = 44
+    ZCAN_CANSCOPE                      = 45
+    ZCAN_CLOUD                         = 46
+    ZCAN_CANDTU_NET_400                = 47
+    ZCAN_CANFDNET_TCP                  = 48
+    ZCAN_CANFDNET_200U_TCP             = 48
+    ZCAN_CANFDNET_UDP                  = 49
+    ZCAN_CANFDNET_200U_UDP             = 49
+    ZCAN_CANFDWIFI_TCP                 = 50
+    ZCAN_CANFDWIFI_100U_TCP            = 50
+    ZCAN_CANFDWIFI_UDP                 = 51
+    ZCAN_CANFDWIFI_100U_UDP            = 51
+    ZCAN_CANFDNET_400U_TCP             = 52
+    ZCAN_CANFDNET_400U_UDP             = 53
+    ZCAN_CANFDBLUE_200U                = 54
+    ZCAN_CANFDNET_100U_TCP             = 55
+    ZCAN_CANFDNET_100U_UDP             = 56
+    ZCAN_CANFDNET_800U_TCP             = 57
+    ZCAN_CANFDNET_800U_UDP             = 58
+    ZCAN_USBCANFD_800U                 = 59
+    ZCAN_PCIE_CANFD_100U_EX            = 60
+    ZCAN_PCIE_CANFD_400U_EX            = 61
+    ZCAN_PCIE_CANFD_200U_MINI          = 62
+    ZCAN_PCIE_CANFD_200U_M2            = 63
+    ZCAN_CANFDDTU_400_TCP              = 64
+    ZCAN_CANFDDTU_400_UDP              = 65
+    ZCAN_CANFDWIFI_200U_TCP            = 66
+    ZCAN_CANFDWIFI_200U_UDP            = 67
+    ZCAN_CANFDDTU_800ER_TCP            = 68
+    ZCAN_CANFDDTU_800ER_UDP            = 69
+    ZCAN_CANFDDTU_800EWGR_TCP          = 70
+    ZCAN_CANFDDTU_800EWGR_UDP          = 71
+    ZCAN_CANFDDTU_600EWGR_TCP          = 72
+    ZCAN_CANFDDTU_600EWGR_UDP          = 73
 
-    ZCAN_OFFLINE_DEVICE                = ZCAN_DEVICE_TYPE(98)
-    ZCAN_VIRTUAL_DEVICE                = ZCAN_DEVICE_TYPE(99)
+    ZCAN_OFFLINE_DEVICE                = 98
+    ZCAN_VIRTUAL_DEVICE                = 99
 
 
 ZUSBCANFD_TYPE = (ZCANDeviceType.ZCAN_USBCANFD_200U,
@@ -286,7 +286,7 @@ class ZCAN_DEVICE_INFO(Structure):  # ZCAN_DEVICE_INFO
 
 class _ZLGCAN(object):
 
-    def __init__(self, dev_index: int, dev_type: ZCANDeviceType, resend: bool, derive: bool, **kwargs):
+    def __init__(self, dev_index: int, dev_type: int, resend: bool, derive: bool, **kwargs):
         """
         Create ZLG-CAN object
         :param resend: true if retry to send a frame until success else false 
@@ -294,7 +294,7 @@ class _ZLGCAN(object):
         self._logger = logging.getLogger(self.__class__.__name__)
         self._resend = resend
         self._dev_index = dev_index
-        self._dev_type = dev_type
+        self._dev_type = ZCAN_DEVICE_TYPE(dev_type)
         self._dev_derive = derive
         self._dev_info = None
         self._dev_is_canfd = None
@@ -315,6 +315,10 @@ class _ZLGCAN(object):
         return self._dev_index
 
     @property
+    def device_type(self):
+        return self._dev_type.value
+
+    @property
     def device_is_canfd(self):
         return self._dev_is_canfd
 
@@ -333,7 +337,7 @@ class _ZLGCAN(object):
         return channels[channel]
 
     def _merge_support(self):
-        if self._dev_type not in (ZCANDeviceType.ZCAN_USBCANFD_200U, ZCANDeviceType.ZCAN_USBCANFD_100U,
+        if self.device_type not in (ZCANDeviceType.ZCAN_USBCANFD_200U, ZCANDeviceType.ZCAN_USBCANFD_100U,
                                   ZCANDeviceType.ZCAN_USBCANFD_MINI, ZCANDeviceType.ZCAN_CANFDNET_TCP,
                                   ZCANDeviceType.ZCAN_CANFDNET_UDP, ZCANDeviceType.ZCAN_CANFDNET_400U_TCP,
                                   ZCANDeviceType.ZCAN_CANFDNET_400U_UDP, ZCANDeviceType.ZCAN_CANFDNET_100U_TCP,
@@ -343,7 +347,7 @@ class _ZLGCAN(object):
                                   ZCANDeviceType.ZCAN_CANFDDTU_400_UDP, ZCANDeviceType.ZCAN_PCIE_CANFD_100U_EX,
                                   ZCANDeviceType.ZCAN_PCIE_CANFD_400U_EX, ZCANDeviceType.ZCAN_PCIE_CANFD_200U_MINI,
                                   ZCANDeviceType.ZCAN_PCIE_CANFD_200U_M2):
-            raise ZCANException(f'ZLG: merge receive is not supported by {self._dev_type}!')
+            raise ZCANException(f'ZLG: merge receive is not supported by {self.device_type}!')
 
     def _get_can_init_config(self, mode, filter, **kwargs):
         pass
