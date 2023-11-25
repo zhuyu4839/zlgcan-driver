@@ -395,13 +395,8 @@ class _ZCANWindows(_ZLGCAN):
             config.config.canfd.mode = mode
             config.config.canfd.pad = kwargs.get('pad', 0)
         else:
-            if self.device_type in (ZCANDeviceType.ZCAN_PCI5010U, ZCANDeviceType.ZCAN_PCI5020U,
-                                  ZCANDeviceType.ZCAN_USBCAN_E_U, ZCANDeviceType.ZCAN_USBCAN_2E_U,
-                                  ZCANDeviceType.ZCAN_USBCAN_4E_U, ZCANDeviceType.ZCAN_CANDTU_200UR,
-                                  ZCANDeviceType.ZCAN_CANDTU_MINI, ZCANDeviceType.ZCAN_CANDTU_NET,
-                                  ZCANDeviceType.ZCAN_CANDTU_100UR, ZCANDeviceType.ZCAN_CANDTU_NET_400):
-                config.config.can.acc_code = acc_code
-                config.config.can.acc_mask = acc_mask
+            config.config.can.acc_code = acc_code
+            config.config.can.acc_mask = acc_mask
             config.config.can.filter = filter
             try:
                 _dev_bd_cfg = self._bd_cfg[self.device_type]
