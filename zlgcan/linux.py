@@ -166,7 +166,7 @@ class _ZCANLinux(_ZLGCAN):
     def _get_can_init_config(self, mode, filter, **kwargs):
         try:
             _dev_bd_cfg = self._bd_cfg[self._dev_type.value]
-            bitrate_cfg = _dev_bd_cfg["bitrate"].get(kwargs.get("bitrate"))
+            bitrate_cfg = _dev_bd_cfg["bitrate"].get(kwargs.get("bitrate"), {})
         except KeyError:
             raise ZCANException(f"the device baudrate info is not configured in the {_bd_cfg_filename}")
 
@@ -367,7 +367,7 @@ class _ZCANLinux(_ZLGCAN):
         """
         channel = self._get_channel_handler('CAN', channel)
         if msg_type == ZCANMessageType.CANFD:
-            channel |= 0x80000000
+            channel |= (0x80000000 + channel)
         return self._library.VCI_GetReceiveNum(self._dev_type, self._dev_index, channel)
 
     # EXTERN_C U32 ZCAN_API VCI_TransmitFD(U32 Type, U32 Card, U32 Port, ZCAN_FD_MSG *pData, U32 Count);

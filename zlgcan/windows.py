@@ -404,11 +404,12 @@ class _ZCANWindows(_ZLGCAN):
                 config.config.can.acc_mask = acc_mask
             config.config.can.filter = filter
             try:
-                _dev_bd_cfg = self._bd_cfg[self._dev_type.value].get("bitrate")
+                _dev_bd_cfg = self._bd_cfg[self._dev_type.value]
+                bitrate_cfg = _dev_bd_cfg["bitrate"].get(kwargs.get("bitrate"), {})
             except KeyError:
                 raise ZCANException(f"the device baudrate info is not configured in the {_bd_cfg_filename}")
-            timing0 = _dev_bd_cfg.get("timing0", None)
-            timing1 = _dev_bd_cfg.get("timing1", None)
+            timing0 = bitrate_cfg.get("timing0", None)
+            timing1 = bitrate_cfg.get("timing1", None)
             assert timing0 is not None, "'timing0' is not configured!"
             assert timing1 is not None, "'timing1' is not configured!"
             config.config.can.timing0 = timing0
@@ -770,12 +771,12 @@ class _ZCANWindows(_ZLGCAN):
         return self._library.ZCAN_GetReceiveNum(self._get_channel_handler('CAN', channel), msg_type)
 
     # UINT FUNC_CALL ZCAN_TransmitFD(CHANNEL_HANDLE channel_handle, ZCAN_TransmitFD_Data* pTransmit, UINT len);
-    def TransmitFD(self, channel, msgs, size=None):
+    def TransmitFD(self, channel, msgs, size=None, throw=False):
         handler = self._get_channel_handler('CAN', channel)
         _size = size or len(msgs)
         ret = self._library.ZCAN_TransmitFD(handler, byref(msgs), _size)
         self._logger.debug(f'ZLG: Transmit ZCAN_TransmitFD_Data expect: {_size}, actual: {ret}')
-        if ret < _size:
+        if ret < _size and throw:
             raise ZCANException(f"TransmitFD failed(size: {_size}, actual: {ret})")
         return ret
 
@@ -790,19 +791,12 @@ class _ZCANWindows(_ZLGCAN):
         yield from can_msgs
 
     # # UINT FUNC_CALL ZCAN_Transmit(CHANNEL_HANDLE channel_handle, ZCAN_Transmit_Data* pTransmit, UINT len);
-    def Transmit(self, channel, msgs, size=None):
-        """
-        发送CAN报文
-        :param channel: 通道号, 范围 0 ~ 通道数-1
-        :param msgs: 消息报文
-        :param size: 报文大小
-        :return: 实际发送报文长度
-        """
+    def Transmit(self, channel, msgs, size=None, throw=False):
         handler = self._get_channel_handler('CAN', channel)
         _size = size or len(msgs)
         ret = self._library.ZCAN_Transmit(handler, byref(msgs), _size)
         self._logger.debug(f'ZLG: Transmit ZCAN_Transmit_Data expect: {_size}, actual: {ret}')
-        if ret < _size:
+        if ret < _size and throw:
             raise ZCANException(f"Transmit failed(size: {_size}, actual: {ret})")
         return ret
 
