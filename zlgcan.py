@@ -80,7 +80,7 @@ def _zlg_convert_msg_linux(msg, **kwargs):
             is_error_frame=bool(msg.hdr.inf.err),
             channel=msg.hdr.chn or channel,
             dlc=msg.hdr.len,
-            data=bytes(msg.dat),
+            data=bytearray(msg.dat),
             is_fd=bool(msg.hdr.inf.fmt),
             is_rx=kwargs.get("is_rx", False),
             bitrate_switch=bool(msg.hdr.inf.brs),
@@ -97,7 +97,7 @@ def _zlg_convert_msg_linux(msg, **kwargs):
             is_error_frame=False,
             channel=channel,
             dlc=msg.DataLen,
-            data=bytes(msg.Data),
+            data=bytearray(msg.Data),
             is_fd=False,
             is_rx=kwargs.get("is_rx", False),
             bitrate_switch=False,
@@ -123,18 +123,18 @@ def _zlg_convert_msg_win(msg, **kwargs):                        # channel=None, 
             if msg.is_fd:
                 result = ZCAN_TransmitFD_Data_1()
                 result[0].frame.len = msg.dlc
-                result[0].frame.brs = msg.bitrate_switch
-                result[0].frame.data = (ctypes.c_ubyte * 64)(*msg.data)
+                result[0].frame.brs = int(msg.bitrate_switch)
             else:
                 result = ZCAN_Transmit_Data_1()
                 result[0].frame.can_dlc = msg.dlc
-                result[0].frame.data = (ctypes.c_ubyte * msg.dlc)(*msg.data)
             result[0].transmit_type = trans_type
 
             result[0].frame.can_id = msg.arbitration_id
-            result[0].frame.err = msg.is_error_frame
-            result[0].frame.rtr = msg.is_remote_frame
-            result[0].frame.eff = msg.is_extended_id
+            result[0].frame.err = int(msg.is_error_frame)
+            result[0].frame.rtr = int(msg.is_remote_frame)
+            result[0].frame.eff = int(msg.is_extended_id)
+            for _idx, _val in enumerate(msg.data):
+                result[0].frame.data[_idx] = _val
             return result
         else:
             channel = kwargs.get('channel', None)
@@ -144,9 +144,9 @@ def _zlg_convert_msg_win(msg, **kwargs):                        # channel=None, 
             assert channel is not None
             result[0].chn = channel
             result[0].data.zcanCANFDData.frame.can_id = msg.arbitration_id
-            result[0].data.zcanCANFDData.frame.err = msg.is_error_frame
-            result[0].data.zcanCANFDData.frame.rtr = msg.is_remote_frame
-            result[0].data.zcanCANFDData.frame.eff = msg.is_extended_id
+            result[0].data.zcanCANFDData.frame.err = int(msg.is_error_frame)
+            result[0].data.zcanCANFDData.frame.rtr = int(msg.is_remote_frame)
+            result[0].data.zcanCANFDData.frame.eff = int(msg.is_extended_id)
 
             result[0].data.zcanCANFDData.flag.transmitType = trans_type
             echo = kwargs.get('is_echo', False)
@@ -162,12 +162,12 @@ def _zlg_convert_msg_win(msg, **kwargs):                        # channel=None, 
         return Message(
             timestamp=msg.timestamp / 1000,
             arbitration_id=msg.frame.can_id,
-            is_extended_id=msg.frame.eff,
-            is_remote_frame=msg.frame.rtr,
-            is_error_frame=msg.frame.err,
+            is_extended_id=bool(msg.frame.eff),
+            is_remote_frame=bool(msg.frame.rtr),
+            is_error_frame=bool(msg.frame.err),
             channel=channel,
             dlc=msg.frame.can_dlc,
-            data=bytes(msg.frame.data),
+            data=bytearray(msg.frame.data),
             is_rx=True,
         )
     elif isinstance(msg, ZCAN_ReceiveFD_Data):                          # 接收CANFD报文转换
@@ -176,32 +176,32 @@ def _zlg_convert_msg_win(msg, **kwargs):                        # channel=None, 
         return Message(
             timestamp=msg.timestamp / 1000,
             arbitration_id=msg.frame.can_id,
-            is_extended_id=msg.frame.eff,
-            is_remote_frame=msg.frame.rtr,
-            is_error_frame=msg.frame.err,
+            is_extended_id=bool(msg.frame.eff),
+            is_remote_frame=bool(msg.frame.rtr),
+            is_error_frame=bool(msg.frame.err),
             channel=channel,
             dlc=msg.frame.len,
-            data=bytes(msg.frame.data),
+            data=bytearray(msg.frame.data),
             is_fd=True,
             is_rx=True,
-            bitrate_switch=msg.frame.brs,
-            error_state_indicator=msg.frame.esi,
+            bitrate_switch=bool(msg.frame.brs),
+            error_state_indicator=bool(msg.frame.esi),
         )
     elif isinstance(msg, ZCANDataObj):                                  # 合并接收CAN|CANFD报文转换
         data = msg.data.zcanCANFDData
         return Message(
             timestamp=data.timeStamp / 1000,
             arbitration_id=data.frame.can_id,
-            is_extended_id=data.frame.eff,
-            is_remote_frame=data.frame.rtr,
-            is_error_frame=data.frame.err,
+            is_extended_id=bool(data.frame.eff),
+            is_remote_frame=bool(data.frame.rtr),
+            is_error_frame=bool(data.frame.err),
             channel=msg.chn,
             dlc=data.frame.len,
-            data=bytes(data.frame.data),
-            is_fd=data.flag.frameType,
+            data=bytearray(data.frame.data),
+            is_fd=bool(data.flag.frameType),
             is_rx=True,
-            bitrate_switch=data.frame.brs,
-            error_state_indicator=data.frame.esi,
+            bitrate_switch=bool(data.frame.brs),
+            error_state_indicator=bool(data.frame.esi),
         ), data.flag.txEchoed
     else:
         raise ZCANException(f'Unknown message type: {type(msg)}')

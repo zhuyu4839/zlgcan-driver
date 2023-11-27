@@ -270,9 +270,11 @@ class _ZCANLinux(_ZLGCAN):
     # EXTERN_C U32 ZCAN_API VCI_OpenDevice(U32 Type, U32 Card, U32 Reserved);
     def OpenDevice(self, reserved=0):
         self._dev_handler = _library_check_run(self._library, 'VCI_OpenDevice', self._dev_type, self._dev_index, reserved)
-        # matched = re.findall(r'[.](\w*?),', inspect.getframeinfo(inspect.currentframe().f_back)[3][0])
-        # assert len(matched) > 0
-        # self._dev_type_name = matched[0]
+        if self._dev_derive:
+            self._dev_info = self.kwargs.get("dev_info")
+            self._channels = self.kwargs.get("channels", (0, ))
+            self._dev_is_canfd = self.kwargs.get("canfd", False)
+            return
         self._dev_info = self.GetDeviceInf()
         channels = self._dev_info.can_num
         self._channels = tuple(i for i in range(channels))
@@ -282,12 +284,11 @@ class _ZCANLinux(_ZLGCAN):
     def CloseDevice(self):
         can_channels = self._channel_handlers['CAN']
         lin_channels = self._channel_handlers['LIN']
-        if not self._dev_derive:
-            for channel, _ in can_channels.items():
-                try:
-                    self.ResetCAN(channel)
-                except ZCANException as e:
-                    self._logger.warning(e)
+        for channel, _ in can_channels.items():
+            try:
+                self.ResetCAN(channel)
+            except ZCANException as e:
+                self._logger.warning(e)
         # for channel in lin_channels:
         #     self.ResetLIN(channel)
         _library_check_run(self._library, 'VCI_CloseDevice', self._dev_type, self._dev_index)
