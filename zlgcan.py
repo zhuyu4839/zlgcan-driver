@@ -36,7 +36,7 @@ def _zlg_convert_msg_linux(msg, **kwargs):
     if isinstance(msg, Message):
         channel = kwargs.get('channel')
         assert channel is not None or msg.channel is not None, 'channel is required!'
-        trans_type = kwargs.get('trans_type', ZCANCanTransType.NORMAL if kwargs.get('resend', False) else ZCANCanTransType.SINGLE)
+        trans_type = kwargs.get('trans_type', ZCANCanTransType.NORMAL)
         device_type = kwargs.get("device_type")
         if device_type in ZUSBCAN_I_II_TYPE:
             result = (ZCAN_CAN_FRAME_I_II * 1)()
@@ -116,7 +116,7 @@ def _zlg_convert_msg_win(msg, **kwargs):                        # channel=None, 
 
     if isinstance(msg, Message):                        # 发送报文转换
         is_merge = kwargs.get('is_merge', None)
-        trans_type = kwargs.get('trans_type', ZCANCanTransType.NORMAL if kwargs.get('resend', False) else ZCANCanTransType.SINGLE)
+        trans_type = kwargs.get('trans_type', ZCANCanTransType.NORMAL)
         assert is_merge is not None, 'is_merge required when convert to ZLG.'
         # assert trans_type is not None, 'trans_type required when convert to ZLG.'
         if not is_merge:
