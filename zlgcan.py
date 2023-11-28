@@ -75,8 +75,8 @@ def _zlg_convert_msg_linux(msg, **kwargs):
         return Message(
             timestamp=msg.hdr.ts / 1000,
             arbitration_id=msg.hdr.id,
-            is_extended_id=bool(msg.hdr.inf.sdf),
-            is_remote_frame=bool(msg.hdr.inf.sef),
+            is_extended_id=bool(msg.hdr.inf.sef),
+            is_remote_frame=bool(msg.hdr.inf.sdf),
             is_error_frame=bool(msg.hdr.inf.err),
             channel=msg.hdr.chn or channel,
             dlc=msg.hdr.len,
