@@ -1,4 +1,4 @@
-# ZLGCAN驱动及集成到python-can
+# ZLGCAN驱动及集成到python-can(请先使用dev分支，main分支代码还有坑)
 
 1. 安装python-can
 
