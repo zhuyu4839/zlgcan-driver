@@ -335,7 +335,7 @@ class IProperty(Structure):  # IProperty
 
 class _ZCANWindows(_ZLGCAN):
 
-    def __init__(self, dev_index: int, dev_type: ZCANDeviceType, resend: bool, derive: bool, **kwargs):
+    def __init__(self, dev_index: int, dev_type: int, resend: bool, derive: bool, **kwargs):
         super().__init__(dev_index, dev_type, resend, derive, **kwargs)
         if _system_bit == '32bit':
             try:
@@ -505,7 +505,8 @@ class _ZCANWindows(_ZLGCAN):
         self._merge_support()
         _size = size or len(msgs)
         ret = self._library.ZCAN_TransmitData(self._dev_handler, byref(msgs), _size)
-        self._logger.debug(f'ZLG: Transmit ZCANDataObj expect: {_size}, actual: {ret}')
+        if ret < _size:
+            self._logger.warning(f'ZLG: Transmit ZCANDataObj expect: {_size}, actual: {ret}')
         return ret
 
     # UINT FUNC_CALL ZCAN_ReceiveData(DEVICE_HANDLE device_handle, ZCANDataObj* pReceive, UINT len, int wait_time DEF(-1));
@@ -525,7 +526,8 @@ class _ZCANWindows(_ZLGCAN):
             raise ZCANException('ZLG: device merge receive is not enable!')
         msgs = (ZCANDataObj * size)()
         ret = self._library.ZCAN_ReceiveData(self._dev_handler, byref(msgs), size, c_int(timeout))
-        self._logger.debug(f'ZLG: Received {ret} ZCANDataObj messages.')
+        if ret < size:
+            self._logger.warning(f'ZLG: Received ZCANDataObj expect: {size}, actual: {ret}.')
         return msgs, ret
 
     # IProperty* FUNC_CALL GetIProperty(DEVICE_HANDLE device_handle);
@@ -589,7 +591,8 @@ class _ZCANWindows(_ZLGCAN):
             timeout = int(timeout)
         msgs = (ZCLOUD_GPS_FRAME * size)()
         ret = self._library.ZCLOUD_ReceiveGPS(self._dev_handler, byref(msgs), size, timeout)
-        self._logger.debug(f'ZLG: Master Transmit ZCLOUD_GPS_FRAME expect: {size}, actual: {ret}')
+        if ret < size:
+            self._logger.warning(f'ZLG: Master Transmit ZCLOUD_GPS_FRAME expect: {size}, actual: {ret}')
         return msgs, ret
 
     # CHANNEL_HANDLE FUNC_CALL ZCAN_InitLIN(DEVICE_HANDLE device_handle, UINT can_index, PZCAN_LIN_INIT_CONFIG pLINInitConfig);
@@ -614,7 +617,8 @@ class _ZCANWindows(_ZLGCAN):
         handler = self._get_channel_handler('LIN', channel)
         _size = size or len(msgs)
         ret = self._library.ZCAN_TransmitLIN(handler, byref(msgs), _size)
-        self._logger.debug(f'ZLG: Master Transmit ZCAN_LIN_MSG expect: {_size}, actual: {ret}')
+        if ret < _size:
+            self._logger.warning(f'ZLG: Master Transmit ZCAN_LIN_MSG expect: {_size}, actual: {ret}')
         return ret
 
     # UINT FUNC_CALL ZCAN_ReceiveLIN(CHANNEL_HANDLE channel_handle, PZCAN_LIN_MSG pReceive, UINT Len,int WaitTime);
@@ -624,7 +628,8 @@ class _ZCANWindows(_ZLGCAN):
         msgs = (ZCAN_LIN_MSG * size)()
         handler = self._get_channel_handler('LIN', channel)
         ret = self._library.ZCAN_ReceiveLIN(handler, byref(msgs), size, c_int(timeout))
-        self._logger.debug(f'ZLG: Master Received {ret} ZCAN_LIN_MSG messages')
+        if ret < size:
+            self._logger.warning(f'ZLG: Master Received ZCAN_LIN_MSG expect: {size}, actual: {ret}')
         return msgs, ret
 
     # UINT FUNC_CALL ZCAN_SetLINSlaveMsg(CHANNEL_HANDLE channel_handle, PZCAN_LIN_MSG pSend, UINT nMsgCount);
@@ -724,6 +729,8 @@ class _ZCANWindows(_ZLGCAN):
         if ret == INVALID_CHANNEL_HANDLE:
             raise ZCANException('ZLG: ZCAN_InitCAN failed!')
         self._channel_handlers['CAN'][channel] = ret
+        if self.device_type in ZUSBCAN_I_II_TYPE:
+            return
         self.ResistanceStatus(channel, kwargs.get(kwargs.get('initenal_resistance', 1)))
 
     # UINT FUNC_CALL ZCAN_StartCAN(CHANNEL_HANDLE channel_handle);
@@ -776,9 +783,10 @@ class _ZCANWindows(_ZLGCAN):
         handler = self._get_channel_handler('CAN', channel)
         _size = size or len(msgs)
         ret = self._library.ZCAN_TransmitFD(handler, byref(msgs), _size)
-        self._logger.debug(f'ZLG: Transmit ZCAN_TransmitFD_Data expect: {_size}, actual: {ret}')
-        if ret < _size and throw:
-            raise ZCANException(f"TransmitFD failed(size: {_size}, actual: {ret})")
+        if ret < _size:
+            self._logger.warning(f'ZLG: Transmit ZCAN_TransmitFD_Data expect: {_size}, actual: {ret}')
+            if throw:
+                raise ZCANException(f"TransmitFD failed(size: {_size}, actual: {ret})")
         return ret
 
     # UINT FUNC_CALL ZCAN_ReceiveFD(CHANNEL_HANDLE channel_handle, ZCAN_ReceiveFD_Data* pReceive, UINT len, int timeout DEF(-1));
@@ -788,7 +796,8 @@ class _ZCANWindows(_ZLGCAN):
         handler = self._get_channel_handler('CAN', channel)
         can_msgs = (ZCAN_ReceiveFD_Data * size)()
         ret = self._library.ZCAN_ReceiveFD(handler, byref(can_msgs), size, timeout)
-        self._logger.debug(f'ZLG: Receive ZCAN_ReceiveFD_Data expect: {size}, actual: {ret}')
+        if ret < size:
+            self._logger.warning(f'ZLG: Receive ZCAN_ReceiveFD_Data expect: {size}, actual: {ret}')
         yield from can_msgs
 
     # # UINT FUNC_CALL ZCAN_Transmit(CHANNEL_HANDLE channel_handle, ZCAN_Transmit_Data* pTransmit, UINT len);
@@ -796,9 +805,10 @@ class _ZCANWindows(_ZLGCAN):
         handler = self._get_channel_handler('CAN', channel)
         _size = size or len(msgs)
         ret = self._library.ZCAN_Transmit(handler, byref(msgs), _size)
-        self._logger.debug(f'ZLG: Transmit ZCAN_Transmit_Data expect: {_size}, actual: {ret}')
-        if ret < _size and throw:
-            raise ZCANException(f"Transmit failed(size: {_size}, actual: {ret})")
+        if ret < _size:
+            self._logger.warning(f'ZLG: Transmit ZCAN_Transmit_Data expect: {_size}, actual: {ret}')
+            if throw:
+                raise ZCANException(f"Transmit failed(size: {_size}, actual: {ret})")
         return ret
 
     # UINT FUNC_CALL ZCAN_Receive(CHANNEL_HANDLE channel_handle, ZCAN_Receive_Data* pReceive, UINT len, int wait_time DEF(-1));
@@ -815,7 +825,8 @@ class _ZCANWindows(_ZLGCAN):
         handler = self._get_channel_handler('CAN', channel)
         can_msgs = (ZCAN_Receive_Data * size)()
         ret = self._library.ZCAN_Receive(handler, byref(can_msgs), size, timeout)
-        self._logger.debug(f'ZLG: Receive ZCAN_ReceiveFD_Data expect: {size}, actual: {ret}')
+        if ret < size:
+            self._logger.warning(f'ZLG: Receive ZCAN_ReceiveFD_Data expect: {size}, actual: {ret}')
         yield from can_msgs
 
     def TransmitInterval(self, channel, interval_msgs=None):

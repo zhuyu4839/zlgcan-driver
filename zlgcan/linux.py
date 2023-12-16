@@ -380,9 +380,10 @@ class _ZCANLinux(_ZLGCAN):
         channel = self._get_channel_handler('CAN', channel)
         _size = size or len(msgs)
         ret = self._library.VCI_TransmitFD(self._dev_type, self._dev_index, channel, byref(msgs), _size)
-        self._logger.debug(f'ZLG: Transmit ZCAN_CANFD_FRAME expect: {_size}, actual: {ret}')
-        if ret < _size and throw:
-            raise ZCANException(f"TransmitFD failed(size: {_size}, actual: {ret})")
+        if ret < _size:
+            self._logger.warning(f'ZLG: Transmit ZCAN_CANFD_FRAME expect: {_size}, actual: {ret}')
+            if throw:
+                raise ZCANException(f"TransmitFD failed(size: {_size}, actual: {ret})")
         return ret
 
     # EXTERN_C U32 ZCAN_API VCI_ReceiveFD(U32 Type, U32 Card, U32 Port, ZCAN_FD_MSG *pData, U32 Count, U32 Time);
@@ -392,7 +393,8 @@ class _ZCANLinux(_ZLGCAN):
             timeout = int(timeout)
         can_msgs = (ZCAN_CANFD_FRAME * size)()
         ret = self._library.VCI_ReceiveFD(self._dev_type, self._dev_index, channel, byref(can_msgs), size, timeout)
-        self._logger.debug(f'ZLG: Receive ZCAN_CANFD_FRAME expect: {size}, actual: {ret}')
+        if ret < size:
+            self._logger.warning(f'ZLG: Receive ZCAN_CANFD_FRAME expect: {size}, actual: {ret}')
         yield from can_msgs
 
     # EXTERN_C U32 ZCAN_API VCI_Transmit(U32 Type, U32 Card, U32 Port, ZCAN_20_MSG *pData, U32 Count);
@@ -400,9 +402,10 @@ class _ZCANLinux(_ZLGCAN):
         channel = self._get_channel_handler('CAN', channel)
         _size = size or len(msgs)
         ret = self._library.VCI_Transmit(self._dev_type, self._dev_index, channel, byref(msgs), _size)
-        self._logger.debug(f'ZLG: Transmit ZCAN_CAN_FRAME expect: {_size}, actual: {ret}')
-        if ret < _size and throw:
-            raise ZCANException(f"Transmit failed(size: {_size}, actual: {ret})")
+        if ret < _size:
+            self._logger.warning(f'ZLG: Transmit ZCAN_CAN_FRAME expect: {_size}, actual: {ret}')
+            if throw:
+                raise ZCANException(f"Transmit failed(size: {_size}, actual: {ret})")
         return ret
 
     # EXTERN_C U32 ZCAN_API VCI_Receive(U32 Type, U32 Card, U32 Port, ZCAN_20_MSG *pData, U32 Count, U32 Time);
@@ -422,10 +425,9 @@ class _ZCANLinux(_ZLGCAN):
         else:
             can_msgs = (ZCAN_CAN_FRAME * size)()
         ret = self._library.VCI_Receive(self._dev_type, self._dev_index, channel, byref(can_msgs), size, timeout)
-        self._logger.debug(f'ZLG: Receive ZCAN_CAN_FRAME expect: {size}, actual: {ret}')
+        if ret < size:
+            self._logger.warning(f'ZLG: Receive ZCAN_CAN_FRAME expect: {size}, actual: {ret}')
         yield from can_msgs
-        # for i in range(ret):
-        #     yield can_msgs[i]
 
     def TransmitInterval(self, channel, interval_msgs=None):
         """
