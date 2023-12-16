@@ -212,7 +212,7 @@ class ZCanBus(BusABC):
     def __init__(self,
                  channel: Union[int, Sequence[int], str] = None, *,
                  resend: bool = False,
-                 device_type: ZCANDeviceType,
+                 device_type: int,
                  device_index: int = 0,
                  derive: bool = False,
                  rx_queue_size: Optional[int] = None,
@@ -265,7 +265,7 @@ class ZCanBus(BusABC):
 
         self.rx_queue = collections.deque(
             maxlen=rx_queue_size
-        )  # type: Deque[Tuple[int, Any]]               # channel, raw_msg
+        )  # type: Deque[Message]               # channel, raw_msg
         try:
             self.device = ZCAN(device_index, device_type, resend, derive)
             self.device.OpenDevice()
@@ -351,13 +351,7 @@ class ZCanBus(BusABC):
             self.shutdown()
             raise CanInitializationError(str(e))
 
-    def _recv_from_queue(self) -> Tuple[Message, bool]:
-        """Return a message from the internal receive queue"""
-        channel, raw_msg = self.rx_queue.popleft()
-
-        return zlg_convert_msg(raw_msg, channel=channel, is_rx=True, device_type=self.device.device_type), False
-
-    def poll_received_messages(self, timeout):
+    def poll_received_messages(self):
         try:
             for channel in self.available:
                 can_num = self.device.GetReceiveNum(channel, ZCANMessageType.CAN)
@@ -365,12 +359,12 @@ class ZCanBus(BusABC):
                 if can_num:
                     LOG.debug(f'ZLG-CAN - can message received: {can_num}.')
                     self.rx_queue.extend(
-                        (channel, raw_msg) for raw_msg in self.device.Receive(channel, can_num, timeout)
+                        zlg_convert_msg(raw_msg, channel=channel, is_rx=True, device_type=self.device.device_type) for raw_msg in self.device.Receive(channel, can_num)
                     )
                 if canfd_num:
                     LOG.debug(f'ZLG-CAN - canfd message received: {canfd_num}.')
                     self.rx_queue.extend(
-                        (channel, raw_msg) for raw_msg in self.device.ReceiveFD(channel, canfd_num, timeout)
+                        zlg_convert_msg(raw_msg, channel=channel, is_rx=True, device_type=self.device.device_type) for raw_msg in self.device.ReceiveFD(channel, canfd_num)
                     )
         except ZCANException as e:
             raise CanOperationError(str(e))
@@ -378,17 +372,16 @@ class ZCanBus(BusABC):
     def _recv_internal(self, timeout: Optional[float]) -> Tuple[Optional[Message], bool]:
 
         if self.rx_queue:
-            return self._recv_from_queue()
+            return self.rx_queue.popleft(), False
 
         deadline = None
         while deadline is None or time.time() < deadline:
             if deadline is None and timeout is not None:
                 deadline = time.time() + timeout
 
-            self.poll_received_messages(timeout)
-
+            self.poll_received_messages()
             if self.rx_queue:
-                return self._recv_from_queue()
+                return self.rx_queue.popleft(), False
 
         return None, False
 
@@ -419,7 +412,10 @@ class ZCanBus(BusABC):
     def shutdown(self) -> None:
         LOG.debug('ZLG-CAN - shutdown.')
         super().shutdown()
-        self.device.CloseDevice()
+        try:
+            self.device.CloseDevice()
+        except ZCANException as e:
+            LOG.warning(f"ZLG-CAN - shutdown: {str(e)}")
 
     def clear_rx_buffer(self, channel=None):
         if channel:
