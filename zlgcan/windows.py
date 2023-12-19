@@ -366,7 +366,7 @@ class _ZCANWindows(_ZLGCAN):
             if self._library is None:
                 self._library = windll.LoadLibrary(os.path.join(_curr_path, 'windows/x86/zlgcan/zlgcan.dll'))
         else:
-            self._lib_path = os.path.join(_curr_path, 'windows/x86_64/zlgcan/zlgcan.dll')
+            self._library = windll.LoadLibrary(os.path.join(_curr_path, 'windows/x86_64/zlgcan/zlgcan.dll'))
 
         if self._library is None:
             raise ZCANException(
