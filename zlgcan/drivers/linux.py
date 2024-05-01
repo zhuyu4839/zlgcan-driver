@@ -116,7 +116,7 @@ class _ZCANLinux(_ZLGCAN):
         if self._dev_type in [ZCANDeviceType.ZCAN_CANETUDP, ZCANDeviceType.ZCAN_CANETE, ZCANDeviceType.ZCAN_CANETTCP,
                               ZCANDeviceType.ZCAN_CANDTU_NET, ZCANDeviceType.ZCAN_CANDTU_NET_400]:
             result = c_int()
-            _library_run(self._library, 'VCI_SetReference',
+            _library_run(self._library, 'VCI_GetReference',
                          self._dev_type, self._dev_index, channel, ref_code, cast(byref(result), c_void_p))
             return result
 
