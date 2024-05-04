@@ -45,7 +45,7 @@
    * USBCANFD-200U - ZCAN_USBCANFD_200U
 
 7. 注意事项:
-   * ZCAN_USBCAN1及ZCAN_USBCAN2类型的设备无论是windows还是Linux, 波特率支持均在baudrate.conf.yaml中配置
+   * ZCAN_USBCAN1及ZCAN_USBCAN2类型的设备无论是windows还是Linux, 波特率支持均在`bitrate.cfg.yaml`中配置
      * 此时计算timing0及timing1请下载[CAN波特率计算软件](https://zlg.cn/can/down/down/id/22.html)
    * 其他CANFD类型的CAN卡仅仅在Linux上使用时`bitrate.cfg.yaml`中配置
      * 此时计算相关值可以通过`ZCANPRO`软件
