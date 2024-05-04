@@ -1,0 +1,1575 @@
+<?xml version="1.0"?>
+<info locale="device_locale_strings.xml">
+	<device>
+		<value>0</value>
+		<meta>
+			<visible>false</visible>
+			<type>options.int32</type>
+			<desc>设备索引</desc>
+			<options>
+				<option type="int32" value="0" desc="0"></option>
+				<option type="int32" value="1" desc="1"></option>
+				<option type="int32" value="2" desc="2"></option>
+				<option type="int32" value="3" desc="3"></option>
+				<option type="int32" value="4" desc="4"></option>
+				<option type="int32" value="5" desc="5"></option>
+				<option type="int32" value="6" desc="6"></option>
+				<option type="int32" value="7" desc="7"></option>
+				<option type="int32" value="8" desc="8"></option>
+				<option type="int32" value="9" desc="9"></option>
+				<option type="int32" value="10" desc="10"></option>
+				<option type="int32" value="11" desc="11"></option>
+				<option type="int32" value="12" desc="12"></option>
+				<option type="int32" value="13" desc="13"></option>
+				<option type="int32" value="14" desc="14"></option>
+				<option type="int32" value="15" desc="15"></option>
+				<option type="int32" value="16" desc="16"></option>
+				<option type="int32" value="17" desc="17"></option>
+				<option type="int32" value="18" desc="18"></option>
+				<option type="int32" value="19" desc="19"></option>
+				<option type="int32" value="20" desc="20"></option>
+				<option type="int32" value="21" desc="21"></option>
+				<option type="int32" value="22" desc="22"></option>
+				<option type="int32" value="23" desc="23"></option>
+				<option type="int32" value="24" desc="24"></option>
+				<option type="int32" value="25" desc="25"></option>
+				<option type="int32" value="26" desc="26"></option>
+				<option type="int32" value="27" desc="27"></option>
+				<option type="int32" value="28" desc="28"></option>
+				<option type="int32" value="29" desc="29"></option>
+				<option type="int32" value="30" desc="30"></option>
+				<option type="int32" value="31" desc="31"></option>
+			</options>
+		</meta>
+	</device>
+	<channel>
+		<value>0</value>
+		<meta>
+			<visible>false</visible>
+			<type>options.int32</type>
+			<desc>通道号</desc>
+			<options>
+				<option type="int32" value="0" desc="Channel 0"></option>
+				<option type="int32" value="1" desc="Channel 1"></option>
+				<option type="int32" value="2" desc="Channel 2"></option>
+				<option type="int32" value="3" desc="Channel 3"></option>
+				<option type="int32" value="4" desc="Channel 4"></option>
+				<option type="int32" value="5" desc="Channel 5"></option>
+				<option type="int32" value="6" desc="Channel 6"></option>
+				<option type="int32" value="7" desc="Channel 7"></option>
+			</options>
+		</meta>
+		<channel_0 stream="channel_0" case="parent-value=0">
+			<baud_rate flag="0x0046" at_initcan="pre">
+				<value>1000000</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>波特率</desc>
+					<options>
+						<option type="int32" value="1000000" desc="1000kbps"></option>
+						<option type="int32" value="800000" desc="800kbps"></option>
+						<option type="int32" value="500000" desc="500kbps"></option>
+						<option type="int32" value="250000" desc="250kbps"></option>
+						<option type="int32" value="125000" desc="125kbps"></option>
+						<option type="int32" value="100000" desc="100kbps"></option>
+						<option type="int32" value="50000" desc="50kbps"></option>
+						<option type="int32" value="20000" desc="20kbps"></option>
+						<option type="int32" value="10000" desc="10kbps"></option>
+						<option type="int32" value="5000" desc="5kbps"></option>
+						<option type="int32" value="0" desc="custom"></option>
+					</options>
+				</meta>
+			</baud_rate>
+			<baud_rate_custom flag="0x0044" at_initcan="pre">
+				<value>1.0Mbps(62%),(00,23)</value>
+				<meta>
+					<visible>$/info/channel/channel_0/baud_rate == 10</visible>
+					<type>string</type>
+					<desc>自定义波特率</desc>
+				</meta>
+			</baud_rate_custom>
+			<work_mode initcan="work_mode">
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>工作模式</desc>
+					<options>
+						<option type="int32" value="0" desc="normal_mode"></option>
+						<option type="int32" value="1" desc="readonly_mode"></option>
+					</options>
+				</meta>
+			</work_mode>
+			<redirect flag="0x0030" havechild="true" >
+				<value>0 0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>转发参数：[目的端口 开启关闭转发]</desc>
+				</meta>
+				<can0 flag="0x0030" at_initcan="pre">
+					<value>0 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can0</desc>
+						<options>
+							<option type="int32" value="0 1" desc="redirect_enable"></option>
+							<option type="int32" value="0 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can0>
+				<can1 flag="0x0030" at_initcan="pre">
+					<value>1 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can1</desc>
+						<options>
+							<option type="int32" value="1 1" desc="redirect_enable"></option>
+							<option type="int32" value="1 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can1>
+				<can2 flag="0x0030" at_initcan="pre">
+					<value>2 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can2</desc>
+						<options>
+							<option type="int32" value="2 1" desc="redirect_enable"></option>
+							<option type="int32" value="2 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can2>
+				<can3 flag="0x0030" at_initcan="pre">
+					<value>3 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can3</desc>
+						<options>
+							<option type="int32" value="3 1" desc="redirect_enable"></option>
+							<option type="int32" value="3 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can3>
+				<can4 flag="0x0030" at_initcan="pre">
+					<value>4 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can4</desc>
+						<options>
+							<option type="int32" value="4 1" desc="redirect_enable"></option>
+							<option type="int32" value="4 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can4>
+				<can5 flag="0x0030" at_initcan="pre">
+					<value>5 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can5</desc>
+						<options>
+							<option type="int32" value="5 1" desc="redirect_enable"></option>
+							<option type="int32" value="5 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can5>
+				<can6 flag="0x0030" at_initcan="pre">
+					<value>6 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can6</desc>
+						<options>
+							<option type="int32" value="6 1" desc="redirect_enable"></option>
+							<option type="int32" value="6 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can6>
+				<can7 flag="0x0030" at_initcan="pre">
+					<value>7 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can7</desc>
+						<options>
+							<option type="int32" value="7 1" desc="redirect_enable"></option>
+							<option type="int32" value="7 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can7>
+			</redirect>
+			<auto_send flag="0x0034">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>定时发送</desc>
+				</meta>
+			</auto_send>
+			<clear_auto_send flag="0x0036">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>清空定时发送</desc>
+				</meta>
+			</clear_auto_send>
+			<filter initcan="filter" >
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>滤波方式</desc>
+					<visible>false</visible>
+					<options>
+						<option type="int32" value="0" desc="double_filter"></option>
+						<option type="int32" value="1" desc="single_filter"></option>
+					</options>
+				</meta>
+			</filter>
+			<acc_code hex="1" initcan="acc_code">
+				<value>0x0000</value>
+				<meta>
+					<type>uint32</type>
+					<desc>验收码</desc>
+					<visible>false</visible>
+				</meta>
+			</acc_code>
+			<acc_mask hex="1" initcan="acc_mask">
+				<value>0xFFFFFFFF</value>
+				<meta>
+					<type>uint32</type>
+					<desc>屏蔽码</desc>
+					<visible>false</visible>
+				</meta>
+			</acc_mask>
+			<filter_batch flag="0x0045" at_initcan="pre">
+				<value></value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc></desc>
+				</meta>
+			</filter_batch>
+		</channel_0>
+		<channel_1 stream="channel_1" case="parent-value=1">
+			<baud_rate flag="0x0146" at_initcan="pre">
+				<value>1000000</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>波特率</desc>
+					<options>
+						<option type="int32" value="1000000" desc="1000kbps"></option>
+						<option type="int32" value="800000" desc="800kbps"></option>
+						<option type="int32" value="500000" desc="500kbps"></option>
+						<option type="int32" value="250000" desc="250kbps"></option>
+						<option type="int32" value="125000" desc="125kbps"></option>
+						<option type="int32" value="100000" desc="100kbps"></option>
+						<option type="int32" value="50000" desc="50kbps"></option>
+						<option type="int32" value="20000" desc="20kbps"></option>
+						<option type="int32" value="10000" desc="10kbps"></option>
+						<option type="int32" value="5000" desc="5kbps"></option>
+						<option type="int32" value="0" desc="custom"></option>
+					</options>
+				</meta>
+			</baud_rate>
+			<baud_rate_custom flag="0x0144" at_initcan="pre">
+				<value>1.0Mbps(62%),(00,23)</value>
+				<meta>
+					<visible>$/info/channel/channel_1/baud_rate == 10</visible>
+					<type>string</type>
+					<desc>自定义波特率</desc>
+				</meta>
+			</baud_rate_custom>
+			<work_mode initcan="work_mode">
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>工作模式</desc>
+					<options>
+						<option type="int32" value="0" desc="normal_mode"></option>
+						<option type="int32" value="1" desc="readonly_mode"></option>
+					</options>
+				</meta>
+			</work_mode>
+			<redirect flag="0x0130" havechild="true" >
+				<value>0 0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>转发参数：[目的端口 开启关闭转发]</desc>
+				</meta>
+				<can0 flag="0x0130" at_initcan="pre">
+					<value>0 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can0</desc>
+						<options>
+							<option type="int32" value="0 1" desc="redirect_enable"></option>
+							<option type="int32" value="0 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can0>
+				<can1 flag="0x0130" at_initcan="pre">
+					<value>1 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can1</desc>
+						<options>
+							<option type="int32" value="1 1" desc="redirect_enable"></option>
+							<option type="int32" value="1 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can1>
+				<can2 flag="0x0130" at_initcan="pre">
+					<value>2 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can2</desc>
+						<options>
+							<option type="int32" value="2 1" desc="redirect_enable"></option>
+							<option type="int32" value="2 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can2>
+				<can3 flag="0x0130" at_initcan="pre">
+					<value>3 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can3</desc>
+						<options>
+							<option type="int32" value="3 1" desc="redirect_enable"></option>
+							<option type="int32" value="3 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can3>
+				<can4 flag="0x0130" at_initcan="pre">
+					<value>4 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can4</desc>
+						<options>
+							<option type="int32" value="4 1" desc="redirect_enable"></option>
+							<option type="int32" value="4 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can4>
+				<can5 flag="0x0130" at_initcan="pre">
+					<value>5 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can5</desc>
+						<options>
+							<option type="int32" value="5 1" desc="redirect_enable"></option>
+							<option type="int32" value="5 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can5>
+				<can6 flag="0x0130" at_initcan="pre">
+					<value>6 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can6</desc>
+						<options>
+							<option type="int32" value="6 1" desc="redirect_enable"></option>
+							<option type="int32" value="6 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can6>
+				<can7 flag="0x0130" at_initcan="pre">
+					<value>7 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can7</desc>
+						<options>
+							<option type="int32" value="7 1" desc="redirect_enable"></option>
+							<option type="int32" value="7 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can7>
+			</redirect>
+			<auto_send flag="0x0134">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>定时发送</desc>
+				</meta>
+			</auto_send>
+			<clear_auto_send flag="0x0136">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>清空定时发送</desc>
+				</meta>
+			</clear_auto_send>
+			<filter initcan="filter" >
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>滤波方式</desc>
+					<visible>false</visible>
+					<options>
+						<option type="int32" value="0" desc="double_filter"></option>
+						<option type="int32" value="1" desc="single_filter"></option>
+					</options>
+				</meta>
+			</filter>
+			<acc_code hex="1" initcan="acc_code">
+				<value>0x0000</value>
+				<meta>
+					<type>uint32</type>
+					<desc>验收码</desc>
+					<visible>false</visible>
+				</meta>
+			</acc_code>
+			<acc_mask hex="1" initcan="acc_mask">
+				<value>0xFFFFFFFF</value>
+				<meta>
+					<type>uint32</type>
+					<desc>屏蔽码</desc>
+					<visible>false</visible>
+				</meta>
+			</acc_mask>
+			<filter_batch flag="0x0145" at_initcan="pre">
+				<value></value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc></desc>
+				</meta>
+			</filter_batch>
+		</channel_1>
+		<channel_2 stream="channel_2" case="parent-value=2">
+			<baud_rate flag="0x0246" at_initcan="pre">
+				<value>1000000</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>波特率</desc>
+					<options>
+						<option type="int32" value="1000000" desc="1000kbps"></option>
+						<option type="int32" value="800000" desc="800kbps"></option>
+						<option type="int32" value="500000" desc="500kbps"></option>
+						<option type="int32" value="250000" desc="250kbps"></option>
+						<option type="int32" value="125000" desc="125kbps"></option>
+						<option type="int32" value="100000" desc="100kbps"></option>
+						<option type="int32" value="50000" desc="50kbps"></option>
+						<option type="int32" value="20000" desc="20kbps"></option>
+						<option type="int32" value="10000" desc="10kbps"></option>
+						<option type="int32" value="5000" desc="5kbps"></option>
+						<option type="int32" value="0" desc="custom"></option>
+					</options>
+				</meta>
+			</baud_rate>
+			<baud_rate_custom flag="0x0244" at_initcan="pre">
+				<value>1.0Mbps(62%),(00,23)</value>
+				<meta>
+					<visible>$/info/channel/channel_2/baud_rate == 10</visible>
+					<type>string</type>
+					<desc>自定义波特率</desc>
+				</meta>
+			</baud_rate_custom>
+			<work_mode initcan="work_mode">
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>工作模式</desc>
+					<options>
+						<option type="int32" value="0" desc="normal_mode"></option>
+						<option type="int32" value="1" desc="readonly_mode"></option>
+					</options>
+				</meta>
+			</work_mode>
+			<redirect flag="0x0230" havechild="true" >
+				<value>0 0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>转发参数：[目的端口 开启关闭转发]</desc>
+				</meta>
+				<can0 flag="0x0230" at_initcan="pre">
+					<value>0 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can0</desc>
+						<options>
+							<option type="int32" value="0 1" desc="redirect_enable"></option>
+							<option type="int32" value="0 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can0>
+				<can1 flag="0x0230" at_initcan="pre">
+					<value>1 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can1</desc>
+						<options>
+							<option type="int32" value="1 1" desc="redirect_enable"></option>
+							<option type="int32" value="1 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can1>
+				<can2 flag="0x0230" at_initcan="pre">
+					<value>2 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can2</desc>
+						<options>
+							<option type="int32" value="2 1" desc="redirect_enable"></option>
+							<option type="int32" value="2 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can2>
+				<can3 flag="0x0230" at_initcan="pre">
+					<value>3 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can3</desc>
+						<options>
+							<option type="int32" value="3 1" desc="redirect_enable"></option>
+							<option type="int32" value="3 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can3>
+				<can4 flag="0x0230" at_initcan="pre">
+					<value>4 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can4</desc>
+						<options>
+							<option type="int32" value="4 1" desc="redirect_enable"></option>
+							<option type="int32" value="4 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can4>
+				<can5 flag="0x0230" at_initcan="pre">
+					<value>5 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can5</desc>
+						<options>
+							<option type="int32" value="5 1" desc="redirect_enable"></option>
+							<option type="int32" value="5 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can5>
+				<can6 flag="0x0230" at_initcan="pre">
+					<value>6 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can6</desc>
+						<options>
+							<option type="int32" value="6 1" desc="redirect_enable"></option>
+							<option type="int32" value="6 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can6>
+				<can7 flag="0x0230" at_initcan="pre">
+					<value>7 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can7</desc>
+						<options>
+							<option type="int32" value="7 1" desc="redirect_enable"></option>
+							<option type="int32" value="7 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can7>
+			</redirect>
+			<auto_send flag="0x0234">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>定时发送</desc>
+				</meta>
+			</auto_send>
+			<clear_auto_send flag="0x0236">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>清空定时发送</desc>
+				</meta>
+			</clear_auto_send>
+			<filter initcan="filter" >
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>滤波方式</desc>
+					<visible>false</visible>
+					<options>
+						<option type="int32" value="0" desc="double_filter"></option>
+						<option type="int32" value="1" desc="single_filter"></option>
+					</options>
+				</meta>
+			</filter>
+			<acc_code hex="1" initcan="acc_code">
+				<value>0x0000</value>
+				<meta>
+					<type>uint32</type>
+					<desc>验收码</desc>
+					<visible>false</visible>
+				</meta>
+			</acc_code>
+			<acc_mask hex="1" initcan="acc_mask">
+				<value>0xFFFFFFFF</value>
+				<meta>
+					<type>uint32</type>
+					<desc>屏蔽码</desc>
+					<visible>false</visible>
+				</meta>
+			</acc_mask>
+			<filter_batch flag="0x0245" at_initcan="pre">
+				<value></value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc></desc>
+				</meta>
+			</filter_batch>
+		</channel_2>
+		<channel_3 stream="channel_3" case="parent-value=3">
+			<baud_rate flag="0x0346" at_initcan="pre">
+				<value>1000000</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>波特率</desc>
+					<options>
+						<option type="int32" value="1000000" desc="1000kbps"></option>
+						<option type="int32" value="800000" desc="800kbps"></option>
+						<option type="int32" value="500000" desc="500kbps"></option>
+						<option type="int32" value="250000" desc="250kbps"></option>
+						<option type="int32" value="125000" desc="125kbps"></option>
+						<option type="int32" value="100000" desc="100kbps"></option>
+						<option type="int32" value="50000" desc="50kbps"></option>
+						<option type="int32" value="20000" desc="20kbps"></option>
+						<option type="int32" value="10000" desc="10kbps"></option>
+						<option type="int32" value="5000" desc="5kbps"></option>
+						<option type="int32" value="0" desc="custom"></option>
+					</options>
+				</meta>
+			</baud_rate>
+			<baud_rate_custom flag="0x0344" at_initcan="pre">
+				<value>1.0Mbps(62%),(00,23)</value>
+				<meta>
+					<visible>$/info/channel/channel_3/baud_rate == 10</visible>
+					<type>string</type>
+					<desc>自定义波特率</desc>
+				</meta>
+			</baud_rate_custom>
+			<work_mode initcan="work_mode">
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>工作模式</desc>
+					<options>
+						<option type="int32" value="0" desc="normal_mode"></option>
+						<option type="int32" value="1" desc="readonly_mode"></option>
+					</options>
+				</meta>
+			</work_mode>
+			<redirect flag="0x0330" havechild="true" >
+				<value>0 0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>转发参数：[目的端口 开启关闭转发]</desc>
+				</meta>
+				<can0 flag="0x0330" at_initcan="pre">
+					<value>0 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can0</desc>
+						<options>
+							<option type="int32" value="0 1" desc="redirect_enable"></option>
+							<option type="int32" value="0 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can0>
+				<can1 flag="0x0330" at_initcan="pre">
+					<value>1 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can1</desc>
+						<options>
+							<option type="int32" value="1 1" desc="redirect_enable"></option>
+							<option type="int32" value="1 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can1>
+				<can2 flag="0x0330" at_initcan="pre">
+					<value>2 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can2</desc>
+						<options>
+							<option type="int32" value="2 1" desc="redirect_enable"></option>
+							<option type="int32" value="2 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can2>
+				<can3 flag="0x0330" at_initcan="pre">
+					<value>3 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can3</desc>
+						<options>
+							<option type="int32" value="3 1" desc="redirect_enable"></option>
+							<option type="int32" value="3 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can3>
+				<can4 flag="0x0330" at_initcan="pre">
+					<value>4 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can4</desc>
+						<options>
+							<option type="int32" value="4 1" desc="redirect_enable"></option>
+							<option type="int32" value="4 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can4>
+				<can5 flag="0x0330" at_initcan="pre">
+					<value>5 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can5</desc>
+						<options>
+							<option type="int32" value="5 1" desc="redirect_enable"></option>
+							<option type="int32" value="5 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can5>
+				<can6 flag="0x0330" at_initcan="pre">
+					<value>6 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can6</desc>
+						<options>
+							<option type="int32" value="6 1" desc="redirect_enable"></option>
+							<option type="int32" value="6 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can6>
+				<can7 flag="0x0330" at_initcan="pre">
+					<value>7 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can7</desc>
+						<options>
+							<option type="int32" value="7 1" desc="redirect_enable"></option>
+							<option type="int32" value="7 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can7>
+			</redirect>
+			<auto_send flag="0x0334">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>定时发送</desc>
+				</meta>
+			</auto_send>
+			<clear_auto_send flag="0x0336">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>清空定时发送</desc>
+				</meta>
+			</clear_auto_send>
+			<filter initcan="filter" >
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>滤波方式</desc>
+					<visible>false</visible>
+					<options>
+						<option type="int32" value="0" desc="double_filter"></option>
+						<option type="int32" value="1" desc="single_filter"></option>
+					</options>
+				</meta>
+			</filter>
+			<acc_code hex="1" initcan="acc_code">
+				<value>0x0000</value>
+				<meta>
+					<type>uint32</type>
+					<desc>验收码</desc>
+					<visible>false</visible>
+				</meta>
+			</acc_code>
+			<acc_mask hex="1" initcan="acc_mask">
+				<value>0xFFFFFFFF</value>
+				<meta>
+					<type>uint32</type>
+					<desc>屏蔽码</desc>
+					<visible>false</visible>
+				</meta>
+			</acc_mask>
+			<filter_batch flag="0x0345" at_initcan="pre">
+				<value></value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc></desc>
+				</meta>
+			</filter_batch>
+		</channel_3>
+		<channel_4 stream="channel_4" case="parent-value=4">
+			<baud_rate flag="0x0446" at_initcan="pre">
+				<value>1000000</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>波特率</desc>
+					<options>
+						<option type="int32" value="1000000" desc="1000kbps"></option>
+						<option type="int32" value="800000" desc="800kbps"></option>
+						<option type="int32" value="500000" desc="500kbps"></option>
+						<option type="int32" value="250000" desc="250kbps"></option>
+						<option type="int32" value="125000" desc="125kbps"></option>
+						<option type="int32" value="100000" desc="100kbps"></option>
+						<option type="int32" value="50000" desc="50kbps"></option>
+						<option type="int32" value="20000" desc="20kbps"></option>
+						<option type="int32" value="10000" desc="10kbps"></option>
+						<option type="int32" value="5000" desc="5kbps"></option>
+						<option type="int32" value="0" desc="custom"></option>
+					</options>
+				</meta>
+			</baud_rate>
+			<baud_rate_custom flag="0x0444" at_initcan="pre">
+				<value>1.0Mbps(62%),(00,23)</value>
+				<meta>
+					<visible>$/info/channel/channel_4/baud_rate == 10</visible>
+					<type>string</type>
+					<desc>自定义波特率</desc>
+				</meta>
+			</baud_rate_custom>
+			<work_mode initcan="work_mode">
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>工作模式</desc>
+					<options>
+						<option type="int32" value="0" desc="normal_mode"></option>
+						<option type="int32" value="1" desc="readonly_mode"></option>
+					</options>
+				</meta>
+			</work_mode>
+			<redirect flag="0x0430" havechild="true" >
+				<value>0 0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>转发参数：[目的端口 开启关闭转发]</desc>
+				</meta>
+				<can0 flag="0x0430" at_initcan="pre">
+					<value>0 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can0</desc>
+						<options>
+							<option type="int32" value="0 1" desc="redirect_enable"></option>
+							<option type="int32" value="0 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can0>
+				<can1 flag="0x0430" at_initcan="pre">
+					<value>1 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can1</desc>
+						<options>
+							<option type="int32" value="1 1" desc="redirect_enable"></option>
+							<option type="int32" value="1 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can1>
+				<can2 flag="0x0430" at_initcan="pre">
+					<value>2 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can2</desc>
+						<options>
+							<option type="int32" value="2 1" desc="redirect_enable"></option>
+							<option type="int32" value="2 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can2>
+				<can3 flag="0x0430" at_initcan="pre">
+					<value>3 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can3</desc>
+						<options>
+							<option type="int32" value="3 1" desc="redirect_enable"></option>
+							<option type="int32" value="3 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can3>
+				<can4 flag="0x0430" at_initcan="pre">
+					<value>4 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can4</desc>
+						<options>
+							<option type="int32" value="4 1" desc="redirect_enable"></option>
+							<option type="int32" value="4 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can4>
+				<can5 flag="0x0430" at_initcan="pre">
+					<value>5 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can5</desc>
+						<options>
+							<option type="int32" value="5 1" desc="redirect_enable"></option>
+							<option type="int32" value="5 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can5>
+				<can6 flag="0x0430" at_initcan="pre">
+					<value>6 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can6</desc>
+						<options>
+							<option type="int32" value="6 1" desc="redirect_enable"></option>
+							<option type="int32" value="6 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can6>
+				<can7 flag="0x0430" at_initcan="pre">
+					<value>7 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can7</desc>
+						<options>
+							<option type="int32" value="7 1" desc="redirect_enable"></option>
+							<option type="int32" value="7 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can7>
+			</redirect>
+			<auto_send flag="0x0434">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>定时发送</desc>
+				</meta>
+			</auto_send>
+			<clear_auto_send flag="0x0436">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>清空定时发送</desc>
+				</meta>
+			</clear_auto_send>
+			<filter initcan="filter" >
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>滤波方式</desc>
+					<visible>false</visible>
+					<options>
+						<option type="int32" value="0" desc="double_filter"></option>
+						<option type="int32" value="1" desc="single_filter"></option>
+					</options>
+				</meta>
+			</filter>
+			<acc_code hex="1" initcan="acc_code">
+				<value>0x0000</value>
+				<meta>
+					<type>uint32</type>
+					<desc>验收码</desc>
+					<visible>false</visible>
+				</meta>
+			</acc_code>
+			<acc_mask hex="1" initcan="acc_mask">
+				<value>0xFFFFFFFF</value>
+				<meta>
+					<type>uint32</type>
+					<desc>屏蔽码</desc>
+					<visible>false</visible>
+				</meta>
+			</acc_mask>
+			<filter_batch flag="0x0445" at_initcan="pre">
+				<value></value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc></desc>
+				</meta>
+			</filter_batch>
+		</channel_4>
+		<channel_5 stream="channel_5" case="parent-value=5">
+			<baud_rate flag="0x0546" at_initcan="pre">
+				<value>1000000</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>波特率</desc>
+					<options>
+						<option type="int32" value="1000000" desc="1000kbps"></option>
+						<option type="int32" value="800000" desc="800kbps"></option>
+						<option type="int32" value="500000" desc="500kbps"></option>
+						<option type="int32" value="250000" desc="250kbps"></option>
+						<option type="int32" value="125000" desc="125kbps"></option>
+						<option type="int32" value="100000" desc="100kbps"></option>
+						<option type="int32" value="50000" desc="50kbps"></option>
+						<option type="int32" value="20000" desc="20kbps"></option>
+						<option type="int32" value="10000" desc="10kbps"></option>
+						<option type="int32" value="5000" desc="5kbps"></option>
+						<option type="int32" value="0" desc="custom"></option>
+					</options>
+				</meta>
+			</baud_rate>
+			<baud_rate_custom flag="0x0544" at_initcan="pre">
+				<value>1.0Mbps(62%),(00,23)</value>
+				<meta>
+					<visible>$/info/channel/channel_5/baud_rate == 10</visible>
+					<type>string</type>
+					<desc>自定义波特率</desc>
+				</meta>
+			</baud_rate_custom>
+			<work_mode initcan="work_mode">
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>工作模式</desc>
+					<options>
+						<option type="int32" value="0" desc="normal_mode"></option>
+						<option type="int32" value="1" desc="readonly_mode"></option>
+					</options>
+				</meta>
+			</work_mode>
+			<redirect flag="0x0530" havechild="true" >
+				<value>0 0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>转发参数：[目的端口 开启关闭转发]</desc>
+				</meta>
+				<can0 flag="0x0530" at_initcan="pre">
+					<value>0 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can0</desc>
+						<options>
+							<option type="int32" value="0 1" desc="redirect_enable"></option>
+							<option type="int32" value="0 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can0>
+				<can1 flag="0x0530" at_initcan="pre">
+					<value>1 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can1</desc>
+						<options>
+							<option type="int32" value="1 1" desc="redirect_enable"></option>
+							<option type="int32" value="1 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can1>
+				<can2 flag="0x0530" at_initcan="pre">
+					<value>2 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can2</desc>
+						<options>
+							<option type="int32" value="2 1" desc="redirect_enable"></option>
+							<option type="int32" value="2 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can2>
+				<can3 flag="0x0530" at_initcan="pre">
+					<value>3 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can3</desc>
+						<options>
+							<option type="int32" value="3 1" desc="redirect_enable"></option>
+							<option type="int32" value="3 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can3>
+				<can4 flag="0x0530" at_initcan="pre">
+					<value>4 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can4</desc>
+						<options>
+							<option type="int32" value="4 1" desc="redirect_enable"></option>
+							<option type="int32" value="4 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can4>
+				<can5 flag="0x0530" at_initcan="pre">
+					<value>5 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can5</desc>
+						<options>
+							<option type="int32" value="5 1" desc="redirect_enable"></option>
+							<option type="int32" value="5 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can5>
+				<can6 flag="0x0530" at_initcan="pre">
+					<value>6 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can6</desc>
+						<options>
+							<option type="int32" value="6 1" desc="redirect_enable"></option>
+							<option type="int32" value="6 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can6>
+				<can7 flag="0x0530" at_initcan="pre">
+					<value>7 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can7</desc>
+						<options>
+							<option type="int32" value="7 1" desc="redirect_enable"></option>
+							<option type="int32" value="7 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can7>
+			</redirect>
+			<auto_send flag="0x0534">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>定时发送</desc>
+				</meta>
+			</auto_send>
+			<clear_auto_send flag="0x0536">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>清空定时发送</desc>
+				</meta>
+			</clear_auto_send>
+			<filter initcan="filter" >
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>滤波方式</desc>
+					<visible>false</visible>
+					<options>
+						<option type="int32" value="0" desc="double_filter"></option>
+						<option type="int32" value="1" desc="single_filter"></option>
+					</options>
+				</meta>
+			</filter>
+			<acc_code hex="1" initcan="acc_code">
+				<value>0x0000</value>
+				<meta>
+					<type>uint32</type>
+					<desc>验收码</desc>
+					<visible>false</visible>
+				</meta>
+			</acc_code>
+			<acc_mask hex="1" initcan="acc_mask">
+				<value>0xFFFFFFFF</value>
+				<meta>
+					<type>uint32</type>
+					<desc>屏蔽码</desc>
+					<visible>false</visible>
+				</meta>
+			</acc_mask>
+			<filter_batch flag="0x0545" at_initcan="pre">
+				<value></value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc></desc>
+				</meta>
+			</filter_batch>
+		</channel_5>
+		<channel_6 stream="channel_6" case="parent-value=6">
+			<baud_rate flag="0x0646" at_initcan="pre">
+				<value>1000000</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>波特率</desc>
+					<options>
+						<option type="int32" value="1000000" desc="1000kbps"></option>
+						<option type="int32" value="800000" desc="800kbps"></option>
+						<option type="int32" value="500000" desc="500kbps"></option>
+						<option type="int32" value="250000" desc="250kbps"></option>
+						<option type="int32" value="125000" desc="125kbps"></option>
+						<option type="int32" value="100000" desc="100kbps"></option>
+						<option type="int32" value="50000" desc="50kbps"></option>
+						<option type="int32" value="20000" desc="20kbps"></option>
+						<option type="int32" value="10000" desc="10kbps"></option>
+						<option type="int32" value="5000" desc="5kbps"></option>
+						<option type="int32" value="0" desc="custom"></option>
+					</options>
+				</meta>
+			</baud_rate>
+			<baud_rate_custom flag="0x0644" at_initcan="pre">
+				<value>1.0Mbps(62%),(00,23)</value>
+				<meta>
+					<visible>$/info/channel/channel_6/baud_rate == 10</visible>
+					<type>string</type>
+					<desc>自定义波特率</desc>
+				</meta>
+			</baud_rate_custom>
+			<work_mode initcan="work_mode">
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>工作模式</desc>
+					<options>
+						<option type="int32" value="0" desc="normal_mode"></option>
+						<option type="int32" value="1" desc="readonly_mode"></option>
+					</options>
+				</meta>
+			</work_mode>
+			<redirect flag="0x0630" havechild="true" >
+				<value>0 0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>转发参数：[目的端口 开启关闭转发]</desc>
+				</meta>
+				<can0 flag="0x0630" at_initcan="pre">
+					<value>0 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can0</desc>
+						<options>
+							<option type="int32" value="0 1" desc="redirect_enable"></option>
+							<option type="int32" value="0 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can0>
+				<can1 flag="0x0630" at_initcan="pre">
+					<value>1 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can1</desc>
+						<options>
+							<option type="int32" value="1 1" desc="redirect_enable"></option>
+							<option type="int32" value="1 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can1>
+				<can2 flag="0x0630" at_initcan="pre">
+					<value>2 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can2</desc>
+						<options>
+							<option type="int32" value="2 1" desc="redirect_enable"></option>
+							<option type="int32" value="2 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can2>
+				<can3 flag="0x0630" at_initcan="pre">
+					<value>3 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can3</desc>
+						<options>
+							<option type="int32" value="3 1" desc="redirect_enable"></option>
+							<option type="int32" value="3 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can3>
+				<can4 flag="0x0630" at_initcan="pre">
+					<value>4 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can4</desc>
+						<options>
+							<option type="int32" value="4 1" desc="redirect_enable"></option>
+							<option type="int32" value="4 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can4>
+				<can5 flag="0x0630" at_initcan="pre">
+					<value>5 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can5</desc>
+						<options>
+							<option type="int32" value="5 1" desc="redirect_enable"></option>
+							<option type="int32" value="5 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can5>
+				<can6 flag="0x0630" at_initcan="pre">
+					<value>6 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can6</desc>
+						<options>
+							<option type="int32" value="6 1" desc="redirect_enable"></option>
+							<option type="int32" value="6 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can6>
+				<can7 flag="0x0630" at_initcan="pre">
+					<value>7 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can7</desc>
+						<options>
+							<option type="int32" value="7 1" desc="redirect_enable"></option>
+							<option type="int32" value="7 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can7>
+			</redirect>
+			<auto_send flag="0x0634">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>定时发送</desc>
+				</meta>
+			</auto_send>
+			<clear_auto_send flag="0x0636">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>清空定时发送</desc>
+				</meta>
+			</clear_auto_send>
+			<filter initcan="filter" >
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>滤波方式</desc>
+					<visible>false</visible>
+					<options>
+						<option type="int32" value="0" desc="double_filter"></option>
+						<option type="int32" value="1" desc="single_filter"></option>
+					</options>
+				</meta>
+			</filter>
+			<acc_code hex="1" initcan="acc_code">
+				<value>0x0000</value>
+				<meta>
+					<type>uint32</type>
+					<desc>验收码</desc>
+					<visible>false</visible>
+				</meta>
+			</acc_code>
+			<acc_mask hex="1" initcan="acc_mask">
+				<value>0xFFFFFFFF</value>
+				<meta>
+					<type>uint32</type>
+					<desc>屏蔽码</desc>
+					<visible>false</visible>
+				</meta>
+			</acc_mask>
+			<filter_batch flag="0x0645" at_initcan="pre">
+				<value></value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc></desc>
+				</meta>
+			</filter_batch>
+		</channel_6>
+		<channel_7 stream="channel_7" case="parent-value=7">
+			<baud_rate flag="0x0746" at_initcan="pre">
+				<value>1000000</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>波特率</desc>
+					<options>
+						<option type="int32" value="1000000" desc="1000kbps"></option>
+						<option type="int32" value="800000" desc="800kbps"></option>
+						<option type="int32" value="500000" desc="500kbps"></option>
+						<option type="int32" value="250000" desc="250kbps"></option>
+						<option type="int32" value="125000" desc="125kbps"></option>
+						<option type="int32" value="100000" desc="100kbps"></option>
+						<option type="int32" value="50000" desc="50kbps"></option>
+						<option type="int32" value="20000" desc="20kbps"></option>
+						<option type="int32" value="10000" desc="10kbps"></option>
+						<option type="int32" value="5000" desc="5kbps"></option>
+						<option type="int32" value="0" desc="custom"></option>
+					</options>
+				</meta>
+			</baud_rate>
+			<baud_rate_custom flag="0x0744" at_initcan="pre">
+				<value>1.0Mbps(62%),(00,23)</value>
+				<meta>
+					<visible>$/info/channel/channel_7/baud_rate == 10</visible>
+					<type>string</type>
+					<desc>自定义波特率</desc>
+				</meta>
+			</baud_rate_custom>
+			<work_mode initcan="work_mode">
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>工作模式</desc>
+					<options>
+						<option type="int32" value="0" desc="normal_mode"></option>
+						<option type="int32" value="1" desc="readonly_mode"></option>
+					</options>
+				</meta>
+			</work_mode>
+			<redirect flag="0x0730" havechild="true" >
+				<value>0 0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>转发参数：[目的端口 开启关闭转发]</desc>
+				</meta>
+				<can0 flag="0x0730" at_initcan="pre">
+					<value>0 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can0</desc>
+						<options>
+							<option type="int32" value="0 1" desc="redirect_enable"></option>
+							<option type="int32" value="0 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can0>
+				<can1 flag="0x0730" at_initcan="pre">
+					<value>1 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can1</desc>
+						<options>
+							<option type="int32" value="1 1" desc="redirect_enable"></option>
+							<option type="int32" value="1 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can1>
+				<can2 flag="0x0730" at_initcan="pre">
+					<value>2 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can2</desc>
+						<options>
+							<option type="int32" value="2 1" desc="redirect_enable"></option>
+							<option type="int32" value="2 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can2>
+				<can3 flag="0x0730" at_initcan="pre">
+					<value>3 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can3</desc>
+						<options>
+							<option type="int32" value="3 1" desc="redirect_enable"></option>
+							<option type="int32" value="3 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can3>
+				<can4 flag="0x0730" at_initcan="pre">
+					<value>4 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can4</desc>
+						<options>
+							<option type="int32" value="4 1" desc="redirect_enable"></option>
+							<option type="int32" value="4 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can4>
+				<can5 flag="0x0730" at_initcan="pre">
+					<value>5 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can5</desc>
+						<options>
+							<option type="int32" value="5 1" desc="redirect_enable"></option>
+							<option type="int32" value="5 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can5>
+				<can6 flag="0x0730" at_initcan="pre">
+					<value>6 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can6</desc>
+						<options>
+							<option type="int32" value="6 1" desc="redirect_enable"></option>
+							<option type="int32" value="6 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can6>
+				<can7 flag="0x0730" at_initcan="pre">
+					<value>7 0</value>
+					<meta>
+						<type>options.string</type>
+						<desc>can7</desc>
+						<options>
+							<option type="int32" value="7 1" desc="redirect_enable"></option>
+							<option type="int32" value="7 0" desc="redirect_disable"></option>
+						</options>
+					</meta>
+				</can7>
+			</redirect>
+			<auto_send flag="0x0734">
+				<value>0</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>定时发送</desc>
+				</meta>
+			</auto_send>
+			<clear_auto_send flag="0x0736">
+				<value>1</value>
+				<meta>
+					<visible>false</visible>
+					<type>string</type>
+					<desc>清空定时发送</desc>
+				</meta>
+			</clear_auto_send>
+			<filter initcan="filter" >
+				<value>0</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>滤波方式</desc>
+					<visible>false</visible>
+					<options>
+						<option type="int32" value="0" desc="double_filter"></option>
+						<option type="int32" value="1" desc="single_filter"></option>
+					</options>
+				</meta>
+			</filter>
+			<acc_code hex="1" initcan="acc_code">
+				<value>0x0000</value>
+				<meta>
+					<type>uint32</type>
+					<desc>验收码</desc>
+					<visible>false</visible>
+				</meta>
+			</acc_code>
+			<acc_mask hex="1" initcan="acc_mask">
+				<value>0xFFFFFFFF</value>
+				<meta>
+					<type>uint32</type>
+					<desc>屏蔽码</desc>
+					<visible>false</visible>
+				</meta>
+			</acc_mask>
+			<filter_batch flag="0x0745" at_initcan="pre">
+				<value></value>
+				<meta>
+					<type>string</type>
+					<visible>false</visible>
+					<desc></desc>
+				</meta>
+			</filter_batch>
+		</channel_7>
+	</channel>
+</info>
