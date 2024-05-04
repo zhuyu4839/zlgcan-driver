@@ -47,7 +47,7 @@
 7. 注意事项:
    * ZCAN_USBCAN1及ZCAN_USBCAN2类型的设备无论是windows还是Linux, 波特率支持均在baudrate.conf.yaml中配置
      * 此时计算timing0及timing1请下载[CAN波特率计算软件](https://zlg.cn/can/down/down/id/22.html)
-   * 其他CANFD类型的CAN卡仅仅在Linux上使用时baudrate.conf.yaml中配置
+   * 其他CANFD类型的CAN卡仅仅在Linux上使用时`bitrate.cfg.yaml`中配置
      * 此时计算相关值可以通过`ZCANPRO`软件
    * 在Linux上使用ZCAN_USBCAN1衍生CAN卡时, 请在初始化时候设置`ZCanDeriveInfo`信息
    * 该库主要依赖[zlgcan-driver-rs](https://github.com/zhuyu4839/zlgcan-driver-rs),如有问题,请提[issue](https://github.com/zhuyu4839/zlgcan-driver-rs/issues/new)
