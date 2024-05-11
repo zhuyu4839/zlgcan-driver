@@ -16,35 +16,35 @@
    ```
    "zlgcan": ("can.interfaces.zlgcan", "ZCanBus"),
 
-4. 把`zlgcan.py`及`library`文件夹及`libzlgcan_driver_rs_api.x86_64.so`或`zlgcan_driver_rs_api.x86.dll`或`zlgcan_driver_rs_api.x86_64.dll`拷贝到can/interfaces/文件夹
+4. 把`zlgcan`文件夹拷贝到`can/interfaces/`文件夹下
+5. 把`libary`文件夹及`bitrate.cfg.yaml`文件拷贝到当前工程根目录下
 
-5. 使用:
+6. 使用:
      ```python
      import can
-     import time
-          
-     with can.Bus(bustype='zlgcan', device_type=41,
-                  configs=[{'bitrate': 500000, 'resistance': 1}, {'bitrate': 500000, 'resistance': 1}]  # 1通道配置
-                  ) as bus:
-         while True:
-             msg = can.Message(
-                 arbitration_id=0x01,
-                 is_extended_id=False,
-                 channel=0,
-                 data=[0x01, 0x02, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02, ],
-                 is_rx=False,
-             )
-             bus.send(msg, trans_type=ZCANCanTransType.SELF_SR)
-             time.sleep(0.05)
-             print(bus.recv())
+     from can.interfaces.zlgcan import ZCanTxMode, ZCANDeviceType
 
-6. CAN测试列表：
+     with can.Bus(interface="zlgcan", device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
+                  configs=[{'bitrate': 500000, 'resistance': 1}, {'bitrate': 500000, 'resistance': 1}]) as bus:
+         bus.send(can.Message(
+             arbitration_id=0x123,
+             is_extended_id=False,
+             channel=0,
+             data=[0x01, 0x02, 0x03, ],
+             dlc=3,
+         ), tx_mode=ZCanTxMode.SELF_SR)
+
+         # time.sleep(0.1)
+         _msg = bus.recv()
+         print(_msg)
+
+7. CAN测试列表：
    * USBCAN-I-mini - ZCAN_USBCAN1, ZCAN_USBCAN2
    * USBCANFD-100U-mini - ZCAN_USBCANFD_MINI
    * USBCANFD-100U - ZCAN_USBCANFD_100U
    * USBCANFD-200U - ZCAN_USBCANFD_200U
 
-7. 注意事项:
+8. 注意事项:
    * ZCAN_USBCAN1及ZCAN_USBCAN2类型的设备无论是windows还是Linux, 波特率支持均在`bitrate.cfg.yaml`中配置
      * 此时计算timing0及timing1请下载[CAN波特率计算软件](https://zlg.cn/can/down/down/id/22.html)
    * 其他CANFD类型的CAN卡仅仅在Linux上使用时`bitrate.cfg.yaml`中配置
@@ -52,7 +52,7 @@
    * 在Linux上使用ZCAN_USBCAN1衍生CAN卡时, 请在初始化时候设置`ZCanDeriveInfo`信息
    * 该库主要依赖[zlgcan-driver-rs](https://github.com/zhuyu4839/zlgcan-driver-rs),如有问题,请提[issue](https://github.com/zhuyu4839/zlgcan-driver-rs/issues/new)
 
-8. 官方工具及文档:
+9. 官方工具及文档:
    * [工具下载](https://zlg.cn/can/down/down/id/22.html)
    * [驱动下载](https://manual.zlg.cn/web/#/146)
    * [二次开发文档](https://manual.zlg.cn/web/#/42/1710)
