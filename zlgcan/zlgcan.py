@@ -4,6 +4,7 @@ import can
 import collections
 import os
 import platform
+import sys
 
 from ctypes import c_uint8, c_bool, c_int64, c_int32, c_char_p, cdll, c_void_p, byref, c_uint32, POINTER, Structure, \
     string_at, cast
@@ -146,7 +147,8 @@ class CanMessage(Structure):
 
 _current = os.path.dirname(__file__)
 _system_bit, _ = platform.architecture()
-_PREFIX, _EXTEND = ("lib", "so") if os.name == "posix" else ("", "dll")
+_PREFIX = {"win32": ""}.get(sys.platform, "lib")
+_EXTEND = {"darwin": "dylib", "win32": "dll"}.get(sys.platform, "so")
 _PRE_EXTEND = "x86_64" if _system_bit == "64bit" else "x86"
 _LIB_PATH = os.path.join(_current, f"{_PREFIX}zlgcan_driver_rs_api.{_PRE_EXTEND}.{_EXTEND}")
 _LIB = cdll.LoadLibrary(_LIB_PATH)
@@ -172,7 +174,7 @@ class ZCanBus(can.BusABC):
 
         cfg_length = len(configs)
         if cfg_length == 0:
-            raise CanInitializationError('ZLG-CAN - Configuration list or tuple of dict is required.')
+            raise CanInitializationError("ZLG-CAN - Configuration list or tuple of dict is required.")
 
         self.rx_queue = collections.deque(
             maxlen=rx_queue_size
@@ -211,12 +213,12 @@ class ZCanBus(can.BusABC):
             _cfg.chl_type = cfg.get("chl_type", 0)
             _cfg.chl_mode = cfg.get("chl_mode", 0)
             _cfg.bitrate = bitrate
-            _cfg.filter = None if filter is None else byref(filter)
-            _cfg.dbitrate = None if dbitrate is None else byref(dbitrate)
-            _cfg.resistance = None if resistance is None else byref(resistance)
-            _cfg.acc_code = None if acc_code is None else byref(acc_code)
-            _cfg.acc_mask = None if acc_mask is None else byref(acc_mask)
-            _cfg.brp = None if brp is None else byref(brp)
+            _cfg.filter = None if filter is None else cast(id(filter), POINTER(c_uint8))
+            _cfg.dbitrate = None if dbitrate is None else cast(id(dbitrate), POINTER(c_uint32))
+            _cfg.resistance = None if resistance is None else cast(id(resistance), POINTER(c_bool))
+            _cfg.acc_code = None if acc_code is None else cast(id(acc_code), POINTER(c_uint32))
+            _cfg.acc_mask = None if acc_mask is None else cast(id(acc_mask), POINTER(c_uint32))
+            _cfg.brp = None if brp is None else cast(id(brp), POINTER(c_uint32))
             cfg_ptr = _LIB.zlgcan_chl_cfg_can(factory, _cfg, byref(error))
             if not cfg_ptr:
                 raise can.CanOperationError(error.value.decode("utf-8"))
@@ -247,7 +249,7 @@ class ZCanBus(can.BusABC):
             LOG.warning("Send message failed: {}", error.value.decode("utf-8"))
 
     def shutdown(self) -> None:
-        LOG.debug('ZLG-CAN - shutdown.')
+        LOG.debug("ZLG-CAN - shutdown.")
         super().shutdown()
         if hasattr(self, "device"):
             _LIB.zlgcan_close(self.device)
@@ -302,7 +304,7 @@ class ZCanBus(can.BusABC):
         return None, False
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     with ZCanBus(device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
                  configs=[{"bitrate": 500_000}, {"bitrate": 500_000}]) as bus:
         bus.send(can.Message(

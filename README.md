@@ -20,23 +20,23 @@
 5. 把`libary`文件夹及`bitrate.cfg.yaml`文件拷贝到当前工程根目录下
 
 6. 使用:
-     ```python
-     import can
-     from can.interfaces.zlgcan import ZCanTxMode, ZCANDeviceType
-
-     with can.Bus(interface="zlgcan", device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
-                  configs=[{'bitrate': 500000, 'resistance': 1}, {'bitrate': 500000, 'resistance': 1}]) as bus:
-         bus.send(can.Message(
-             arbitration_id=0x123,
-             is_extended_id=False,
-             channel=0,
-             data=[0x01, 0x02, 0x03, ],
-             dlc=3,
-         ), tx_mode=ZCanTxMode.SELF_SR)
-
-         # time.sleep(0.1)
-         _msg = bus.recv()
-         print(_msg)
+   ```python
+   import can
+   from can.interfaces.zlgcan import ZCanTxMode, ZCANDeviceType
+   
+   with can.Bus(interface="zlgcan", device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
+                configs=[{'bitrate': 500000, 'resistance': 1}, {'bitrate': 500000, 'resistance': 1}]) as bus:
+       bus.send(can.Message(
+           arbitration_id=0x123,
+           is_extended_id=False,
+           channel=0,
+           data=[0x01, 0x02, 0x03, ],
+           dlc=3,
+       ), tx_mode=ZCanTxMode.SELF_SR)
+   
+       # time.sleep(0.1)
+       _msg = bus.recv()
+       print(_msg)
 
 7. CAN测试列表：
    * USBCAN-I-mini - ZCAN_USBCAN1, ZCAN_USBCAN2
