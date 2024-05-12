@@ -198,7 +198,7 @@ class ZCanBus(can.BusABC):
 
         self.dev_info = _LIB.zlgcan_device_info(self.device, byref(error))
         if self.dev_info is not None:
-            LOG.info(f"Device opened: {}", self.dev_info.decode("utf-8"))
+            LOG.info(f"Device: {self.dev_info.decode('utf-8')} has opened")
 
         try:
             cfg_ptrs = (c_void_p * cfg_length)()
