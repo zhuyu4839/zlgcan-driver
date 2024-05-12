@@ -182,6 +182,11 @@ class ZCanBus(can.BusABC):
         self.channels = []
 
         error = c_char_p()
+
+        factory = _LIB.zlgcan_cfg_factory_can(byref(error))
+        if not factory:
+            raise can.CanOperationError(error.value.decode("utf-8"))
+            
         if derive is None:
             derive = c_void_p(0)
         else:
@@ -192,42 +197,43 @@ class ZCanBus(can.BusABC):
         self.device = c_void_p(device)
 
         self.dev_info = _LIB.zlgcan_device_info(self.device, byref(error))
-        LOG.info(self.dev_info.decode("utf-8"))
+        if self.dev_info is not None:
+            LOG.info(f"Device opened: {}", self.dev_info.decode("utf-8"))
 
-        factory = _LIB.zlgcan_cfg_factory_can(byref(error))
-        if not factory:
-            raise can.CanOperationError(error.value.decode("utf-8"))
+        try:
+            cfg_ptrs = (c_void_p * cfg_length)()
+            for idx, cfg in enumerate(configs):
+                bitrate = cfg.get("bitrate", None)
+                assert bitrate is not None, "bitrate is required!"
+                filter = cfg.get("filter")
+                dbitrate = cfg.get("dbitrate")
+                resistance = cfg.get("resistance")
+                acc_code = cfg.get("acc_code")
+                acc_mask = cfg.get("acc_mask")
+                brp = cfg.get("brp")
+                _cfg = ZCanChlCfg()
+                _cfg.dev_type = device_type
+                _cfg.chl_type = cfg.get("chl_type", 0)
+                _cfg.chl_mode = cfg.get("chl_mode", 0)
+                _cfg.bitrate = bitrate
+                _cfg.filter = None if filter is None else cast(id(filter), POINTER(c_uint8))
+                _cfg.dbitrate = None if dbitrate is None else cast(id(dbitrate), POINTER(c_uint32))
+                _cfg.resistance = None if resistance is None else cast(id(resistance), POINTER(c_bool))
+                _cfg.acc_code = None if acc_code is None else cast(id(acc_code), POINTER(c_uint32))
+                _cfg.acc_mask = None if acc_mask is None else cast(id(acc_mask), POINTER(c_uint32))
+                _cfg.brp = None if brp is None else cast(id(brp), POINTER(c_uint32))
+                cfg_ptr = _LIB.zlgcan_chl_cfg_can(factory, _cfg, byref(error))
+                if not cfg_ptr:
+                    raise can.CanOperationError(error.value.decode("utf-8"))
+                cfg_ptrs[idx] = cfg_ptr
+                self.channels.append(idx)
 
-        cfg_ptrs = (c_void_p * cfg_length)()
-        for idx, cfg in enumerate(configs):
-            bitrate = cfg.get("bitrate", None)
-            assert bitrate is not None, "bitrate is required!"
-            filter = cfg.get("filter")
-            dbitrate = cfg.get("dbitrate")
-            resistance = cfg.get("resistance")
-            acc_code = cfg.get("acc_code")
-            acc_mask = cfg.get("acc_mask")
-            brp = cfg.get("brp")
-            _cfg = ZCanChlCfg()
-            _cfg.dev_type = device_type
-            _cfg.chl_type = cfg.get("chl_type", 0)
-            _cfg.chl_mode = cfg.get("chl_mode", 0)
-            _cfg.bitrate = bitrate
-            _cfg.filter = None if filter is None else cast(id(filter), POINTER(c_uint8))
-            _cfg.dbitrate = None if dbitrate is None else cast(id(dbitrate), POINTER(c_uint32))
-            _cfg.resistance = None if resistance is None else cast(id(resistance), POINTER(c_bool))
-            _cfg.acc_code = None if acc_code is None else cast(id(acc_code), POINTER(c_uint32))
-            _cfg.acc_mask = None if acc_mask is None else cast(id(acc_mask), POINTER(c_uint32))
-            _cfg.brp = None if brp is None else cast(id(brp), POINTER(c_uint32))
-            cfg_ptr = _LIB.zlgcan_chl_cfg_can(factory, _cfg, byref(error))
-            if not cfg_ptr:
+            ret = _LIB.zlgcan_init_can(self.device, byref(cfg_ptrs), cfg_length, byref(error))
+            if not ret:
                 raise can.CanOperationError(error.value.decode("utf-8"))
-            cfg_ptrs[idx] = cfg_ptr
-            self.channels.append(idx)
-
-        ret = _LIB.zlgcan_init_can(self.device, byref(cfg_ptrs), cfg_length, byref(error))
-        if not ret:
-            raise can.CanOperationError(error.value.decode("utf-8"))
+        except Exception as e:
+            self.shutdown()
+            raise e
 
     def send(self, msg: can.Message, timeout: Optional[float] = None, *, tx_mode: ZCanTxMode = ZCanTxMode.NORMAL) -> None:
         raw_msg = CanMessage()
