@@ -16,8 +16,8 @@
    ```
    "zlgcan": ("can.interfaces.zlgcan", "ZCanBus"),
 
-4. 把`zlgcan`文件夹拷贝到`can/interfaces/`文件夹下
-5. 把[libary](https://github.com/zhuyu4839/zlgcan-driver-rs/tree/master/zlgcan-driver/library)文件夹及[bitrate.cfg.yaml](https://github.com/zhuyu4839/zlgcan-driver-rs/blob/master/bitrate.cfg.yaml)文件拷贝到当前工程根目录下
+4. 将`zlgcan`文件夹及最新驱动适配库[zlgcan-driver-rs-api.tar.gz](https://github.com/zhuyu4839/zlgcan-driver-rs/releases)拷贝到`can/interfaces/`文件夹下
+5. 将[libary](https://github.com/zhuyu4839/zlgcan-driver-rs/tree/master/zlgcan-driver/library)文件夹及[bitrate.cfg.yaml](https://github.com/zhuyu4839/zlgcan-driver-rs/blob/master/bitrate.cfg.yaml)文件拷贝到当前工程根目录下
 
 6. 使用:
    ```python
