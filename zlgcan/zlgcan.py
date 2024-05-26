@@ -272,7 +272,7 @@ class ZCanBus(can.BusABC):
             for i in range(count):
                 raw_msg = buffer[i]
                 msg = can.Message(
-                    timestamp=float(raw_msg.timestamp / 1000),
+                    timestamp=raw_msg.timestamp / 1000.,
                     arbitration_id=raw_msg.arbitration_id,
                     is_extended_id=raw_msg.is_extended_id,
                     is_remote_frame=raw_msg.is_remote_frame,
@@ -298,9 +298,9 @@ class ZCanBus(can.BusABC):
             return self._recv_from_queue()
 
         deadline = None
-        while deadline is None or time.time() < deadline:
+        while deadline is None or time.monotonic() < deadline:
             if deadline is None and timeout is not None:
-                deadline = time.time() + timeout
+                deadline = time.monotonic() + timeout
 
             self.poll_received_messages(timeout or 0)
 
