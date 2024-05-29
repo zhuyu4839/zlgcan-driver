@@ -1,4 +1,4 @@
-# ZLGCAN驱动及集成到python-can
+# ZLGCAN驱动及集成到python-can(因内存模型不同，目前Windows下32位python会报内存非法访问的错误)
 
 1. 安装python-can
 
@@ -16,10 +16,11 @@
    ```
    "zlgcan": ("can.interfaces.zlgcan", "ZCanBus"),
 
-4. 将`zlgcan`文件夹及最新驱动适配库[zlgcan-driver-rs-api.tar.gz](https://github.com/zhuyu4839/zlgcan-driver-rs/releases)拷贝到`can/interfaces/`文件夹下
-5. 将[libary](https://github.com/zhuyu4839/zlgcan-driver-rs/tree/master/zlgcan-driver/library)文件夹及[bitrate.cfg.yaml](https://github.com/zhuyu4839/zlgcan-driver-rs/blob/master/bitrate.cfg.yaml)文件拷贝到当前工程根目录下
+4. 将`zlgcan`文件夹拷贝到`can/interfaces/`文件夹下
+5. 将最新驱动适配库[zlgcan-driver-rs-api.tar.gz](https://github.com/zhuyu4839/zlgcan-driver-rs/releases)中库文件拷贝到`can/interfaces/zlgcan`文件夹下
+6. 将[libary](https://github.com/zhuyu4839/zlgcan-driver-rs/tree/master/zlgcan-driver/library)文件夹及[bitrate.cfg.yaml](https://github.com/zhuyu4839/zlgcan-driver-rs/blob/master/bitrate.cfg.yaml)文件拷贝到当前工程根目录下
 
-6. 使用:
+7. 使用:
    ```python
    import can
    from can.interfaces.zlgcan import ZCanTxMode, ZCANDeviceType
@@ -38,13 +39,13 @@
        _msg = bus.recv()
        print(_msg)
 
-7. CAN测试列表：
+8. CAN测试列表：
    * USBCAN-I-mini - ZCAN_USBCAN1, ZCAN_USBCAN2
    * USBCANFD-100U-mini - ZCAN_USBCANFD_MINI
    * USBCANFD-100U - ZCAN_USBCANFD_100U
    * USBCANFD-200U - ZCAN_USBCANFD_200U
 
-8. 注意事项:
+9. 注意事项:
    * ZCAN_USBCAN1及ZCAN_USBCAN2类型的设备无论是windows还是Linux, 波特率支持均在`bitrate.cfg.yaml`中配置
      * 此时计算timing0及timing1请下载[CAN波特率计算软件](https://zlg.cn/can/down/down/id/22.html)
    * 其他CANFD类型的CAN卡仅仅在Linux上使用时`bitrate.cfg.yaml`中配置
@@ -52,7 +53,7 @@
    * 在Linux上使用ZCAN_USBCAN1衍生CAN卡时, 请在初始化时候设置`ZCanDeriveInfo`信息
    * 该库主要依赖[zlgcan-driver-rs](https://github.com/zhuyu4839/zlgcan-driver-rs),如有问题,请提[issue](https://github.com/zhuyu4839/zlgcan-driver-rs/issues/new)
 
-9. 官方工具及文档:
+10. 官方工具及文档:
    * [工具下载](https://zlg.cn/can/down/down/id/22.html)
    * [驱动下载](https://manual.zlg.cn/web/#/146)
    * [二次开发文档](https://manual.zlg.cn/web/#/42/1710)
