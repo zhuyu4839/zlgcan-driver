@@ -95,7 +95,6 @@ jobs:
         env:
           MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         with:
-          user: __token__
-          password: ${{ secrets.PYPI_TOKEN }}
+          token: ${{ secrets.PYPI_TOKEN }}
           command: upload
           args: --non-interactive --skip-existing wheels-*/*
