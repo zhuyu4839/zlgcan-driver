@@ -226,18 +226,19 @@ class ZCanBus(can.BusABC):
         return None, False
 
 
-with ZCanBus(interface="zlgcan", device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
-             configs=[{'bitrate': 500000, 'resistance': 1}, {'bitrate': 1000000, 'resistance': 1}]) as bus:
-    # bus.send(can.Message(
-    #     arbitration_id=0x7DF,
-    #     is_extended_id=False,
-    #     channel=0,
-    #     data=[0x02, 0x10, 0x03, ],
-    #     dlc=3,
-    # ), tx_mode=ZCanTxMode.SELF_SR)
+if __name__ == '__main__':
+    with ZCanBus(interface="zlgcan", device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
+                 configs=[{'bitrate': 500000, 'resistance': 1}, {'bitrate': 1000000, 'resistance': 1}]) as bus:
+        # bus.send(can.Message(
+        #     arbitration_id=0x7DF,
+        #     is_extended_id=False,
+        #     channel=0,
+        #     data=[0x02, 0x10, 0x03, ],
+        #     dlc=3,
+        # ), tx_mode=ZCanTxMode.SELF_SR)
 
-    start = time.monotonic()
-    while time.monotonic() - start < 0.1:
-        _msg = bus.recv()
-        print(_msg)
+        start = time.monotonic()
+        while time.monotonic() - start < 0.1:
+            _msg = bus.recv()
+            print(_msg)
 
