@@ -198,10 +198,9 @@ class ZCanBus(can.BusABC):
     def poll_received_messages(self, timeout):
         for channel in self.channels:
             raw_msgs: list[ZCanMessagePy] = zlgcan_recv(self.device, channel, timeout)
-            # print(len(raw_msgs))
-            for raw_msg in raw_msgs:
-                self.rx_queue.append(convert_to_python(raw_msg))
-            # self.rx_queue.extend(map(lambda raw_msg: convert_to_python(raw_msg), raw_msgs))
+            # for raw_msg in raw_msgs:
+            #     self.rx_queue.append(convert_to_python(raw_msg))
+            self.rx_queue.extend(map(lambda raw_msg: convert_to_python(raw_msg), raw_msgs))
 
     def _recv_from_queue(self) -> Tuple[Message, bool]:
         """Return a message from the internal receive queue"""
@@ -227,18 +226,18 @@ class ZCanBus(can.BusABC):
         return None, False
 
 
-# with ZCanBus(interface="zlgcan", device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
-#              configs=[{'bitrate': 500000, 'resistance': 1}, {'bitrate': 1000000, 'resistance': 1}]) as bus:
-#     bus.send(can.Message(
-#         arbitration_id=0x7DF,
-#         is_extended_id=False,
-#         channel=0,
-#         data=[0x02, 0x10, 0x03, ],
-#         dlc=3,
-#     ), tx_mode=ZCanTxMode.SELF_SR)
-#
-#     start = time.monotonic()
-#     while time.monotonic() - start < 0.1:
-#         _msg = bus.recv()
-#         print(_msg)
+with ZCanBus(interface="zlgcan", device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
+             configs=[{'bitrate': 500000, 'resistance': 1}, {'bitrate': 1000000, 'resistance': 1}]) as bus:
+    # bus.send(can.Message(
+    #     arbitration_id=0x7DF,
+    #     is_extended_id=False,
+    #     channel=0,
+    #     data=[0x02, 0x10, 0x03, ],
+    #     dlc=3,
+    # ), tx_mode=ZCanTxMode.SELF_SR)
+
+    start = time.monotonic()
+    while time.monotonic() - start < 0.1:
+        _msg = bus.recv()
+        print(_msg)
 
