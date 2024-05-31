@@ -12,19 +12,17 @@ from can.bus import LOG
 from typing import Optional, Union, Sequence, Deque, Tuple, List, Dict
 try:
     from zlgcan_driver_py import ZCanChlCfgPy, ZCanMessagePy, ZDeriveInfoPy, ZCanChlCfgFactoryWrap, ZCanDriverWrap, \
-        convert_to_python, convert_from_python, set_message_mode, zlgcan_cfg_factory_can, zlgcan_open, zlgcan_device_info, \
-        zlgcan_init_can, zlgcan_clear_can_buffer, zlgcan_send, zlgcan_recv, zlgcan_close
-except ImportError:
+        convert_to_python, convert_from_python, set_message_mode, zlgcan_cfg_factory_can, zlgcan_open, \
+        zlgcan_device_info, zlgcan_init_can, zlgcan_clear_can_buffer, zlgcan_send, zlgcan_recv, zlgcan_close
+except ModuleNotFoundError:
     import sys
     import platform
     _system_bit, _ = platform.architecture()
     _platform = sys.platform
     not_support = CanError(f"The system {_platform}'.'{_system_bit} is not supported!")
-    require_lib = CanError("Please install library zlgcan-driver-py!")
+    require_lib = CanError("Please install library `zlgcan-driver-py`!")
     raise {
-        "win32": {
-            {"32bit": not_support}.get(_system_bit, require_lib)
-        },
+        "win32": {"32bit": not_support}.get(_system_bit, require_lib),
         "darwin": not_support,
         "linux": {"32bit": not_support}.get(_system_bit, require_lib)
     }.get(_platform, not_support)
