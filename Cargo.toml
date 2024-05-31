@@ -1,0 +1,14 @@
+[package]
+name = "zlgcan-driver-py"
+version = "0.1.1"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "zlgcan_driver_py"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = "0.21"
+zlgcan_common = { version = "1.0.0-rc4" }
+zlgcan_driver = { version = "1.0.0-rc4" }

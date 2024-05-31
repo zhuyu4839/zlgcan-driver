@@ -1,162 +1,123 @@
-import time
-
+"""
+The ZLGCAN device supported based on zlgcan-driver-rs.
+See the example `zlgcan_demo.py`
+"""
 import can
 import collections
-import os
-import platform
-import sys
+import time
 
-from ctypes import c_uint8, c_bool, c_int64, c_int32, c_char_p, cdll, c_void_p, byref, c_uint32, POINTER, Structure, \
-    string_at, cast
-from typing import Optional, Union, Sequence, Deque, Tuple, List, Dict
-
-from can import CanInitializationError, Message
+from can import CanError, CanInitializationError, Message
 from can.bus import LOG
+
+from typing import Optional, Union, Sequence, Deque, Tuple, List, Dict
+try:
+    from zlgcan_driver_py import ZCanChlCfgPy, ZCanMessagePy, ZDeriveInfoPy, ZCanChlCfgFactoryWrap, ZCanDriverWrap, \
+        convert_to_python, convert_from_python, set_message_mode, zlgcan_cfg_factory_can, zlgcan_open, zlgcan_device_info, \
+        zlgcan_init_can, zlgcan_clear_can_buffer, zlgcan_send, zlgcan_recv, zlgcan_close
+except ImportError:
+    import sys
+    import platform
+    _system_bit, _ = platform.architecture()
+    _platform = sys.platform
+    not_support = CanError(f"The system {_platform}'.'{_system_bit} is not supported!")
+    require_lib = CanError("Please install library zlgcan-driver-py!")
+    raise {
+        "win32": {
+            {"32bit": not_support}.get(_system_bit, require_lib)
+        },
+        "darwin": not_support,
+        "linux": {"32bit": not_support}.get(_system_bit, require_lib)
+    }.get(_platform, not_support)
 
 
 class ZCanTxMode:
-    NORMAL = 0              # 正常发送
-    SINGLE = 1              # 单次发送
-    SELF_SR = 2             # 自发自收
-    SINGLE_SELF_SR = 3      # 单次自发自收
+    NORMAL = 0  # 正常发送
+    SINGLE = 1  # 单次发送
+    SELF_SR = 2  # 自发自收
+    SINGLE_SELF_SR = 3  # 单次自发自收
 
 
 class ZCANDeviceType:
-    ZCAN_PCI5121                       = 1
-    ZCAN_PCI9810                       = 2
-    ZCAN_USBCAN1                       = 3
-    ZCAN_USBCAN2                       = 4
-    ZCAN_PCI9820                       = 5
-    ZCAN_CAN232                        = 6
-    ZCAN_PCI5110                       = 7
-    ZCAN_CANLITE                       = 8
-    ZCAN_ISA9620                       = 9
-    ZCAN_ISA5420                       = 10
-    ZCAN_PC104CAN                      = 11
-    ZCAN_CANETUDP                      = 12
-    ZCAN_CANETE                        = 12
-    ZCAN_DNP9810                       = 13
-    ZCAN_PCI9840                       = 14
-    ZCAN_PC104CAN2                     = 15
-    ZCAN_PCI9820I                      = 16
-    ZCAN_CANETTCP                      = 17
-    ZCAN_PCIE_9220                     = 18
-    ZCAN_PCI5010U                      = 19
-    ZCAN_USBCAN_E_U                    = 20
-    ZCAN_USBCAN_2E_U                   = 21
-    ZCAN_PCI5020U                      = 22
-    ZCAN_EG20T_CAN                     = 23
-    ZCAN_PCIE9221                      = 24
-    ZCAN_WIFICAN_TCP                   = 25
-    ZCAN_WIFICAN_UDP                   = 26
-    ZCAN_PCIe9120                      = 27
-    ZCAN_PCIe9110                      = 28
-    ZCAN_PCIe9140                      = 29
-    ZCAN_USBCAN_4E_U                   = 31
-    ZCAN_CANDTU_200UR                  = 32
-    ZCAN_CANDTU_MINI                   = 33
-    ZCAN_USBCAN_8E_U                   = 34
-    ZCAN_CANREPLAY                     = 35
-    ZCAN_CANDTU_NET                    = 36
-    ZCAN_CANDTU_100UR                  = 37
-    ZCAN_PCIE_CANFD_100U               = 38
-    ZCAN_PCIE_CANFD_200U               = 39
-    ZCAN_PCIE_CANFD_400U               = 40
-    ZCAN_USBCANFD_200U                 = 41
-    ZCAN_USBCANFD_100U                 = 42
-    ZCAN_USBCANFD_MINI                 = 43
-    ZCAN_CANFDCOM_100IE                = 44
-    ZCAN_CANSCOPE                      = 45
-    ZCAN_CLOUD                         = 46
-    ZCAN_CANDTU_NET_400                = 47
-    ZCAN_CANFDNET_TCP                  = 48
-    ZCAN_CANFDNET_200U_TCP             = 48
-    ZCAN_CANFDNET_UDP                  = 49
-    ZCAN_CANFDNET_200U_UDP             = 49
-    ZCAN_CANFDWIFI_TCP                 = 50
-    ZCAN_CANFDWIFI_100U_TCP            = 50
-    ZCAN_CANFDWIFI_UDP                 = 51
-    ZCAN_CANFDWIFI_100U_UDP            = 51
-    ZCAN_CANFDNET_400U_TCP             = 52
-    ZCAN_CANFDNET_400U_UDP             = 53
-    ZCAN_CANFDBLUE_200U                = 54
-    ZCAN_CANFDNET_100U_TCP             = 55
-    ZCAN_CANFDNET_100U_UDP             = 56
-    ZCAN_CANFDNET_800U_TCP             = 57
-    ZCAN_CANFDNET_800U_UDP             = 58
-    ZCAN_USBCANFD_800U                 = 59
-    ZCAN_PCIE_CANFD_100U_EX            = 60
-    ZCAN_PCIE_CANFD_400U_EX            = 61
-    ZCAN_PCIE_CANFD_200U_MINI          = 62
-    ZCAN_PCIE_CANFD_200U_M2            = 63
-    ZCAN_CANFDDTU_400_TCP              = 64
-    ZCAN_CANFDDTU_400_UDP              = 65
-    ZCAN_CANFDWIFI_200U_TCP            = 66
-    ZCAN_CANFDWIFI_200U_UDP            = 67
-    ZCAN_CANFDDTU_800ER_TCP            = 68
-    ZCAN_CANFDDTU_800ER_UDP            = 69
-    ZCAN_CANFDDTU_800EWGR_TCP          = 70
-    ZCAN_CANFDDTU_800EWGR_UDP          = 71
-    ZCAN_CANFDDTU_600EWGR_TCP          = 72
-    ZCAN_CANFDDTU_600EWGR_UDP          = 73
+    ZCAN_PCI5121 = 1
+    ZCAN_PCI9810 = 2
+    ZCAN_USBCAN1 = 3
+    ZCAN_USBCAN2 = 4
+    ZCAN_PCI9820 = 5
+    ZCAN_CAN232 = 6
+    ZCAN_PCI5110 = 7
+    ZCAN_CANLITE = 8
+    ZCAN_ISA9620 = 9
+    ZCAN_ISA5420 = 10
+    ZCAN_PC104CAN = 11
+    ZCAN_CANETUDP = 12
+    ZCAN_CANETE = 12
+    ZCAN_DNP9810 = 13
+    ZCAN_PCI9840 = 14
+    ZCAN_PC104CAN2 = 15
+    ZCAN_PCI9820I = 16
+    ZCAN_CANETTCP = 17
+    ZCAN_PCIE_9220 = 18
+    ZCAN_PCI5010U = 19
+    ZCAN_USBCAN_E_U = 20
+    ZCAN_USBCAN_2E_U = 21
+    ZCAN_PCI5020U = 22
+    ZCAN_EG20T_CAN = 23
+    ZCAN_PCIE9221 = 24
+    ZCAN_WIFICAN_TCP = 25
+    ZCAN_WIFICAN_UDP = 26
+    ZCAN_PCIe9120 = 27
+    ZCAN_PCIe9110 = 28
+    ZCAN_PCIe9140 = 29
+    ZCAN_USBCAN_4E_U = 31
+    ZCAN_CANDTU_200UR = 32
+    ZCAN_CANDTU_MINI = 33
+    ZCAN_USBCAN_8E_U = 34
+    ZCAN_CANREPLAY = 35
+    ZCAN_CANDTU_NET = 36
+    ZCAN_CANDTU_100UR = 37
+    ZCAN_PCIE_CANFD_100U = 38
+    ZCAN_PCIE_CANFD_200U = 39
+    ZCAN_PCIE_CANFD_400U = 40
+    ZCAN_USBCANFD_200U = 41
+    ZCAN_USBCANFD_100U = 42
+    ZCAN_USBCANFD_MINI = 43
+    ZCAN_CANFDCOM_100IE = 44
+    ZCAN_CANSCOPE = 45
+    ZCAN_CLOUD = 46
+    ZCAN_CANDTU_NET_400 = 47
+    ZCAN_CANFDNET_TCP = 48
+    ZCAN_CANFDNET_200U_TCP = 48
+    ZCAN_CANFDNET_UDP = 49
+    ZCAN_CANFDNET_200U_UDP = 49
+    ZCAN_CANFDWIFI_TCP = 50
+    ZCAN_CANFDWIFI_100U_TCP = 50
+    ZCAN_CANFDWIFI_UDP = 51
+    ZCAN_CANFDWIFI_100U_UDP = 51
+    ZCAN_CANFDNET_400U_TCP = 52
+    ZCAN_CANFDNET_400U_UDP = 53
+    ZCAN_CANFDBLUE_200U = 54
+    ZCAN_CANFDNET_100U_TCP = 55
+    ZCAN_CANFDNET_100U_UDP = 56
+    ZCAN_CANFDNET_800U_TCP = 57
+    ZCAN_CANFDNET_800U_UDP = 58
+    ZCAN_USBCANFD_800U = 59
+    ZCAN_PCIE_CANFD_100U_EX = 60
+    ZCAN_PCIE_CANFD_400U_EX = 61
+    ZCAN_PCIE_CANFD_200U_MINI = 62
+    ZCAN_PCIE_CANFD_200U_M2 = 63
+    ZCAN_CANFDDTU_400_TCP = 64
+    ZCAN_CANFDDTU_400_UDP = 65
+    ZCAN_CANFDWIFI_200U_TCP = 66
+    ZCAN_CANFDWIFI_200U_UDP = 67
+    ZCAN_CANFDDTU_800ER_TCP = 68
+    ZCAN_CANFDDTU_800ER_UDP = 69
+    ZCAN_CANFDDTU_800EWGR_TCP = 70
+    ZCAN_CANFDDTU_800EWGR_UDP = 71
+    ZCAN_CANFDDTU_600EWGR_TCP = 72
+    ZCAN_CANFDDTU_600EWGR_UDP = 73
 
-    ZCAN_OFFLINE_DEVICE                = 98
-    ZCAN_VIRTUAL_DEVICE                = 99
-
-
-class ZCanDeriveInfo(Structure):
-    _fields_ = [("canfd", c_bool),
-                ("channels", c_uint8),
-                ]
-
-
-class ZCanChlCfgFactory(Structure):
-    pass
-
-
-class ZCanChlCfg(Structure):
-    _fields_ = [("dev_type", c_uint32),
-                ("chl_type", c_uint8),
-                ("chl_mode", c_uint8),
-                ("bitrate", c_uint32),
-                ("filter", c_char_p),
-                ("dbitrate", POINTER(c_uint32)),
-                ("resistance", POINTER(c_bool)),
-                ("acc_code", POINTER(c_uint32)),
-                ("acc_mask", POINTER(c_uint32)),
-                ("brp", POINTER(c_uint32)),
-                ]
-
-
-class CanMessage(Structure):
-    _fields_ = [("timestamp", c_int64),
-                ("arbitration_id", c_int32),
-                ("is_extended_id", c_bool),
-                ("is_remote_frame", c_bool),
-                ("is_error_frame", c_bool),
-                ("channel", c_uint8),
-                ("len", c_uint8),
-                ("data", c_char_p),
-                ("is_fd", c_bool),
-                ("is_rx", c_bool),
-                ("bitrate_switch", c_bool),
-                ("error_state_indicator", c_bool),
-                ("tx_mode", c_uint8)
-                ]
-
-
-_current = os.path.dirname(__file__)
-_system_bit, _ = platform.architecture()
-_PREFIX = {"win32": ""}.get(sys.platform, "lib")
-_EXTEND = {"darwin": "dylib", "win32": "dll"}.get(sys.platform, "so")
-_PRE_EXTEND = "x86_64" if _system_bit == "64bit" else "x86"
-_LIB_PATH = os.path.join(_current, f"{_PREFIX}zlgcan_driver_rs_api.{_PRE_EXTEND}.{_EXTEND}")
-_LIB = cdll.LoadLibrary(_LIB_PATH)
-_LIB.zlgcan_open.restype = c_void_p
-_LIB.zlgcan_device_info.restype = c_char_p
-_LIB.zlgcan_cfg_factory_can.restype = POINTER(ZCanChlCfgFactory)
-_LIB.zlgcan_chl_cfg_can.restype = c_void_p
-_LIB.zlgcan_recv.argtypes = [c_void_p, c_uint8, c_uint32, POINTER(POINTER(CanMessage)), POINTER(c_char_p)]
+    ZCAN_OFFLINE_DEVICE = 98
+    ZCAN_VIRTUAL_DEVICE = 99
 
 
 class ZCanBus(can.BusABC):
@@ -165,11 +126,22 @@ class ZCanBus(can.BusABC):
                  channel: Union[int, Sequence[int], str] = None, *,
                  device_type: int,
                  device_index: int = 0,
-                 derive: ZCanDeriveInfo = None,
+                 derive: ZDeriveInfoPy = None,
                  rx_queue_size: Optional[int] = None,
                  configs: Union[List[Dict], Tuple[Dict]] = None,
                  can_filters: Optional[can.typechecking.CanFilters] = None,
                  **kwargs: object):
+        """
+        Constructor
+
+        :param channel: Not used(from super).
+        :param device_type: The device type that your device belongs, see `ZCANDeviceType`.
+        :param device_index: The device index.
+        :param derive: The deriver info for specifying the channels and canfd supported if your device is not official.
+        :param rx_queue_size: The receiving queue size.
+        :param configs: The channel configration. See `zlgcan_demo.py`.
+        :param can_filters: From super.
+        """
         super().__init__(channel=channel, can_filters=can_filters, **kwargs)
 
         cfg_length = len(configs)
@@ -181,110 +153,57 @@ class ZCanBus(can.BusABC):
         )  # type: Deque[can.Message]               # channel, raw_msg
         self.channels = []
 
-        error = c_char_p()
+        factory = zlgcan_cfg_factory_can()
+        self.device = zlgcan_open(device_type, device_index, derive)
 
-        factory = _LIB.zlgcan_cfg_factory_can(byref(error))
-        if not factory:
-            raise can.CanOperationError(error.value.decode("utf-8"))
-            
-        if derive is None:
-            derive = c_void_p(0)
-        else:
-            derive = byref(derive)
-        device = _LIB.zlgcan_open(device_type, device_index, derive, byref(error))
-        if not device:
-            raise can.CanOperationError(error.value.decode("utf-8"))
-        self.device = c_void_p(device)
-
-        self.dev_info = _LIB.zlgcan_device_info(self.device, byref(error))
+        self.dev_info = zlgcan_device_info(self.device)
         if self.dev_info is not None:
-            LOG.info(f"Device: {self.dev_info.decode('utf-8')} has opened")
+            LOG.info(f"Device: {self.dev_info} has opened")
 
         try:
-            cfg_ptrs = (c_void_p * cfg_length)()
+            cfg_list = []
             for idx, cfg in enumerate(configs):
                 bitrate = cfg.get("bitrate", None)
                 assert bitrate is not None, "bitrate is required!"
-                filter = cfg.get("filter")
-                dbitrate = cfg.get("dbitrate")
-                resistance = cfg.get("resistance")
-                acc_code = cfg.get("acc_code")
-                acc_mask = cfg.get("acc_mask")
-                brp = cfg.get("brp")
-                _cfg = ZCanChlCfg()
-                _cfg.dev_type = device_type
-                _cfg.chl_type = cfg.get("chl_type", 0)
-                _cfg.chl_mode = cfg.get("chl_mode", 0)
-                _cfg.bitrate = bitrate
-                _cfg.filter = None if filter is None else cast(id(filter), POINTER(c_uint8))
-                _cfg.dbitrate = None if dbitrate is None else cast(id(dbitrate), POINTER(c_uint32))
-                _cfg.resistance = None if resistance is None else cast(id(resistance), POINTER(c_bool))
-                _cfg.acc_code = None if acc_code is None else cast(id(acc_code), POINTER(c_uint32))
-                _cfg.acc_mask = None if acc_mask is None else cast(id(acc_mask), POINTER(c_uint32))
-                _cfg.brp = None if brp is None else cast(id(brp), POINTER(c_uint32))
-                cfg_ptr = _LIB.zlgcan_chl_cfg_can(factory, _cfg, byref(error))
-                if not cfg_ptr:
-                    raise can.CanOperationError(error.value.decode("utf-8"))
-                cfg_ptrs[idx] = cfg_ptr
+                _cfg = ZCanChlCfgPy(
+                    dev_type=device_type,
+                    chl_type=cfg.get("chl_type", 0),
+                    chl_mode=cfg.get("chl_mode", 0),
+                    bitrate=bitrate,
+                    filter=cfg.get("filter"),
+                    dbitrate=cfg.get("dbitrate"),
+                    resistance=bool(cfg.get("resistance", 1)),
+                    acc_code=cfg.get("acc_code"),
+                    acc_mask=cfg.get("acc_mask"),
+                    brp=cfg.get("brp")
+                )
+                cfg_list.append(_cfg)
                 self.channels.append(idx)
 
-            ret = _LIB.zlgcan_init_can(self.device, byref(cfg_ptrs), cfg_length, byref(error))
-            if not ret:
-                raise can.CanOperationError(error.value.decode("utf-8"))
+            zlgcan_init_can(self.device, factory, cfg_list)
         except Exception as e:
             self.shutdown()
             raise e
 
-    def send(self, msg: can.Message, timeout: Optional[float] = None, *, tx_mode: ZCanTxMode = ZCanTxMode.NORMAL) -> None:
-        raw_msg = CanMessage()
-        raw_msg.timestamp = int(msg.timestamp * 1000)
-        raw_msg.arbitration_id = msg.arbitration_id
-        raw_msg.is_extended_id = msg.is_extended_id
-        raw_msg.is_remote_frame = msg.is_remote_frame
-        raw_msg.is_error_frame = msg.is_error_frame
-        raw_msg.channel = msg.channel
-        raw_msg.len = msg.dlc
-        raw_msg.data = c_char_p(bytes(msg.data))
-        raw_msg.is_fd = msg.is_fd
-        raw_msg.bitrate_switch = msg.bitrate_switch
-        raw_msg.error_state_indicator = msg.error_state_indicator
-        raw_msg.tx_mode = tx_mode
-        error = c_char_p()
-        ret = _LIB.zlgcan_send(self.device, raw_msg, byref(error))
-        if not ret:
-            LOG.warning("Send message failed: {}", error.value.decode("utf-8"))
+    def send(self, msg: can.Message, timeout: Optional[float] = None, *,
+             tx_mode: ZCanTxMode = ZCanTxMode.NORMAL) -> None:
+        raw_msg = convert_from_python(msg)
+        set_message_mode(raw_msg, tx_mode)
+        zlgcan_send(self.device, raw_msg)
 
     def shutdown(self) -> None:
         LOG.debug("ZLG-CAN - shutdown.")
         super().shutdown()
         if hasattr(self, "device"):
-            _LIB.zlgcan_close(self.device)
+            zlgcan_close(self.device)
 
     def poll_received_messages(self, timeout):
         for channel in self.channels:
-            error = c_char_p()
-            buffer = cast(c_void_p(0), POINTER(CanMessage))
-            count = _LIB.zlgcan_recv(self.device, channel, timeout, byref(buffer), byref(error))
-            if count == 0:
-                if error.value is not None:
-                    LOG.warning(error.value.decode("utf-8"))
-
-            for i in range(count):
-                raw_msg = buffer[i]
-                msg = can.Message(
-                    timestamp=raw_msg.timestamp / 1000.,
-                    arbitration_id=raw_msg.arbitration_id,
-                    is_extended_id=raw_msg.is_extended_id,
-                    is_remote_frame=raw_msg.is_remote_frame,
-                    is_error_frame=raw_msg.is_error_frame,
-                    channel=raw_msg.channel,
-                    dlc=raw_msg.len,
-                    data=string_at(raw_msg.data, raw_msg.len),
-                    is_fd=raw_msg.is_fd,
-                    bitrate_switch=raw_msg.bitrate_switch,
-                    error_state_indicator=raw_msg.error_state_indicator,
-                )
-                self.rx_queue.append(msg)
+            raw_msgs: list[ZCanMessagePy] = zlgcan_recv(self.device, channel, timeout)
+            # print(len(raw_msgs))
+            for raw_msg in raw_msgs:
+                self.rx_queue.append(convert_to_python(raw_msg))
+            # self.rx_queue.extend(map(lambda raw_msg: convert_to_python(raw_msg), raw_msgs))
 
     def _recv_from_queue(self) -> Tuple[Message, bool]:
         """Return a message from the internal receive queue"""
@@ -292,7 +211,7 @@ class ZCanBus(can.BusABC):
         return msg, False
 
     def _recv_internal(
-        self, timeout: Optional[float]
+            self, timeout: Optional[float]
     ) -> Tuple[Optional[Message], bool]:
         if self.rx_queue:
             return self._recv_from_queue()
@@ -310,19 +229,18 @@ class ZCanBus(can.BusABC):
         return None, False
 
 
-if __name__ == "__main__":
-    with ZCanBus(device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
-                 configs=[{"bitrate": 500_000}, {"bitrate": 500_000}]) as bus:
-        bus.send(can.Message(
-            arbitration_id=0x123,
-            is_extended_id=False,
-            channel=0,
-            data=[0x01, 0x02, 0x03, ],
-            dlc=3,
-        ))
-
-        # time.sleep(0.1)
-        _msg = bus.recv()
-        print(_msg)
-
+# with ZCanBus(interface="zlgcan", device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
+#              configs=[{'bitrate': 500000, 'resistance': 1}, {'bitrate': 1000000, 'resistance': 1}]) as bus:
+#     bus.send(can.Message(
+#         arbitration_id=0x7DF,
+#         is_extended_id=False,
+#         channel=0,
+#         data=[0x02, 0x10, 0x03, ],
+#         dlc=3,
+#     ), tx_mode=ZCanTxMode.SELF_SR)
+#
+#     start = time.monotonic()
+#     while time.monotonic() - start < 0.1:
+#         _msg = bus.recv()
+#         print(_msg)
 
