@@ -10,7 +10,18 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
+dependencies = [
+    "python-can",
+]
 dynamic = ["version"]
+description = "Python wrapper for zlgcan-driver-rs."
+authors = [{ name = "Smith Jesse" }]
+license = { text = "LGPL v3" }
+
+[project.urls]
+homepage = "https://github.com/zhuyu4839/zlgcan-driver"
+repository = "https://github.com/zhuyu4839/zlgcan-driver"
+
 [tool.maturin]
 features = ["pyo3/extension-module"]
-python = ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
