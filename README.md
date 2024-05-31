@@ -17,7 +17,10 @@
    "zlgcan": ("can.interfaces.zlgcan", "ZCanBus"),
 
 4. 将`zlgcan`文件夹拷贝到`can/interfaces/`文件夹下
-5. 将最新驱动适配库[zlgcan-driver-rs-api.tar.gz](https://github.com/zhuyu4839/zlgcan-driver-rs/releases)中库文件拷贝到`can/interfaces/zlgcan`文件夹下
+5. 安装zlgcan-driver-py库:
+   ```shell
+   pip install zlgcan-driver-py
+
 6. 将[libary](https://github.com/zhuyu4839/zlgcan-driver-rs/tree/master/zlgcan-driver/library)文件夹及[bitrate.cfg.yaml](https://github.com/zhuyu4839/zlgcan-driver-rs/blob/master/bitrate.cfg.yaml)文件拷贝到当前工程根目录下
 
 7. 使用:
@@ -41,9 +44,11 @@
 
 8. CAN测试列表：
    * USBCAN-I-mini - ZCAN_USBCAN1, ZCAN_USBCAN2
+   * USBCAN-4E-U - ZCAN_USBCAN_4E_U
    * USBCANFD-100U-mini - ZCAN_USBCANFD_MINI
    * USBCANFD-100U - ZCAN_USBCANFD_100U
    * USBCANFD-200U - ZCAN_USBCANFD_200U
+   * USBCANFD-800U - ZCAN_USBCANFD_800U
 
 9. 注意事项:
    * ZCAN_USBCAN1及ZCAN_USBCAN2类型的设备无论是windows还是Linux, 波特率支持均在`bitrate.cfg.yaml`中配置
