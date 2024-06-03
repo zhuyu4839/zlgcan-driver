@@ -203,6 +203,14 @@ struct ZDeriveInfoPy {
     pub(crate) channels: u8,
 }
 
+#[pymethods]
+impl ZDeriveInfoPy {
+    #[new]
+    fn new(canfd: bool, channels: u8) -> Self {
+        Self { canfd, channels }
+    }
+}
+
 impl Into<DeriveInfo> for ZDeriveInfoPy {
     fn into(self) -> DeriveInfo {
         DeriveInfo::new(self.canfd, self.channels)
