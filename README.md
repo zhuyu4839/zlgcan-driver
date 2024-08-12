@@ -21,7 +21,18 @@
    ```shell
    pip install zlgcan-driver-py
 
-6. 将[libary](https://github.com/zhuyu4839/zlgcan-driver-rs/tree/master/zlgcan-driver/library)文件夹及[bitrate.cfg.yaml](https://github.com/zhuyu4839/zlgcan-driver-rs/blob/master/bitrate.cfg.yaml)文件拷贝到当前工程根目录下
+6. 准备
+   * 确保安装相关驱动(USBCAN-I/II驱动得额外安装)
+   * 确保安装相[VC++运行环境](https://manual.zlg.cn/web/#/152?page_id=5332)
+   * 将[libary](https://github.com/zhuyu4839/zlgcan-driver-rs/tree/master/zlgcan-driver/library)文件夹及[bitrate.cfg.yaml](https://github.com/zhuyu4839/zlgcan-driver-rs/blob/master/bitrate.cfg.yaml)文件拷贝到当前工程根目录下(v0.1.5前版本)
+   * 在当前工程目录下新建一个`zcan.env`文件, 中间配置`ZCAN_LIBRARY`及`ZCAN_BITRATE`两个环境变量(相对路径/绝对路径),否则使用v0.1.5前版本默认路径:
+     * `ZCAN_LIBRARY`为`library`父目录
+     * `ZCAN_BITRATE`为`bitrate.cfg.yaml`文件的路径
+   * 以下为示例
+   ```shell
+   ZCAN_LIBRARY="C:/your_library_path"
+   ZCAN_BITRATE="C:/your_path/bitrate.cfg.yaml"
+   ```
 
 7. 使用:
    ```python
