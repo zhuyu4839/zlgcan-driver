@@ -10,5 +10,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 pyo3 = "0.21"
-zlgcan_common = { version = "2.0.0-rc2" }
-zlgcan_driver = { version = "2.0.0-rc3" }
+can-type-rs = "1.0.6"
+zlgcan_common = "3.0.0-rc"
+zlgcan_driver = "3.0.0-rc"

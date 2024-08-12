@@ -2,6 +2,8 @@ use std::sync::{Arc, Mutex};
 use pyo3::prelude::*;
 use pyo3::{exceptions, wrap_pyfunction};
 use pyo3::types::PyDict;
+use can_type_rs::frame::{Direct, Frame};
+use can_type_rs::identifier::Id;
 use zlgcan_common::can::{CanChlCfg, CanChlCfgExt, CanChlCfgFactory, CanMessage};
 use zlgcan_common::device::DeriveInfo;
 use zlgcan_driver::driver::{ZCanDriver, ZDevice};
@@ -25,6 +27,7 @@ struct ZCanChlCfgPy {
 #[pymethods]
 impl ZCanChlCfgPy {
     #[new]
+    #[pyo3(signature = (dev_type, chl_type, chl_mode, bitrate, filter=None, dbitrate=None, resistance=None, acc_code=None, acc_mask=None, brp=None))]
     fn new(
         dev_type: u32,
         chl_type: u8,
@@ -91,18 +94,23 @@ pub struct ZCanMessagePy {
 impl From<CanMessage> for ZCanMessagePy {
     fn from(value: CanMessage) -> Self {
         let data = Vec::from(value.data());
+        let id = value.id(false);
+        let is_extended_id = id.is_extended();
         ZCanMessagePy {
             timestamp: value.timestamp(),
-            arbitration_id: value.arbitration_id(),
-            is_extended_id: value.is_extended_id(),
-            is_remote_frame: value.is_remote_frame(),
+            arbitration_id: id.as_raw(),
+            is_extended_id,
+            is_remote_frame: value.is_remote(),
             is_error_frame: value.is_error_frame(),
             channel: value.channel(),
             data,
-            is_fd: value.is_fd(),
-            is_rx: value.is_rx(),
-            bitrate_switch: value.bitrate_switch(),
-            error_state_indicator: value.error_state_indicator(),
+            is_fd: value.is_can_fd(),
+            is_rx: match value.direct() {
+                Direct::Transmit => false,
+                Direct::Receive => true,
+            },
+            bitrate_switch: value.is_bitrate_switch(),
+            error_state_indicator: value.is_error_frame(),
             tx_mode: value.tx_mode(),
         }
     }
@@ -112,20 +120,26 @@ impl TryInto<CanMessage> for ZCanMessagePy {
     type Error = PyErr;
 
     fn try_into(self) -> Result<CanMessage, Self::Error> {
-        let mut msg = CanMessage::new(
-            self.arbitration_id,
-            Some(self.channel),
-            self.data,
-            self.is_fd,
-            self.is_error_frame,
-            Some(self.is_extended_id),
-        ).map_err(|e| PyErr::new::<exceptions::PyRuntimeError, String>(e.to_string()))?;
-        msg.set_timestamp(Some(self.timestamp))
+        let mut msg = if self.is_error_frame {
+            CanMessage::new_remote(
+                Id::from_bits(self.arbitration_id, false),
+                self.data.len(),
+            )
+        }
+        else {
+            CanMessage::new(
+                Id::from_bits(self.arbitration_id, false),
+                self.data.as_slice(),
+            )
+        }.ok_or(PyErr::new::<exceptions::PyRuntimeError, String>("Can't new CAN message".into()))?;
+        msg.set_timestamp(None)
+            .set_direct(if self.is_rx { Direct::Receive } else { Direct::Transmit })
+            .set_channel(self.channel)
             .set_tx_mode(self.tx_mode)
-            .set_is_remote_frame(self.is_remote_frame)
-            .set_is_rx(self.is_rx)
+            .set_can_fd(self.is_fd)
             .set_bitrate_switch(self.bitrate_switch)
-            .set_error_state_indicator(self.error_state_indicator);
+            .set_esi(self.error_state_indicator)
+            .set_error_frame(self.is_error_frame);
         Ok(msg)
     }
 }
@@ -226,7 +240,7 @@ struct ZCanChlCfgFactoryWrap {
 #[pyclass]
 #[derive(Clone)]
 struct ZCanDriverWrap {
-    inner: Arc<Mutex<ZCanDriver<'static>>>,
+    inner: Arc<Mutex<ZCanDriver>>,
 }
 
 #[pyfunction]
@@ -237,6 +251,7 @@ fn zlgcan_cfg_factory_can() -> PyResult<ZCanChlCfgFactoryWrap> {
 }
 
 #[pyfunction]
+#[pyo3(signature = (dev_type, dev_idx, derive=None))]
 fn zlgcan_open(
     dev_type: u32,
     dev_idx: u32,
@@ -304,6 +319,7 @@ fn zlgcan_send(
 }
 
 #[pyfunction]
+#[pyo3(signature = (device, channel, timeout=None))]
 fn zlgcan_recv<'py>(
     device: ZCanDriverWrap,
     channel: u8,
