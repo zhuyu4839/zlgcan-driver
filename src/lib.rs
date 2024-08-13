@@ -314,7 +314,8 @@ fn zlgcan_send(
 ) -> PyResult<u32> {
     let device = device.inner.lock()
         .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?;
-    unify_send(&device, msg.try_into()?)
+    let message = msg.try_into()?;
+    unify_send(&device, &message)
         .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))
 }
 
