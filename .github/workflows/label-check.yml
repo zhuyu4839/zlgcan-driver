@@ -1,0 +1,32 @@
+name: Label Check
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  check-label:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Check if issue has a label
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const labels = context.issue.labels.map(label => label.name);
+            if (labels.length === 0) {
+              const issueNumber = context.issue.number;
+              const owner = context.repo.owner;
+              const repo = context.repo.repo;
+              const labelToAdd = 'needs-triage';
+
+              await github.issues.addLabels({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                labels: [labelToAdd]
+              });
+            }
