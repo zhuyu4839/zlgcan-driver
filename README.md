@@ -24,14 +24,34 @@
 6. 准备
    * 确保安装相关驱动(USBCAN-I/II驱动得额外安装)
    * 确保安装相[VC++运行环境](https://manual.zlg.cn/web/#/152?page_id=5332)
-   * 将[libary](https://github.com/zhuyu4839/zlgcan-driver-rs/tree/master/zlgcan-driver/library)文件夹及[bitrate.cfg.yaml](https://github.com/zhuyu4839/zlgcan-driver-rs/blob/master/bitrate.cfg.yaml)文件拷贝到当前工程根目录下(v0.1.5前版本)
-   * 在当前工程目录下新建一个`zcan.env`文件, 中间配置`ZCAN_LIBRARY`及`ZCAN_BITRATE`两个环境变量(相对路径/绝对路径),否则使用v0.1.5前版本默认路径:
+   * 将[libary](https://github.com/zhuyu4839/zlgcan-driver-rs/tree/master/zlgcan-driver/library)文件夹及[bitrate.cfg.yaml](https://github.com/zhuyu4839/zlgcan-driver-rs/blob/master/bitrate.cfg.yaml)文件拷贝到当目录(v0.1.5前版本)
+   * 在当前工程目录下新建一个`zcan.env`文件, 中间配置`ZCAN_LIBRARY`环境变量(相对路径/绝对路径),否则使用v0.1.5前版本默认路径:
      * `ZCAN_LIBRARY`为`library`父目录
-     * `ZCAN_BITRATE`为`bitrate.cfg.yaml`文件的路径
+     * 其中`v0.1.5`后版本文件夹内容示例如下:
+     ```shell
+     └─root
+       └─library
+         ├─linux
+         │  └─x86_64
+         ├─windows
+         │  ├─x86
+         │  └─x86_64
+         └─ bitrate.cfg.yaml
+     ```
+      * `v0.1.5`前版本文件夹内容示例如下:
+     ```shell
+     └─root
+       ├─library
+       │  ├──linux
+       │  │  └─x86_64
+       │  └─windows
+       │     ├─x86
+       │     └─x86_64
+       └─ bitrate.cfg.yaml
+     ```
    * 以下为示例
    ```shell
    ZCAN_LIBRARY="C:/your_library_path"
-   ZCAN_BITRATE="C:/your_path/bitrate.cfg.yaml"
    ```
 
 7. 使用:

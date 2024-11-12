@@ -1,13 +1,7 @@
 use std::sync::{Arc, Mutex};
-use pyo3::prelude::*;
-use pyo3::{exceptions, wrap_pyfunction};
-use pyo3::types::PyDict;
-use can_type_rs::frame::{Direct, Frame};
-use can_type_rs::identifier::Id;
-use zlgcan_common::can::{CanChlCfg, CanChlCfgExt, CanChlCfgFactory, CanMessage};
-use zlgcan_common::device::DeriveInfo;
-use zlgcan_driver::driver::{ZCanDriver, ZDevice};
-use zlgcan_driver::utils::{unify_recv, unify_send};
+use iso15765_2::can::{Direct, Frame, Id};
+use pyo3::{exceptions, prelude::*, types::PyDict, wrap_pyfunction};
+use zlgcan::{can::{CanChlCfg, CanChlCfgExt, CanChlCfgFactory, CanMessage, ZCanFrameType}, device::DeriveInfo, driver::{ZCanDriver, ZDevice}};
 
 #[pyclass]
 #[derive(Clone)]
@@ -75,7 +69,7 @@ impl ZCanChlCfgPy {
 }
 
 #[pyclass]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct ZCanMessagePy {
     timestamp: u64,
     arbitration_id: u32,
@@ -94,7 +88,7 @@ pub struct ZCanMessagePy {
 impl From<CanMessage> for ZCanMessagePy {
     fn from(value: CanMessage) -> Self {
         let data = Vec::from(value.data());
-        let id = value.id(false);
+        let id = value.id();
         let is_extended_id = id.is_extended();
         ZCanMessagePy {
             timestamp: value.timestamp(),
@@ -270,7 +264,7 @@ fn zlgcan_open(
 }
 
 #[pyfunction]
-fn zlgcan_device_info(device: ZCanDriverWrap) -> PyResult<String> {
+fn zlgcan_device_info(device: &ZCanDriverWrap) -> PyResult<String> {
     let device = device.inner.lock()
         .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?;
     Ok(
@@ -282,7 +276,7 @@ fn zlgcan_device_info(device: ZCanDriverWrap) -> PyResult<String> {
 
 #[pyfunction]
 fn zlgcan_init_can(
-    device: ZCanDriverWrap,
+    device: &ZCanDriverWrap,
     factory: ZCanChlCfgFactoryWrap,
     cfg: Vec<ZCanChlCfgPy>
 ) -> PyResult<()> {
@@ -298,7 +292,7 @@ fn zlgcan_init_can(
 
 #[pyfunction]
 fn zlgcan_clear_can_buffer(
-    device: ZCanDriverWrap,
+    device: &ZCanDriverWrap,
     channel: u8,
 ) -> PyResult<()> {
     let device = device.inner.lock()
@@ -309,36 +303,57 @@ fn zlgcan_clear_can_buffer(
 
 #[pyfunction]
 fn zlgcan_send(
-    device: ZCanDriverWrap,
+    device: &ZCanDriverWrap,
     msg: ZCanMessagePy,
 ) -> PyResult<u32> {
     let device = device.inner.lock()
         .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?;
-    let message = msg.try_into()?;
-    unify_send(&device, &message)
-        .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))
+    let message: CanMessage = msg.try_into()?;
+    if message.is_can_fd() {
+        device.transmit_canfd(message.channel(), vec![message, ])
+            .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))
+    }
+    else {
+        device.transmit_can(message.channel(), vec![message, ])
+            .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))
+    }
 }
 
 #[pyfunction]
 #[pyo3(signature = (device, channel, timeout=None))]
 fn zlgcan_recv<'py>(
-    device: ZCanDriverWrap,
+    device: &ZCanDriverWrap,
     channel: u8,
     timeout: Option<u32>,
 ) -> PyResult<Vec<ZCanMessagePy>> {
     let device = device.inner.lock()
         .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?;
-    let result = unify_recv(&device, channel, timeout)
-        .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?
-        .into_iter()
-        .map(|m| ZCanMessagePy::from(m))
-        .collect::<Vec<_>>();
-    Ok(result)
+
+    let can_cnt = device.get_can_num(channel, ZCanFrameType::CAN)
+        .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?;
+    let canfd_cnt = device.get_can_num(channel, ZCanFrameType::CANFD)
+        .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?;
+    let mut results = Vec::with_capacity((can_cnt + canfd_cnt) as usize);
+
+    if can_cnt > 0 {
+        let mut can_frames = device.receive_can(channel, can_cnt, timeout)
+            .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?;
+        results.append(&mut can_frames);
+    }
+    if canfd_cnt > 0 {
+        let mut canfd_frames = device.receive_canfd(channel, canfd_cnt, timeout)
+            .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?;
+        results.append(&mut canfd_frames);
+    }
+
+    Ok(results.into_iter()
+        .map(ZCanMessagePy::from)
+        .collect::<Vec<_>>())
 }
 
 #[pyfunction]
 fn zlgcan_close(
-    device: ZCanDriverWrap
+    device: &ZCanDriverWrap
 ) -> PyResult<()> {
     let mut device = device.inner.lock()
         .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?;
@@ -375,3 +390,55 @@ fn zlgcan_driver_py(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     Ok(())
 }
 
+#[cfg(test)]
+mod tests {
+    use std::time::Instant;
+    use zlgcan::can::{ZCanChlMode, ZCanChlType};
+    use zlgcan::device::ZCanDeviceType;
+    use super::*;
+
+    #[test]
+    fn test_receive() -> anyhow::Result<()> {
+        pyo3::prepare_freethreaded_python();
+
+        let cfg_fct = zlgcan_cfg_factory_can()?;
+        let device = zlgcan_open(ZCanDeviceType::ZCAN_USBCANFD_200U as u32, 0, None)?;
+
+        let dev_info = zlgcan_device_info(&device)?;
+        println!("{}", dev_info);
+
+        let cfg = ZCanChlCfgPy::new(
+            ZCanDeviceType::ZCAN_USBCANFD_200U as u32,
+            ZCanChlType::CANFD_ISO as u8,
+            ZCanChlMode::Normal as u8,
+            500_000,
+            None,
+            Some(1_000_000),
+            None,
+            None,
+            None,
+            None,
+        );
+        zlgcan_init_can(&device, cfg_fct, vec![cfg, ])?;
+        std::thread::sleep(std::time::Duration::from_secs(1));
+
+        let start = Instant::now();
+        let mut flag = false;
+        while start.elapsed().as_secs() < 15 {
+            let msgs = zlgcan_recv(&device, 0, None)?;
+            println!("{:?}", msgs);
+            if !msgs.is_empty() {
+                flag = true;
+            }
+            drop(msgs);
+
+            if flag {
+                break;
+            }
+        }
+
+        zlgcan_close(&device)?;
+
+        Ok(())
+    }
+}
