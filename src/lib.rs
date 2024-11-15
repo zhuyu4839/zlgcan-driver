@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
-use iso15765_2::can::{Direct, Frame, Id};
 use pyo3::{exceptions, prelude::*, types::PyDict, wrap_pyfunction};
+use rs_can::{Direct, Frame, Id};
 use zlgcan::{can::{CanChlCfg, CanChlCfgExt, CanChlCfgFactory, CanMessage, ZCanFrameType}, device::DeriveInfo, driver::{ZCanDriver, ZDevice}};
 
 #[pyclass]

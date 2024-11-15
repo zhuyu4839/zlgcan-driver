@@ -14,7 +14,7 @@ dependencies = [
     "python-can",
 ]
 dynamic = ["version"]
-description = "Python wrapper for zlgcan-driver-rs."
+description = "Python wrapper for zlgcan driver."
 authors = [{ name = "Smith Jesse" }]
 license = { text = "LGPL v3" }
 
@@ -27,4 +27,4 @@ zlgcan = "zlgcan.zlgcan:ZCanBus"
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
-python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+python = ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
