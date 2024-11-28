@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<info locale="device_locale_strings.xml">
+	<device canfd="1">
+		<value>0</value>
+		<meta>
+			<type>options.int32</type>
+			<desc>设备索引</desc>
+			<visible>false</visible>
+			<options>
+				<option type="int32" value="0" desc="0"></option>
+				<option type="int32" value="1" desc="1"></option>
+				<option type="int32" value="2" desc="2"></option>
+				<option type="int32" value="3" desc="3"></option>
+				<option type="int32" value="4" desc="4"></option>
+				<option type="int32" value="5" desc="5"></option>
+				<option type="int32" value="6" desc="6"></option>
+				<option type="int32" value="7" desc="7"></option>
+				<option type="int32" value="8" desc="8"></option>
+				<option type="int32" value="9" desc="9"></option>
+				<option type="int32" value="10" desc="10"></option>
+				<option type="int32" value="11" desc="1"></option>
+				<option type="int32" value="12" desc="12"></option>
+				<option type="int32" value="13" desc="13"></option>
+				<option type="int32" value="14" desc="14"></option>
+				<option type="int32" value="15" desc="15"></option>
+				<option type="int32" value="16" desc="16"></option>
+				<option type="int32" value="17" desc="17"></option>
+				<option type="int32" value="18" desc="18"></option>
+				<option type="int32" value="19" desc="19"></option>
+				<option type="int32" value="20" desc="20"></option>
+				<option type="int32" value="21" desc="21"></option>
+				<option type="int32" value="22" desc="22"></option>
+				<option type="int32" value="23" desc="23"></option>
+				<option type="int32" value="24" desc="24"></option>
+				<option type="int32" value="25" desc="25"></option>
+				<option type="int32" value="26" desc="26"></option>
+				<option type="int32" value="27" desc="27"></option>
+				<option type="int32" value="28" desc="28"></option>
+				<option type="int32" value="29" desc="29"></option>
+				<option type="int32" value="30" desc="30"></option>
+			</options>
+		</meta>
+	</device>
+	<channel>
+		<value>0</value>
+		<meta>
+			<visible>false</visible>
+			<type>options.int32</type>
+			<desc>通道号</desc>
+			<options>
+				<option type="int32" value="0" desc="Channel 0"></option>
+				<option type="int32" value="1" desc="Channel 1"></option>
+			</options>
+		</meta>
+		<channel_0 stream="channel_0" case="parent-value=0">
+			<protocol flag="0x0052" at_initcan="pre">
+				<value>1</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>协议</desc>
+					<options>
+						<option type="int32" value="0" desc="CAN"></option>
+						<option type="int32" value="1" desc="CANFD"></option>
+					</options>
+				</meta>
+			</protocol>
+			<canfd_exp>
+				<value>1</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>CANFD加速</desc>
+					<visible>$/info/channel/channel_0/protocol != 0</visible>
+					<options>
+						<option type="int32" value="0" desc="str_no"></option>
+						<option type="int32" value="1" desc="str_yes"></option>
+					</options>
+				</meta>
+			</canfd_exp>
+			<baud_rate>
+				<value>1000000</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>波特率</desc>
+					<options>
+						<option type="int32" value="1000000" desc="1000kbps"></option>
+						<option type="int32" value="800000" desc="800kbps"></option>
+						<option type="int32" value="500000" desc="500kbps"></option>
+						<option type="int32" value="250000" desc="250kbps"></option>
+						<option type="int32" value="125000" desc="125kbps"></option>
+						<option type="int32" value="100000" desc="100kbps"></option>
+						<option type="int32" value="50000" desc="50kbps"></option>
+						<option type="int32" value="20000" desc="20kbps"></option>
+						<option type="int32" value="10000" desc="10kbps"></option>
+						<option type="int32" value="5000" desc="5kbps"></option>
+					</options>
+				</meta>
+			</baud_rate>
+		</channel_0>
+		<channel_1 stream="channel_1" case="parent-value=1">
+			<protocol flag="0x0052" at_initcan="pre">
+				<value>1</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>协议</desc>
+					<options>
+						<option type="int32" value="0" desc="CAN"></option>
+						<option type="int32" value="1" desc="CANFD"></option>
+					</options>
+				</meta>
+			</protocol>
+			<canfd_exp>
+				<value>1</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>CANFD加速</desc>
+					<visible>$/info/channel/channel_0/protocol != 0</visible>
+					<options>
+						<option type="int32" value="0" desc="str_no"></option>
+						<option type="int32" value="1" desc="str_yes"></option>
+					</options>
+				</meta>
+			</canfd_exp>
+			<baud_rate>
+				<value>1000000</value>
+				<meta>
+					<type>options.int32</type>
+					<desc>波特率</desc>
+					<options>
+						<option type="int32" value="1000000" desc="1000kbps"></option>
+						<option type="int32" value="800000" desc="800kbps"></option>
+						<option type="int32" value="500000" desc="500kbps"></option>
+						<option type="int32" value="250000" desc="250kbps"></option>
+						<option type="int32" value="125000" desc="125kbps"></option>
+						<option type="int32" value="100000" desc="100kbps"></option>
+						<option type="int32" value="50000" desc="50kbps"></option>
+						<option type="int32" value="20000" desc="20kbps"></option>
+						<option type="int32" value="10000" desc="10kbps"></option>
+						<option type="int32" value="5000" desc="5kbps"></option>
+					</options>
+				</meta>
+			</baud_rate>
+		</channel_1>
+	</channel>
+</info>

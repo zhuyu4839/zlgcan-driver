@@ -141,10 +141,10 @@ impl TryInto<CanMessage> for ZCanMessagePy {
 impl ZCanMessagePy {
 
     fn to_python<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
-        let can_mod = py.import_bound("can")?;
+        let can_mod = py.import("can")?;
         let message_class = can_mod.getattr("Message")?;
 
-        let kwargs = PyDict::new_bound(py);
+        let kwargs = PyDict::new(py);
         kwargs.set_item("timestamp", self.timestamp as f64 / 1000.)?;
         kwargs.set_item("arbitration_id", self.arbitration_id)?;
         kwargs.set_item("is_extended_id", self.is_extended_id)?;

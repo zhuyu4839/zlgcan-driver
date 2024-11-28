@@ -1,0 +1,35 @@
+USBCAN: &USBCAN
+  bitrate:
+    5000: { timing0: 0xbf, timing1: 0xff }
+    10000: { timing0: 0x31, timing1: 0x1c }
+    20000: { timing0: 0x18, timing1: 0x1c }
+    40000: { timing0: 0x87, timing1: 0xff }
+    50000: { timing0: 0x09, timing1: 0x1c }
+    80000: { timing0: 0x83, timing1: 0xff }
+    100000: { timing0: 0x04, timing1: 0x1c }
+    125000: { timing0: 0x03, timing1: 0x1c }
+    200000: { timing0: 0x81, timing1: 0xfa }
+    250000: { timing0: 0x01, timing1: 0x1c }
+    400000: { timing0: 0x80, timing1: 0xfa }
+    500000: { timing0: 0x00, timing1: 0x1c }
+    800000: { timing0: 0x00, timing1: 0x16 }
+    1000000: { timing0: 0x00, timing1: 0x14 }
+USBCANFD: &USBCANFD
+  clock: 60000000
+  bitrate:
+    500000: { tseg1: 2, tseg2: 0, sjw: 0, smp: 80, brp: 23 }
+    1000000: { tseg1: 7, tseg2: 0, sjw: 0, smp: 90, brp: 5 }
+  data_bitrate:
+    # 500000:
+    #   tseg1: 2
+    #   tseg2: 0
+    #   sjw: 80
+    #   smp: 0
+    #   brp: 23
+
+3: *USBCAN  # USBCAN1
+4: *USBCAN  # USBCAN2
+33: *USBCANFD # ZCAN_CANDTU_MINI
+41: *USBCANFD # USBCANFD_200U|USBCANFD_400U
+42: *USBCANFD # USBCANFD_100U
+43: *USBCANFD # USBCANFD_MINI

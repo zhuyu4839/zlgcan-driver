@@ -1,0 +1,198 @@
+<?xml version="1.0"?>
+<info locale="device_locale_strings.xml">	
+	<DeviceType>
+		<value>99</value>
+		<meta>
+			<type>options.int32</type>
+			<desc>device type</desc>
+			<options>
+				<option type="int32" value="1" desc="VCI_PCI5121" />
+				<option type="int32" value="2" desc="VCI_PCI9810" />
+				<option type="int32" value="3" desc="VCI_USBCAN1" />
+				<option type="int32" value="99" desc="VCI_USBCAN2" />
+				<option type="int32" value="5" desc="VCI_PCI9820" />
+				<option type="int32" value="6" desc="VCI_CAN232" />
+			</options>
+		</meta>
+		<VCI_PCI5121 stream="VCI_PCI5121" case="parent-value=1">
+			<include_file>
+				<value>VCI_PCI5121.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>VCI_PCI5121 config file</desc>
+				</meta>
+			</include_file>
+		</VCI_PCI5121>
+		
+		<VCI_PCI9810 stream="VCI_PCI9810" case="parent-value=2">
+			<include_file>
+				<value>VCI_PCI9810.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>VCI_PCI9810 config file</desc>
+				</meta>
+			</include_file>
+		</VCI_PCI9810>
+		
+		<VCI_USBCAN1 stream="VCI_USBCAN1" case="parent-value=3">
+			<include_file>
+				<value>VCI_USBCAN1.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>VCI_USBCAN1 config file</desc>
+				</meta>
+			</include_file>
+		</VCI_USBCAN1>
+		
+		<VCI_USBCAN2 stream="VCI_USBCAN2" case="parent-value=99">
+			<include_file>
+				<value>VCI_USBCAN2.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>VCI_USBCAN2 config file</desc>
+				</meta>
+			</include_file>
+		</VCI_USBCAN2>
+		
+		<VCI_PCI9820 stream="VCI_PCI9820" case="parent-value=5">
+			<include_file>
+				<value>VCI_PCI9820.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>VCI_PCI9820 config file</desc>
+				</meta>
+			</include_file>
+		</VCI_PCI9820>
+		
+		<VCI_CAN232 stream="VCI_CAN232" case="parent-value=6">
+			<include_file>
+				<value>VCI_CAN232.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>VCI_CAN232 config file</desc>
+				</meta>
+			</include_file>
+		</VCI_CAN232>
+	</DeviceType>
+	
+	<Frame>
+		<can_frame>
+			<can_id>
+				<value>123456</value>
+				<meta>
+					<type>uint32</type>
+					<desc>32 bit CAN_ID + EFF/RTR/ERR flags</desc>
+				</meta>
+			</can_id>
+			
+			<can_dlc>
+				<value>8</value>
+				<meta>
+					<type>uchar</type>
+					<desc>frame payload length in byte (0 .. CAN_MAX_DLEN)</desc>
+				</meta>
+			</can_dlc>
+			
+			<__pad>
+				<value>0</value>
+				<meta>
+					<type>uchar</type>
+					<desc>padding</desc>
+				</meta>
+			</__pad>
+			
+			<__res0>
+				<value>0</value>
+				<meta>
+					<type>uchar</type>
+					<desc>reserved / padding</desc>
+				</meta>
+			</__res0>
+			
+			<__res1>
+				<value>0</value>
+				<meta>
+					<type>uchar</type>
+					<desc>reserved / padding</desc>
+				</meta>
+			</__res1>
+			
+			<data>
+				<value>01234567</value>
+				<meta>
+					<type>string</type>
+					<desc>CAN frame payload (up to 8 byte)</desc>
+				</meta>
+			</data>
+		</can_frame>
+		
+		<canfd_frame>
+			<can_id>
+				<value>123456</value>
+				<meta>
+					<type>uint32</type>
+					<desc>32 bit CAN_ID + EFF/RTR/ERR flags</desc>
+				</meta>
+			</can_id>
+			
+			<len>
+				<value>64</value>
+				<meta>
+					<type>uchar</type>
+					<desc>frame payload length in byte (0 .. CANFD_MAX_DLEN)</desc>
+				</meta>
+			</len>
+			
+			<flags>
+				<value>0</value>
+				<meta>
+					<type>uchar</type>
+					<desc>additional flags for CAN FD</desc>
+				</meta>
+			</flags>
+			
+			<__res0>
+				<value>0</value>
+				<meta>
+					<type>uchar</type>
+					<desc>reserved / padding</desc>
+				</meta>
+			</__res0>
+			
+			<__res1>
+				<value>0</value>
+				<meta>
+					<type>uchar</type>
+					<desc>reserved / padding</desc>
+				</meta>
+			</__res1>
+			
+			<data>
+				<value>01234567</value>
+				<meta>
+					<type>string</type>
+					<desc>CAN FD frame payload (up to CANFD_MAX_DLEN byte)</desc>
+				</meta>
+			</data>
+		</canfd_frame>
+	</Frame>	
+	
+	<Generate>
+		<Timer>
+			<value>500</value>
+			<meta>
+				<type>uint32</type>
+				<desc>生成帧数据的频率,单位毫秒</desc>
+			</meta>
+		</Timer>
+		
+		<BufferNumber>
+			<value>50</value>
+			<meta>
+				<type>uint32</type>
+				<desc>生成帧的个数（缓冲区大小，ZCAN_Receive_Data或ZCAN_ReceiveFD_Data的个数）</desc>
+			</meta>
+		</BufferNumber>
+	</Generate>
+	
+</info>
