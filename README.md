@@ -24,7 +24,7 @@
 6. 准备
    * 确保安装相关驱动(USBCAN-I/II驱动得额外安装)
    * 确保安装相[VC++运行环境](https://manual.zlg.cn/web/#/152?page_id=5332)
-   * 将[library](https://github.com/zhuyu4839/zlgcan-driver/tree/rust-dev/zlgcan-driver/library)文件夹及[bitrate.cfg.yaml](https://github.com/zhuyu4839/zlgcan-driver/blob/rust-dev/zlgcan-driver/library/bitrate.cfg.yaml)文件拷贝到当目录(v0.1.5前版本)
+   * 将[library](https://github.com/zhuyu4839/zlgcan-driver/tree/rust-dev/library)文件夹及[bitrate.cfg.yaml](https://github.com/zhuyu4839/zlgcan-driver/blob/rust-dev/library/bitrate.cfg.yaml)文件拷贝到当目录(v0.1.5前版本)
    * 在当前工程目录下新建一个`zcan.env`文件, 中间配置`ZCAN_LIBRARY`环境变量(相对路径/绝对路径),否则使用v0.1.5前版本默认路径:
      * `ZCAN_LIBRARY`为`library`父目录
      * 其中`v0.1.5`后版本文件夹内容示例如下:
@@ -84,6 +84,7 @@
 9. 注意事项:
    * ZCAN_USBCAN1及ZCAN_USBCAN2类型的设备无论是windows还是Linux, 波特率支持均在`bitrate.cfg.yaml`中配置
      * 此时计算timing0及timing1请下载[CAN波特率计算软件](https://zlg.cn/can/down/down/id/22.html)
+     * `bitrate.cfg.yaml`文件中USBCANFD设备只配置了500k及1M的波特率, 如需使用其他波特率, 请自行添加
    * 其他CANFD类型的CAN卡仅仅在Linux上使用时`bitrate.cfg.yaml`中配置
      * 此时计算相关值可以通过`ZCANPRO`软件
    * 在Linux上使用ZCAN_USBCAN1衍生CAN卡时, 请在初始化时候设置`ZCanDeriveInfo`信息
