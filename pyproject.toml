@@ -23,7 +23,7 @@ homepage = "https://github.com/zhuyu4839/zlgcan-driver"
 repository = "https://github.com/zhuyu4839/zlgcan-driver"
 
 [project.entry-points."can.interface"]
-zlgcan = "zlgcan.zlgcan:ZCanBus"
+zlgcan = "can.interfaces.zlgcan:ZCanBus"
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
