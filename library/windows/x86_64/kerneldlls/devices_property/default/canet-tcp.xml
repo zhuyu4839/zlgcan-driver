@@ -39,6 +39,55 @@
 				<option type="int32" value="29" desc="29"></option>
 				<option type="int32" value="30" desc="30"></option>
 				<option type="int32" value="31" desc="31"></option>
+				<option type="int32" value="32" desc="32"></option>
+				<option type="int32" value="33" desc="33"></option>
+				<option type="int32" value="34" desc="34"></option>
+				<option type="int32" value="35" desc="35"></option>
+				<option type="int32" value="36" desc="36"></option>
+				<option type="int32" value="37" desc="37"></option>
+				<option type="int32" value="38" desc="38"></option>
+				<option type="int32" value="39" desc="39"></option>
+				<option type="int32" value="40" desc="40"></option>
+				<option type="int32" value="41" desc="41"></option>
+				<option type="int32" value="42" desc="42"></option>
+				<option type="int32" value="43" desc="43"></option>
+				<option type="int32" value="44" desc="44"></option>
+				<option type="int32" value="45" desc="45"></option>
+				<option type="int32" value="46" desc="46"></option>
+				<option type="int32" value="47" desc="47"></option>
+				<option type="int32" value="48" desc="48"></option>
+				<option type="int32" value="49" desc="49"></option>
+				<option type="int32" value="50" desc="50"></option>
+				<option type="int32" value="51" desc="51"></option>
+				<option type="int32" value="52" desc="52"></option>
+				<option type="int32" value="53" desc="53"></option>
+				<option type="int32" value="54" desc="54"></option>
+				<option type="int32" value="55" desc="55"></option>
+				<option type="int32" value="56" desc="56"></option>
+				<option type="int32" value="57" desc="57"></option>
+				<option type="int32" value="58" desc="58"></option>
+				<option type="int32" value="59" desc="59"></option>
+				<option type="int32" value="60" desc="60"></option>
+				<option type="int32" value="61" desc="61"></option>
+				<option type="int32" value="62" desc="62"></option>
+				<option type="int32" value="63" desc="63"></option>
+				<option type="int32" value="64" desc="64"></option>
+				<option type="int32" value="65" desc="65"></option>
+				<option type="int32" value="66" desc="66"></option>
+				<option type="int32" value="67" desc="67"></option>
+				<option type="int32" value="68" desc="68"></option>
+				<option type="int32" value="69" desc="69"></option>
+				<option type="int32" value="70" desc="70"></option>
+				<option type="int32" value="71" desc="71"></option>
+				<option type="int32" value="72" desc="72"></option>
+				<option type="int32" value="73" desc="73"></option>
+				<option type="int32" value="74" desc="74"></option>
+				<option type="int32" value="75" desc="75"></option>
+				<option type="int32" value="76" desc="76"></option>
+				<option type="int32" value="77" desc="77"></option>
+				<option type="int32" value="78" desc="78"></option>
+				<option type="int32" value="79" desc="79"></option>
+				<option type="int32" value="80" desc="80"></option>
 			</options>
 		</meta>
 	</device>

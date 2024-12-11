@@ -55,7 +55,7 @@
 		</meta>
 		<channel_0 stream="channel_0" case="parent-value=0">
 			<protocol flag="0x0052" at_initcan="pre">
-				<value>0</value>
+				<value>1</value>
 				<meta>
 					<type>options.int32</type>
 					<desc>协议</desc>
@@ -90,7 +90,7 @@
 				</meta>
 			</canfd_exp>
 			<canfd_abit_baud_rate flag="0x0046" at_initcan="pre">
-				<value>500000</value>
+				<value>1000000</value>
 				<meta>
 					<type>options.int32</type>
 					<desc>仲裁域波特率</desc>
@@ -495,7 +495,7 @@
 		</channel_0>
 		<channel_1 stream="channel_1" case="parent-value=1">
 			<protocol flag="0x0152" at_initcan="pre">
-				<value>0</value>
+				<value>1</value>
 				<meta>
 					<type>options.int32</type>
 					<desc>协议</desc>
@@ -530,7 +530,7 @@
 				</meta>
 			</canfd_exp>
 			<canfd_abit_baud_rate flag="0x0146" at_initcan="pre">
-				<value>500000</value>
+				<value>1000000</value>
 				<meta>
 					<type>options.int32</type>
 					<desc>仲裁域波特率</desc>

@@ -76,6 +76,8 @@
 				<option type="int32" value="77" desc="CANFDDTU-200" />
 				<option type="int32" value="78" desc="ZPSCANFD-TCP" />
 				<option type="int32" value="79" desc="ZPSCANFD-USB" />
+				<option type="int32" value="80" desc="CANFDBridge+" />
+				<option type="int32" value="81" desc="CANFDDTU-300" />
 			</options>
 		</meta>
 		<PCI5121 stream="PCI5121" case="parent-value=1">
@@ -745,5 +747,23 @@
 				</meta>
 			</include_file>
 		</ZPSCANFD-USB>
+		<CANFDBridgePlus stream="CANFDBridge+" case="parent-value=80">
+			<include_file>
+				<value>canfdbridgeplus.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANFDBridge+ config file</desc>
+				</meta>
+			</include_file>
+		</CANFDBridgePlus>		
+		<CANFDDTU-300 stream="CANFDDTU-300" case="parent-value=81">
+			<include_file>
+				<value>canfddtu-300.xml</value>
+				<meta>
+					<type>string</type>
+					<desc>CANFDDTU-300 config file</desc>
+				</meta>
+			</include_file>
+		</CANFDDTU-300>		
 	</DeviceType>
 </info>
