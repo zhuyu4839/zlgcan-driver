@@ -29,6 +29,7 @@
      * (相对运行脚本)`zcan.env`文件指定`library`示例:
      ```shell
      ├─main.py
+     ├─zcan.env
      └─library
        ├─linux
        │  └─x86_64
