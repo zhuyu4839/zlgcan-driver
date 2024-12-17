@@ -36,7 +36,7 @@
 2. 安装zlgcan-driver-py(不建议使用低于0.1.10版本)
 
     ```shell
-    pip install zlgcan-driver-py >= 0.1.10
+    pip install zlgcan >= 0.1.10
 
 3. 使用:
    ```python
