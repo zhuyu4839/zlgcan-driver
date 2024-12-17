@@ -3,7 +3,7 @@
 1. 准备
     * 确保安装相关驱动(USBCAN-I/II驱动得额外安装)
     * 确保安装相[VC++运行环境](https://manual.zlg.cn/web/#/152?page_id=5332)
-    * 将[library](https://github.com/zhuyu4839/zlgcan-driver/tree/rust-dev/library)文件夹及[bitrate.cfg.yaml](https://github.com/zhuyu4839/zlgcan-driver/blob/rust-dev/library/bitrate.cfg.yaml)文件拷贝到当目录(v0.1.5前版本)
+    * 下载[library](https://github.com/zhuyu4839/zlgcan-driver/tree/rust-dev/library)文件夹(里面包含[bitrate.cfg.yaml](https://github.com/zhuyu4839/zlgcan-driver/blob/rust-dev/library/bitrate.cfg.yaml))
     * 在当前工程目录下(相对运行脚本)新建一个`zcan.env`文件, 中间配置`ZCAN_LIBRARY`环境变量(相对路径/绝对路径),否则使用默认(相对运行脚本)路径:
         * 默认(相对运行脚本)路径文件夹内容示例:
       ```shell
