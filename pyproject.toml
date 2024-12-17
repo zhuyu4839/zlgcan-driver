@@ -3,7 +3,7 @@ requires = ["maturin>=1.5,<2.0"]
 build-backend = "maturin"
 
 [project]
-name = "zlgcan-driver-py"
+name = "zlgcan"
 requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Rust",
@@ -27,4 +27,7 @@ zlgcan = "zlgcan.zlgcan:ZCanBus"
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
-python = ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+include = [
+    "zlgcan/*.py"
+]
