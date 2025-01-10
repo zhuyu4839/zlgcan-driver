@@ -168,7 +168,7 @@ impl ZCanMessagePy {
         let is_extended_id: bool = py_message.getattr("is_extended_id")?.extract()?;
         let is_remote_frame: bool = py_message.getattr("is_remote_frame")?.extract()?;
         let is_error_frame: bool = py_message.getattr("is_error_frame")?.extract()?;
-        let channel: Option<u8> = match py_message.getattr("channel")?.extract()?;
+        let channel: Option<u8> = py_message.getattr("channel")?.extract()?;
         let data: Vec<u8> = py_message.getattr("data")?.extract()?;
         let is_fd: bool = py_message.getattr("is_fd")?.extract()?;
         let is_rx: bool = py_message.getattr("is_rx")?.extract()?;
