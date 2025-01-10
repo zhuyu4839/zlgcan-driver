@@ -1,0 +1,14 @@
+pub static TIMESTAMP: &'static str = "timestamp";
+pub static ARBITRATION_ID: &'static str = "arbitration_id";
+pub static IS_EFF: &'static str = "is_extended_id";             /* extended frame format (EFF) */
+pub static IS_RTR: &'static str = "is_remote_frame";            /* remote transmission request */
+pub static IS_ERR: &'static str = "is_error_frame";             /* error message frame */
+pub static CHANNEL: &'static str = "channel";
+pub static DLC: &'static str = "dlc";
+pub static DATA: &'static str = "data";
+pub static IS_CAN_FD: &'static str = "is_fd";
+pub static IS_RX: &'static str = "is_rx";
+pub static IS_BRS: &'static str = "bitrate_switch";
+pub static IS_ESI: &'static str = "error_state_indicator";
+pub static PYTHON_CAN: &'static str = "can";
+pub static PYTHON_CAN_MESSAGE: &'static str = "Message";
