@@ -76,7 +76,7 @@ pub struct ZCanMessagePy {
     is_extended_id: bool,
     is_remote_frame: bool,
     is_error_frame: bool,
-    channel: u8,
+    channel: Option<u8>,
     data: Vec<u8>,
     is_fd: bool,
     is_rx: bool,
@@ -96,7 +96,7 @@ impl From<CanMessage> for ZCanMessagePy {
             is_extended_id,
             is_remote_frame: value.is_remote(),
             is_error_frame: value.is_error_frame(),
-            channel: value.channel(),
+            channel: Some(value.channel()),
             data,
             is_fd: value.is_can_fd(),
             is_rx: match value.direct() {
@@ -128,7 +128,7 @@ impl TryInto<CanMessage> for ZCanMessagePy {
         }.ok_or(PyErr::new::<exceptions::PyRuntimeError, String>("Can't new CAN message".into()))?;
         msg.set_timestamp(None)
             .set_direct(if self.is_rx { Direct::Receive } else { Direct::Transmit })
-            .set_channel(self.channel)
+            .set_channel(self.channel.unwrap_or(0))
             .set_tx_mode(self.tx_mode)
             .set_can_fd(self.is_fd)
             .set_bitrate_switch(self.bitrate_switch)
@@ -152,7 +152,7 @@ impl ZCanMessagePy {
         kwargs.set_item("is_error_frame", self.is_error_frame)?;
         kwargs.set_item("channel", self.channel)?;
         kwargs.set_item("dlc", self.data.len())?;
-        kwargs.set_item("channel", self.channel)?;
+        // kwargs.set_item("channel", self.channel)?;
         kwargs.set_item("data", self.data.clone())?;
         kwargs.set_item("is_fd", self.is_fd)?;
         kwargs.set_item("is_rx", self.is_rx)?;
@@ -182,7 +182,7 @@ impl ZCanMessagePy {
             is_extended_id,
             is_remote_frame,
             is_error_frame,
-            channel,
+            channel: Some(channel),
             data,
             is_fd,
             is_rx,
