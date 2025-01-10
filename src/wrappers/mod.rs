@@ -1,8 +1,10 @@
+mod constants;
+use constants::*;
+
 use std::sync::{Arc, Mutex};
-use pyo3::{exceptions, prelude::*, pyclass, pymethods, types::PyDict, Bound, PyAny, PyErr, PyResult, Python};
+use pyo3::{exceptions, prelude::*, types::PyDict};
 use rs_can::{Direct, Frame, Id};
 use zlgcan::{can::{CanChlCfg, CanChlCfgExt, CanChlCfgFactory, CanMessage}, device::DeriveInfo, driver::ZCanDriver};
-use crate::constants::*;
 
 #[pyclass]
 #[derive(Default, Clone)]
