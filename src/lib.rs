@@ -150,9 +150,8 @@ impl ZCanMessagePy {
         kwargs.set_item("is_extended_id", self.is_extended_id)?;
         kwargs.set_item("is_remote_frame", self.is_remote_frame)?;
         kwargs.set_item("is_error_frame", self.is_error_frame)?;
-        kwargs.set_item("channel", self.channel)?;
+        kwargs.set_item("channel", self.channel.unwrap_or(0))?;
         kwargs.set_item("dlc", self.data.len())?;
-        // kwargs.set_item("channel", self.channel)?;
         kwargs.set_item("data", self.data.clone())?;
         kwargs.set_item("is_fd", self.is_fd)?;
         kwargs.set_item("is_rx", self.is_rx)?;
@@ -169,7 +168,7 @@ impl ZCanMessagePy {
         let is_extended_id: bool = py_message.getattr("is_extended_id")?.extract()?;
         let is_remote_frame: bool = py_message.getattr("is_remote_frame")?.extract()?;
         let is_error_frame: bool = py_message.getattr("is_error_frame")?.extract()?;
-        let channel: u8 = py_message.getattr("channel")?.extract()?;
+        let channel: Option<u8> = match py_message.getattr("channel")?.extract()?;
         let data: Vec<u8> = py_message.getattr("data")?.extract()?;
         let is_fd: bool = py_message.getattr("is_fd")?.extract()?;
         let is_rx: bool = py_message.getattr("is_rx")?.extract()?;
@@ -182,7 +181,7 @@ impl ZCanMessagePy {
             is_extended_id,
             is_remote_frame,
             is_error_frame,
-            channel: Some(channel),
+            channel,
             data,
             is_fd,
             is_rx,
