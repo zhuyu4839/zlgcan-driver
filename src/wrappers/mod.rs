@@ -150,7 +150,7 @@ impl TryInto<CanMessage> for ZCanMessagePy {
     type Error = PyErr;
 
     fn try_into(self) -> Result<CanMessage, Self::Error> {
-        let mut msg = if self.is_error_frame {
+        let mut msg = if self.is_remote_frame {
             CanMessage::new_remote(
                 Id::from_bits(self.arbitration_id, false),
                 self.data.len(),
@@ -158,7 +158,7 @@ impl TryInto<CanMessage> for ZCanMessagePy {
         }
         else {
             CanMessage::new(
-                Id::from_bits(self.arbitration_id, false),
+                Id::from_bits(self.arbitration_id, true),
                 self.data.as_slice(),
             )
         }.ok_or(PyErr::new::<exceptions::PyRuntimeError, String>("Can't new CAN message".into()))?;
