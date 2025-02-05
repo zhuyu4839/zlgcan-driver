@@ -157,10 +157,18 @@ impl TryInto<CanMessage> for ZCanMessagePy {
             )
         }
         else {
-            CanMessage::new(
-                Id::from_bits(self.arbitration_id, true),
-                self.data.as_slice(),
-            )
+            if self.is_extended_id {
+                CanMessage::new(
+                    Id::new_extended(self.arbitration_id),
+                    self.data.as_slice(),
+                )
+            }
+            else {
+                CanMessage::new(
+                    Id::new_standard(self.arbitration_id),
+                    self.data.as_slice(),
+                )
+            }
         }.ok_or(PyErr::new::<exceptions::PyRuntimeError, String>("Can't new CAN message".into()))?;
         msg.set_timestamp(None)
             .set_direct(if self.is_rx { Direct::Receive } else { Direct::Transmit })
