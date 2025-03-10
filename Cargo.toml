@@ -9,12 +9,12 @@ name = "zlgcan_driver_py"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = "0.23"
+pyo3 = "0.24"
 #iso15765-2 = { version = "0.1.0-alpha0" }
 #iso14229-1 = { version = "0.1.0-alpha0" }
 #docan = { version = "0.1.0-alpha0" }
-rs-can = { git = "https://github.com/zhuyu4839/ecu-proto-rs.git", branch = "develop", package = "rs-can" }
-zlgcan = { git = "https://github.com/zhuyu4839/ecu-proto-rs.git", branch = "develop", package = "zlgcan" }
+rs-can = { git = "https://github.com/zhuyu4839/rust-can.git", branch = "develop", package = "rs-can" }
+zlgcan = { git = "https://github.com/zhuyu4839/rust-can.git", branch = "develop", package = "zlgcan" }
 
 [dev-dependencies]
 anyhow = "1"

@@ -3,7 +3,7 @@ use constants::*;
 
 use std::sync::{Arc, Mutex};
 use pyo3::{exceptions, prelude::*, types::PyDict};
-use rs_can::{Direct, Frame, Id};
+use rs_can::{CanDirect, CanFrame, CanId};
 use zlgcan::{can::{CanChlCfg, CanChlCfgExt, CanChlCfgFactory, CanMessage}, device::DeriveInfo, driver::ZCanDriver};
 
 #[pyclass]
@@ -136,8 +136,8 @@ impl From<CanMessage> for ZCanMessagePy {
             data,
             is_fd: value.is_can_fd(),
             is_rx: match value.direct() {
-                Direct::Transmit => false,
-                Direct::Receive => true,
+                CanDirect::Transmit => false,
+                CanDirect::Receive => true,
             },
             bitrate_switch: value.is_bitrate_switch(),
             error_state_indicator: value.is_error_frame(),
@@ -151,27 +151,13 @@ impl TryInto<CanMessage> for ZCanMessagePy {
 
     fn try_into(self) -> Result<CanMessage, Self::Error> {
         let mut msg = if self.is_remote_frame {
-            CanMessage::new_remote(
-                Id::from_bits(self.arbitration_id, false),
-                self.data.len(),
-            )
+            CanMessage::new_remote(CanId::from(self.arbitration_id), self.data.len())
         }
         else {
-            if self.is_extended_id {
-                CanMessage::new(
-                    Id::new_extended(self.arbitration_id),
-                    self.data.as_slice(),
-                )
-            }
-            else {
-                CanMessage::new(
-                    Id::new_standard(self.arbitration_id),
-                    self.data.as_slice(),
-                )
-            }
+            CanMessage::new(CanId::from(self.arbitration_id), self.data.as_slice())
         }.ok_or(PyErr::new::<exceptions::PyRuntimeError, String>("Can't new CAN message".into()))?;
         msg.set_timestamp(None)
-            .set_direct(if self.is_rx { Direct::Receive } else { Direct::Transmit })
+            .set_direct(if self.is_rx { CanDirect::Receive } else { CanDirect::Transmit })
             .set_channel(self.channel)
             .set_tx_mode(self.tx_mode)
             .set_can_fd(self.is_fd)

@@ -2,7 +2,7 @@ pub(crate) mod wrappers;
 
 use std::sync::{Arc, Mutex};
 use pyo3::{exceptions, prelude::*};
-use rs_can::Frame;
+use rs_can::CanFrame;
 use zlgcan::{can::{CanChlCfgFactory, CanMessage, ZCanFrameType}, driver::{ZCanDriver, ZDevice}};
 use crate::wrappers::{ZCanChlCfgFactoryWrap, ZCanChlCfgPy, ZCanDriverWrap, ZCanMessagePy, ZDeriveInfoPy};
 

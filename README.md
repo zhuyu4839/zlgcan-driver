@@ -72,7 +72,7 @@
    * 其他CANFD类型的CAN卡仅仅在Linux上使用时`bitrate.cfg.yaml`中配置
      * 此时计算相关值可以通过`ZCANPRO`软件
    * 在Linux上使用ZCAN_USBCAN1衍生CAN卡时, 请在初始化时候设置`ZCanDeriveInfo`信息
-   * 该库主要依赖[ecu-proto-rs](https://github.com/zhuyu4839/ecu-proto-rs),如有问题,请提[issue](https://github.com/zhuyu4839/ecu-proto-rs/issues/new)
+   * 该库主要依赖[rust-can](https://github.com/zhuyu4839/rust-can),如有问题,请提[issue](https://github.com/zhuyu4839/rust-can/issues/new)
 
 6. 官方工具及文档:
    * [工具下载](https://zlg.cn/can/down/down/id/22.html)
