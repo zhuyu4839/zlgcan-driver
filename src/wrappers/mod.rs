@@ -3,8 +3,12 @@ use constants::*;
 
 use std::sync::{Arc, Mutex};
 use pyo3::{exceptions, prelude::*, types::PyDict};
-use rs_can::{CanDirect, CanFrame, CanId};
-use zlgcan::{can::{CanChlCfg, CanChlCfgExt, CanChlCfgFactory, CanMessage}, device::DeriveInfo, driver::ZCanDriver};
+use rs_can::{CanDirect, CanFrame, CanId, CanType};
+use zlgcan_rs::{
+    can::{CanChlCfg, CanChlCfgExt, CanChlCfgFactory, CanMessage},
+    device::DeriveInfo,
+    driver::ZCanDriver
+};
 
 #[pyclass]
 #[derive(Default, Clone)]
@@ -122,26 +126,26 @@ pub struct ZCanMessagePy {
 }
 
 impl From<CanMessage> for ZCanMessagePy {
-    fn from(value: CanMessage) -> Self {
-        let data = Vec::from(value.data());
-        let id = value.id();
+    fn from(msg: CanMessage) -> Self {
+        let data = Vec::from(msg.data());
+        let id = msg.id();
         let is_extended_id = id.is_extended();
         ZCanMessagePy {
-            timestamp: value.timestamp(),
+            timestamp: msg.timestamp(),
             arbitration_id: id.as_raw(),
             is_extended_id,
-            is_remote_frame: value.is_remote(),
-            is_error_frame: value.is_error_frame(),
-            channel: value.channel(),
+            is_remote_frame: msg.is_remote(),
+            is_error_frame: msg.is_error_frame(),
+            channel: msg.channel(),
             data,
-            is_fd: value.is_can_fd(),
-            is_rx: match value.direct() {
+            is_fd: matches!(msg.can_type(), CanType::CanFd),
+            is_rx: match msg.direct() {
                 CanDirect::Transmit => false,
                 CanDirect::Receive => true,
             },
-            bitrate_switch: value.is_bitrate_switch(),
-            error_state_indicator: value.is_error_frame(),
-            tx_mode: value.tx_mode(),
+            bitrate_switch: msg.is_bitrate_switch(),
+            error_state_indicator: msg.is_error_frame(),
+            tx_mode: msg.tx_mode(),
         }
     }
 }
@@ -160,7 +164,7 @@ impl TryInto<CanMessage> for ZCanMessagePy {
             .set_direct(if self.is_rx { CanDirect::Receive } else { CanDirect::Transmit })
             .set_channel(self.channel)
             .set_tx_mode(self.tx_mode)
-            .set_can_fd(self.is_fd)
+            .set_can_type(if self.is_fd { CanType::CanFd } else { CanType::Can })
             .set_bitrate_switch(self.bitrate_switch)
             .set_esi(self.error_state_indicator)
             .set_error_frame(self.is_error_frame);

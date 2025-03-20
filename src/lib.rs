@@ -2,8 +2,11 @@ pub(crate) mod wrappers;
 
 use std::sync::{Arc, Mutex};
 use pyo3::{exceptions, prelude::*};
-use rs_can::CanFrame;
-use zlgcan::{can::{CanChlCfgFactory, CanMessage, ZCanFrameType}, driver::{ZCanDriver, ZDevice}};
+use rs_can::{CanError, CanFrame, CanType};
+use zlgcan_rs::{
+    can::{CanChlCfgFactory, CanMessage, ZCanFrameType},
+    driver::{ZCanDriver, ZDevice}
+};
 use crate::wrappers::{ZCanChlCfgFactoryWrap, ZCanChlCfgPy, ZCanDriverWrap, ZCanMessagePy, ZDeriveInfoPy};
 
 #[pyfunction]
@@ -89,13 +92,12 @@ fn zlgcan_send(
     let device = device.inner.lock()
         .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?;
     let message: CanMessage = msg.try_into()?;
-    if message.is_can_fd() {
-        device.transmit_canfd(message.channel(), vec![message, ])
-            .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))
-    }
-    else {
-        device.transmit_can(message.channel(), vec![message, ])
-            .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))
+    match message.can_type() {
+        CanType::Can => device.transmit_can(message.channel(), vec![message, ])
+            .map_err(|e| exceptions::PyValueError::new_err(e.to_string())),
+        CanType::CanFd => device.transmit_canfd(message.channel(), vec![message, ])
+            .map_err(|e| exceptions::PyValueError::new_err(e.to_string())),
+        CanType::CanXl => Err(exceptions::PyValueError::new_err(CanError::NotSupportedError.to_string())),
     }
 }
 
@@ -173,8 +175,10 @@ fn zlgcan_driver_py(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 #[cfg(test)]
 mod tests {
     use std::time::Instant;
-    use zlgcan::can::{ZCanChlMode, ZCanChlType};
-    use zlgcan::device::ZCanDeviceType;
+    use zlgcan_rs::{
+        can::{ZCanChlMode, ZCanChlType},
+        device::ZCanDeviceType,
+    };
     use super::*;
 
     #[test]
