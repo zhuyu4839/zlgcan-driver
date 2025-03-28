@@ -1,6 +1,6 @@
 [package]
 name = "zlgcan-driver"
-version = "0.1.15"
+version = "0.1.16"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -13,8 +13,8 @@ pyo3 = "0.24"
 #iso15765-2 = { version = "0.1.0-alpha0" }
 #iso14229-1 = { version = "0.1.0-alpha0" }
 #docan = { version = "0.1.0-alpha0" }
-rs-can = { version = "0.2.0-alpha0" }
-zlgcan = { version = "0.2.0-alpha0" }
+rs-can = { version = "0.2.0-alpha4" }
+zlgcan = { version = "0.2.0-alpha4" }
 
 [dev-dependencies]
 anyhow = "1"

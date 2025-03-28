@@ -2,12 +2,14 @@ pub(crate) mod wrappers;
 
 use std::sync::{Arc, Mutex};
 use pyo3::{exceptions, prelude::*};
-use rs_can::{CanError, CanFrame, CanType};
+use rs_can::{CanError, CanFrame, CanType, ChannelConfig, DeviceBuilder, interfaces::ZLGCAN};
 use zlgcan_rs::{
-    can::{CanChlCfgFactory, CanMessage, ZCanFrameType},
-    driver::{ZCanDriver, ZDevice}
+    can::{CanMessage, ZCanFrameType},
+    device::DeriveInfo,
+    driver::{ZCanDriver, ZDevice},
+    ACC_CODE, ACC_MASK, BRP, CHANNEL_MODE, CHANNEL_TYPE, DERIVE_INFO, DEVICE_INDEX, DEVICE_TYPE, FILTER_TYPE
 };
-use crate::wrappers::{ZCanChlCfgFactoryWrap, ZCanChlCfgPy, ZCanDriverWrap, ZCanMessagePy, ZDeriveInfoPy};
+use crate::wrappers::{ZCanChlCfgPy, ZCanDriverWrap, ZCanMessagePy, ZDeriveInfoPy};
 
 #[pyfunction]
 fn convert_to_python<'py>(py: Python<'py>, rust_message: ZCanMessagePy) -> PyResult<Bound<'py, PyAny>> {
@@ -21,26 +23,35 @@ fn convert_from_python<'py>(py: Python<'py>, py_message: &Bound<'py, PyAny>) -> 
 }
 
 #[pyfunction]
-fn zlgcan_cfg_factory_can() -> PyResult<ZCanChlCfgFactoryWrap> {
-    let factory = CanChlCfgFactory::new()
-        .map_err(|e| PyErr::new::<exceptions::PyRuntimeError, String>(e.to_string()))?;
-    Ok(ZCanChlCfgFactoryWrap { inner: Arc::new(factory) })
-}
-
-#[pyfunction]
-#[pyo3(signature = (dev_type, dev_idx, derive=None))]
-fn zlgcan_open(
+fn zlgcan_init_can(
     dev_type: u32,
     dev_idx: u32,
-    derive: Option<ZDeriveInfoPy>
+    cfgs: Vec<ZCanChlCfgPy>,
+    derive_info: Option<ZDeriveInfoPy>,
 ) -> PyResult<ZCanDriverWrap> {
-    let derive_info = match derive {
-        Some(v) => Some(v.into()),
-        None => None,
-    };
-    let mut device = ZCanDriver::new(dev_type, dev_idx, derive_info)
-        .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?;
-    device.open()
+    let mut builder = DeviceBuilder::new(ZLGCAN);
+    builder.add_other(DEVICE_TYPE, Box::new(dev_type))
+        .add_other(DEVICE_INDEX, Box::new(dev_idx));
+    derive_info.map(
+        |info| builder.add_other(DERIVE_INFO, Box::<DeriveInfo>::new(info.into()))
+    );
+
+    for (i, cfg) in cfgs.into_iter().enumerate() {
+        let mut c = ChannelConfig::new(cfg.bitrate);
+        c.add_other(CHANNEL_TYPE, Box::new(cfg.chl_type))
+            .add_other(CHANNEL_MODE, Box::new(cfg.chl_mode));
+
+        cfg.dbitrate.map(|dbitrate| c.set_data_bitrate(dbitrate));
+        cfg.resistance.map(|resistance| c.set_resistance(resistance));
+        cfg.filter.map(|filter| c.add_other(FILTER_TYPE, Box::new(filter)));
+        cfg.acc_code.map(|acc_code| c.add_other(ACC_CODE, Box::new(acc_code)));
+        cfg.acc_mask.map(|acc_mask| c.add_other(ACC_MASK, Box::new(acc_mask)));
+        cfg.brp.map(|brp| c.add_other(BRP, Box::new(brp)));
+
+        builder.add_config(i.to_string(), c);
+    }
+
+    let device: ZCanDriver = builder.build()
         .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?;
 
     Ok(ZCanDriverWrap { inner: Arc::new(Mutex::new(device)) })
@@ -55,22 +66,6 @@ fn zlgcan_device_info(device: &ZCanDriverWrap) -> PyResult<String> {
             .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?
             .to_string()
     )
-}
-
-#[pyfunction]
-fn zlgcan_init_can(
-    device: &ZCanDriverWrap,
-    factory: ZCanChlCfgFactoryWrap,
-    cfg: Vec<ZCanChlCfgPy>
-) -> PyResult<()> {
-    let mut device = device.inner.lock()
-        .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?;
-    let cfg = cfg.into_iter()
-        .map(|c| c.try_convert(&factory))
-        .collect::<Result<Vec<_>, _>>()
-        .map_err(|e| e)?;
-    device.init_can_chl(cfg)
-        .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))
 }
 
 #[pyfunction]
@@ -148,22 +143,20 @@ fn set_message_mode(msg: &mut ZCanMessagePy, mode: u8) {
     msg.tx_mode = mode;
 }
 
+// 此方法名必须与Cargo.toml-[lib]配置下name保持一致
 #[pymodule]
-fn zlgcan_driver_py(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn zlgcan_driver(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<ZCanChlCfgPy>()?;
     m.add_class::<ZCanMessagePy>()?;
     m.add_class::<ZDeriveInfoPy>()?;
-    m.add_class::<ZCanChlCfgFactoryWrap>()?;
     m.add_class::<ZCanDriverWrap>()?;
 
     m.add_function(wrap_pyfunction!(convert_to_python, m)?)?;
     m.add_function(wrap_pyfunction!(convert_from_python, m)?)?;
     m.add_function(wrap_pyfunction!(set_message_mode, m)?)?;
 
-    m.add_function(wrap_pyfunction!(zlgcan_cfg_factory_can, m)?)?;
-    m.add_function(wrap_pyfunction!(zlgcan_open, m)?)?;
-    m.add_function(wrap_pyfunction!(zlgcan_device_info, m)?)?;
     m.add_function(wrap_pyfunction!(zlgcan_init_can, m)?)?;
+    m.add_function(wrap_pyfunction!(zlgcan_device_info, m)?)?;
     m.add_function(wrap_pyfunction!(zlgcan_clear_can_buffer, m)?)?;
     m.add_function(wrap_pyfunction!(zlgcan_send, m)?)?;
     m.add_function(wrap_pyfunction!(zlgcan_recv, m)?)?;
@@ -185,14 +178,9 @@ mod tests {
     fn test_receive() -> anyhow::Result<()> {
         pyo3::prepare_freethreaded_python();
 
-        let cfg_fct = zlgcan_cfg_factory_can()?;
-        let device = zlgcan_open(ZCanDeviceType::ZCAN_USBCANFD_200U as u32, 0, None)?;
-
-        let dev_info = zlgcan_device_info(&device)?;
-        println!("{}", dev_info);
-
+        let dev_type = ZCanDeviceType::ZCAN_USBCANFD_200U as u32;
+        let dev_idx = 0;
         let cfg = ZCanChlCfgPy::new(
-            ZCanDeviceType::ZCAN_USBCANFD_200U as u32,
             ZCanChlType::CANFD_ISO as u8,
             ZCanChlMode::Normal as u8,
             500_000,
@@ -203,7 +191,10 @@ mod tests {
             None,
             None,
         );
-        zlgcan_init_can(&device, cfg_fct, vec![cfg, ])?;
+
+        let device = zlgcan_init_can(dev_type, dev_idx, vec![cfg, ], None)?;
+        let dev_info = zlgcan_device_info(&device)?;
+        println!("{}", dev_info);
         std::thread::sleep(std::time::Duration::from_secs(1));
 
         let start = Instant::now();

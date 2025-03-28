@@ -5,7 +5,7 @@ use std::sync::{Arc, Mutex};
 use pyo3::{exceptions, prelude::*, types::PyDict};
 use rs_can::{CanDirect, CanFrame, CanId, CanType};
 use zlgcan_rs::{
-    can::{CanChlCfg, CanChlCfgExt, CanChlCfgFactory, CanMessage},
+    can::CanMessage,
     device::DeriveInfo,
     driver::ZCanDriver
 };
@@ -33,12 +33,6 @@ impl Into<DeriveInfo> for ZDeriveInfoPy {
 
 #[pyclass]
 #[derive(Clone)]
-pub struct ZCanChlCfgFactoryWrap {
-    pub(crate) inner: Arc<CanChlCfgFactory>
-}
-
-#[pyclass]
-#[derive(Clone)]
 pub struct ZCanDriverWrap {
     pub(crate) inner: Arc<Mutex<ZCanDriver>>,
 }
@@ -46,24 +40,22 @@ pub struct ZCanDriverWrap {
 #[pyclass]
 #[derive(Clone)]
 pub struct ZCanChlCfgPy {
-    dev_type: u32,
-    chl_type: u8,
-    chl_mode: u8,
-    bitrate: u32,
-    filter: Option<u8>,
-    dbitrate: Option<u32>,
-    resistance: Option<bool>,
-    acc_code: Option<u32>,
-    acc_mask: Option<u32>,
-    brp: Option<u32>,
+    pub(crate) chl_type: u8,
+    pub(crate) chl_mode: u8,
+    pub(crate) bitrate: u32,
+    pub(crate) filter: Option<u8>,
+    pub(crate) dbitrate: Option<u32>,
+    pub(crate) resistance: Option<bool>,
+    pub(crate) acc_code: Option<u32>,
+    pub(crate) acc_mask: Option<u32>,
+    pub(crate) brp: Option<u32>,
 }
 
 #[pymethods]
 impl ZCanChlCfgPy {
     #[new]
-    #[pyo3(signature = (dev_type, chl_type, chl_mode, bitrate, filter=None, dbitrate=None, resistance=None, acc_code=None, acc_mask=None, brp=None))]
+    #[pyo3(signature = (chl_type, chl_mode, bitrate, filter=None, dbitrate=None, resistance=None, acc_code=None, acc_mask=None, brp=None))]
     pub fn new(
-        dev_type: u32,
         chl_type: u8,
         chl_mode: u8,
         bitrate: u32,
@@ -75,7 +67,6 @@ impl ZCanChlCfgPy {
         brp: Option<u32>,
     ) -> Self {
         ZCanChlCfgPy {
-            dev_type,
             chl_type,
             chl_mode,
             bitrate,
@@ -86,25 +77,6 @@ impl ZCanChlCfgPy {
             acc_mask,
             brp,
         }
-    }
-}
-
-impl ZCanChlCfgPy {
-    pub fn try_convert(&self, factory: &ZCanChlCfgFactoryWrap) -> PyResult<CanChlCfg> {
-        factory.inner.new_can_chl_cfg(
-            self.dev_type,
-            self.chl_type,
-            self.chl_mode,
-            self.bitrate,
-            CanChlCfgExt::new(
-                self.filter,
-                self.dbitrate,
-                self.resistance,
-                self.acc_code,
-                self.acc_mask,
-                self.brp
-            )
-        ).map_err(|e| exceptions::PyValueError::new_err(e.to_string()))
     }
 }
 

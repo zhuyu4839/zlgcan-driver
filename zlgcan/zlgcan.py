@@ -11,8 +11,8 @@ from can.bus import LOG
 
 from typing import Optional, Union, Sequence, Deque, Tuple, List, Dict
 try:
-    from zlgcan_driver_py import ZCanChlCfgPy, ZCanMessagePy, ZDeriveInfoPy, ZCanChlCfgFactoryWrap, ZCanDriverWrap, \
-        convert_to_python, convert_from_python, set_message_mode, zlgcan_cfg_factory_can, zlgcan_open, \
+    from zlgcan_driver import ZCanChlCfgPy, ZCanMessagePy, ZDeriveInfoPy, ZCanDriverWrap, \
+        convert_to_python, convert_from_python, set_message_mode, \
         zlgcan_device_info, zlgcan_init_can, zlgcan_clear_can_buffer, zlgcan_send, zlgcan_recv, zlgcan_close
 except ModuleNotFoundError:
     import sys
@@ -20,7 +20,7 @@ except ModuleNotFoundError:
     _system_bit, _ = platform.architecture()
     _platform = sys.platform
     not_support = CanError(f"The system {_platform}'.'{_system_bit} is not supported!")
-    require_lib = CanError("Please install library `zlgcan-driver-py`!")
+    require_lib = CanError("Please install library `zlgcan-driver`!")
     raise {
         "win32": {"32bit": not_support}.get(_system_bit, require_lib),
         "darwin": not_support,
@@ -161,20 +161,12 @@ class ZCanBus(can.BusABC):
             )  # type: Deque[can.Message]               # channel, raw_msg
             self.channels = []
 
-            factory = zlgcan_cfg_factory_can()
-            self.device = zlgcan_open(device_type, device_index, derive)
-
-            self.dev_info = zlgcan_device_info(self.device)
-            if self.dev_info is not None:
-                LOG.info(f"Device: {self.dev_info} has opened")
-
             cfg_list = []
             for idx, cfg in enumerate(configs):
                 bitrate = cfg.get("bitrate", None)
                 dbitrate = cfg.get("dbitrate", None)
                 assert bitrate is not None, "bitrate is required!"
                 _cfg = ZCanChlCfgPy(
-                    dev_type=device_type,
                     chl_type=cfg.get("chl_type", ZCanChlType.CANFD_ISO if dbitrate else ZCanChlType.CAN),
                     chl_mode=cfg.get("chl_mode", 0),
                     bitrate=bitrate,
@@ -188,7 +180,11 @@ class ZCanBus(can.BusABC):
                 cfg_list.append(_cfg)
                 self.channels.append(idx)
 
-            zlgcan_init_can(self.device, factory, cfg_list)
+            self.device = zlgcan_init_can(device_type, device_index, cfg_list, derive)
+
+            self.dev_info = zlgcan_device_info(self.device)
+            if self.dev_info is not None:
+                LOG.info(f"Device: {self.dev_info} has opened")
         except Exception as e:
             self.shutdown()
             raise e

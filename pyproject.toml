@@ -15,7 +15,7 @@ dependencies = [
 ]
 dynamic = ["version"]
 description = "Python wrapper for zlgcan driver."
-authors = [{ name = "Smith Jesse" }]
+authors = [{ name = "Jesse Smith" }]
 license = { text = "LGPL v3" }
 
 [project.urls]
