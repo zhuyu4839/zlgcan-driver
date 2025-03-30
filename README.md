@@ -1,3 +1,6 @@
+![PyPI Downloads](https://static.pepy.tech/badge/zlgcan)
+![PyPI Downloads](https://static.pepy.tech/badge/zlgcan/month)
+
 # ZLGCAN驱动及集成到python-can(因内存模型不同，目前Windows下32位python会报内存非法访问的错误)
 
 1. 准备
