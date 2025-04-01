@@ -2,7 +2,7 @@ pub(crate) mod wrappers;
 
 use std::sync::{Arc, Mutex};
 use pyo3::{exceptions, prelude::*};
-use rs_can::{CanError, CanFrame, CanType, ChannelConfig, DeviceBuilder, interfaces::ZLGCAN};
+use rs_can::{CanError, CanFrame, CanType, ChannelConfig, DeviceBuilder};
 use zlgcan_rs::{
     can::{CanMessage, ZCanFrameType},
     device::DeriveInfo,
@@ -29,7 +29,7 @@ fn zlgcan_init_can(
     cfgs: Vec<ZCanChlCfgPy>,
     derive_info: Option<ZDeriveInfoPy>,
 ) -> PyResult<ZCanDriverWrap> {
-    let mut builder = DeviceBuilder::new(ZLGCAN);
+    let mut builder = DeviceBuilder::new();
     builder.add_other(DEVICE_TYPE, Box::new(dev_type))
         .add_other(DEVICE_INDEX, Box::new(dev_idx));
     derive_info.map(
