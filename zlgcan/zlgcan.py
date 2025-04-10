@@ -131,6 +131,7 @@ class ZCanBus(can.BusABC):
 
     def __init__(self,
                  channel: Union[int, Sequence[int], str] = None, *,
+                 libpath: str = "library/",
                  device_type: int,
                  device_index: int = 0,
                  derive: ZDeriveInfoPy = None,
@@ -142,6 +143,7 @@ class ZCanBus(can.BusABC):
         Constructor
 
         :param channel: Not used(from super).
+        :param libpath: The library root path.
         :param device_type: The device type that your device belongs, see `ZCANDeviceType`.
         :param device_index: The device index.
         :param derive: The deriver info for specifying the channels and canfd supported if your device is not official.
@@ -180,7 +182,7 @@ class ZCanBus(can.BusABC):
                 cfg_list.append(_cfg)
                 self.channels.append(idx)
 
-            self.device = zlgcan_init_can(device_type, device_index, cfg_list, derive)
+            self.device = zlgcan_init_can(libpath, device_type, device_index, cfg_list, derive)
 
             self.dev_info = zlgcan_device_info(self.device)
             if self.dev_info is not None:
@@ -235,7 +237,9 @@ class ZCanBus(can.BusABC):
 
 
 if __name__ == '__main__':
-    with ZCanBus(interface="zlgcan", device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
+    with ZCanBus(interface="zlgcan",
+                 libpath="../../../RustProjects/rust-can/zlgcan/library",
+                 device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
                  configs=[{'bitrate': 500000, 'dbitrate': 1_000_000, 'resistance': 1}]) as bus:
         # bus.send(can.Message(
         #     arbitration_id=0x7DF,

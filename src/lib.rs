@@ -3,12 +3,7 @@ pub(crate) mod wrappers;
 use std::sync::{Arc, Mutex};
 use pyo3::{exceptions, prelude::*};
 use rs_can::{CanError, CanFrame, CanType, ChannelConfig, DeviceBuilder};
-use zlgcan_rs::{
-    can::{CanMessage, ZCanFrameType},
-    device::DeriveInfo,
-    driver::{ZCanDriver, ZDevice},
-    ACC_CODE, ACC_MASK, BRP, CHANNEL_MODE, CHANNEL_TYPE, DERIVE_INFO, DEVICE_INDEX, DEVICE_TYPE, FILTER_TYPE
-};
+use zlgcan_rs::{can::{CanMessage, ZCanFrameType}, device::DeriveInfo, driver::{ZCanDriver, ZDevice}, ACC_CODE, ACC_MASK, BRP, CHANNEL_MODE, CHANNEL_TYPE, DERIVE_INFO, DEVICE_INDEX, DEVICE_TYPE, FILTER_TYPE, LIBPATH};
 use crate::wrappers::{ZCanChlCfgPy, ZCanDriverWrap, ZCanMessagePy, ZDeriveInfoPy};
 
 #[pyfunction]
@@ -24,13 +19,16 @@ fn convert_from_python<'py>(py: Python<'py>, py_message: &Bound<'py, PyAny>) -> 
 
 #[pyfunction]
 fn zlgcan_init_can(
+    libpath: String,
     dev_type: u32,
     dev_idx: u32,
     cfgs: Vec<ZCanChlCfgPy>,
     derive_info: Option<ZDeriveInfoPy>,
 ) -> PyResult<ZCanDriverWrap> {
     let mut builder = DeviceBuilder::new();
-    builder.add_other(DEVICE_TYPE, Box::new(dev_type))
+    builder
+        .add_other(LIBPATH, Box::new(libpath))
+        .add_other(DEVICE_TYPE, Box::new(dev_type))
         .add_other(DEVICE_INDEX, Box::new(dev_idx));
     derive_info.map(
         |info| builder.add_other(DERIVE_INFO, Box::<DeriveInfo>::new(info.into()))
@@ -192,7 +190,7 @@ mod tests {
             None,
         );
 
-        let device = zlgcan_init_can(dev_type, dev_idx, vec![cfg, ], None)?;
+        let device = zlgcan_init_can("../../RustProjects/rust-can/zlgcan/library".into(), dev_type, dev_idx, vec![cfg, ], None)?;
         let dev_info = zlgcan_device_info(&device)?;
         println!("{}", dev_info);
         std::thread::sleep(std::time::Duration::from_secs(1));
@@ -201,8 +199,8 @@ mod tests {
         let mut flag = false;
         while start.elapsed().as_secs() < 15 {
             let msgs = zlgcan_recv(&device, 0, None)?;
-            println!("{:?}", msgs);
             if !msgs.is_empty() {
+                println!("{:?}", msgs);
                 flag = true;
             }
             drop(msgs);

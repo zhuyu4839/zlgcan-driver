@@ -7,39 +7,26 @@
     * 确保安装相关驱动(USBCAN-I/II驱动得额外安装)
     * 确保安装相[VC++运行环境](https://manual.zlg.cn/web/#/152?page_id=5332)
     * 下载[library](https://github.com/zhuyu4839/rust-can/tree/master/zlgcan/library)文件夹(里面包含[bitrate.cfg.yaml](https://github.com/zhuyu4839/rust-can/tree/master/zlgcan/library/bitrate.cfg.yaml))
-    * 在当前工程目录下(相对运行脚本)新建一个`zcan.env`文件, 中间配置`ZCAN_LIBRARY`环境变量(相对路径/绝对路径),否则使用默认(相对运行脚本)路径:
-        * 默认(相对运行脚本)路径文件夹内容示例:
+    * 库文件示例:
       ```shell
-      ├─main.py
-      ├─library
-      │  ├──linux
-      │  │  └─x86_64
-      │  └─windows
-      │     ├─x86
-      │     └─x86_64
-      └─ bitrate.cfg.yaml
-      ```
-        * (相对运行脚本)`zcan.env`文件指定`library`示例:
-      ```shell
-      ├─main.py
-      ├─zcan.env
-      └─library
-        ├─linux
+      library
+        ├──bitrate.cfg.yaml
+        ├──linux
         │  └─x86_64
-        ├─windows
-        │  ├─x86
-        │  └─x86_64
-        └─ bitrate.cfg.yaml
+        └─windows
+           ├─x86
+           └─x86_64
       ```
-    * 以下为`zcan.env`文件内容示例
-   ```shell
-   ZCAN_LIBRARY="C:/your_library_path"
-   ```
+    * 在初始化can.Bus的时候指定zlgcan库路径(从0.2.0开始移除`zcan.env`配置), 默认为相对工程运行文件同级目录下`library`
+      ```python
+      libpath=r"C:\your\library\path"
+      ```
 
-2. 安装zlgcan-driver-py(不建议使用低于0.1.10版本)
+2. 安装zlgcan(不建议使用低于0.2.0版本)
 
     ```shell
-    pip install zlgcan >= 0.1.10
+    pip install zlgcan >= 0.2.0
+    ```
 
 3. 使用:
    ```python
@@ -47,6 +34,7 @@
    from zlgcan.zlgcan import ZCanTxMode, ZCANDeviceType
    
    with can.Bus(interface="zlgcan", device_type=ZCANDeviceType.ZCAN_USBCANFD_200U,
+                libpath="library/",
                 configs=[{'bitrate': 500000, 'resistance': 1}, {'bitrate': 500000, 'resistance': 1}]) as bus:
        bus.send(can.Message(
            arbitration_id=0x123,
@@ -59,6 +47,7 @@
        # time.sleep(0.1)
        _msg = bus.recv()
        print(_msg)
+   ```
 
 4. CAN测试列表：
    * USBCAN-I-mini - ZCAN_USBCAN1, ZCAN_USBCAN2
