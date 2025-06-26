@@ -3,7 +3,7 @@ pub(crate) mod wrappers;
 use std::sync::{Arc, Mutex};
 use pyo3::{exceptions, prelude::*};
 use rs_can::{CanError, CanFrame, CanType, ChannelConfig, DeviceBuilder};
-use zlgcan_rs::{can::{CanMessage, ZCanFrameType}, device::DeriveInfo, driver::{ZCanDriver, ZDevice}, ACC_CODE, ACC_MASK, BRP, CHANNEL_MODE, CHANNEL_TYPE, DERIVE_INFO, DEVICE_INDEX, DEVICE_TYPE, FILTER_TYPE, LIBPATH};
+use zlgcan::{*, can::*, device::*, driver::*};
 use crate::wrappers::{ZCanChlCfgPy, ZCanDriverWrap, ZCanMessagePy, ZDeriveInfoPy};
 
 #[pyfunction]
@@ -46,10 +46,10 @@ fn zlgcan_init_can(
         cfg.acc_mask.map(|acc_mask| c.add_other(ACC_MASK, Box::new(acc_mask)));
         cfg.brp.map(|brp| c.add_other(BRP, Box::new(brp)));
 
-        builder.add_config(i.to_string(), c);
+        builder.add_config(i as u8, c);
     }
 
-    let device: ZCanDriver = builder.build()
+    let device = builder.build::<ZDriver>()
         .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?;
 
     Ok(ZCanDriverWrap { inner: Arc::new(Mutex::new(device)) })
@@ -166,7 +166,7 @@ fn zlgcan_driver(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 #[cfg(test)]
 mod tests {
     use std::time::Instant;
-    use zlgcan_rs::{
+    use zlgcan::{
         can::{ZCanChlMode, ZCanChlType},
         device::ZCanDeviceType,
     };

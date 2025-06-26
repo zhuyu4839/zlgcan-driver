@@ -1,6 +1,6 @@
 [package]
 name = "zlgcan-driver"
-version = "0.2.0"
+version = "0.2.1-beta"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -9,12 +9,12 @@ name = "zlgcan_driver"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = "0.24"
+pyo3 = "0.25"
 #iso15765-2 = { version = "0.1.0-alpha0" }
 #iso14229-1 = { version = "0.1.0-alpha0" }
 #docan = { version = "0.1.0-alpha0" }
-rs-can = "0.2.2"
-zlgcan = "0.2.2"
+rs-can = { git = "https://github.com/jesses2025smith/rust-can.git", package = "rs-can", rev = "e76db38dd2e6d66f0afa9374e9a9513d984b6be2" }
+zlgcan = { git = "https://github.com/jesses2025smith/rust-can.git", package = "zlgcan", rev = "e76db38dd2e6d66f0afa9374e9a9513d984b6be2" }
 
 [dev-dependencies]
 anyhow = "1"

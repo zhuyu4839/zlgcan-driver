@@ -4,10 +4,10 @@ use constants::*;
 use std::sync::{Arc, Mutex};
 use pyo3::{exceptions, prelude::*, types::PyDict};
 use rs_can::{CanDirect, CanFrame, CanId, CanType};
-use zlgcan_rs::{
-    can::CanMessage,
+use zlgcan::{
+    can::{CanMessage, ZCanTxMode},
     device::DeriveInfo,
-    driver::ZCanDriver
+    driver::ZDriver
 };
 
 #[pyclass]
@@ -27,14 +27,14 @@ impl ZDeriveInfoPy {
 
 impl Into<DeriveInfo> for ZDeriveInfoPy {
     fn into(self) -> DeriveInfo {
-        DeriveInfo::new(self.canfd, self.channels)
+        DeriveInfo { canfd: self.canfd, channels: self.channels }
     }
 }
 
 #[pyclass]
 #[derive(Clone)]
 pub struct ZCanDriverWrap {
-    pub(crate) inner: Arc<Mutex<ZCanDriver>>,
+    pub(crate) inner: Arc<Mutex<ZDriver>>,
 }
 
 #[pyclass]
@@ -135,7 +135,7 @@ impl TryInto<CanMessage> for ZCanMessagePy {
         msg.set_timestamp(None)
             .set_direct(if self.is_rx { CanDirect::Receive } else { CanDirect::Transmit })
             .set_channel(self.channel)
-            .set_tx_mode(self.tx_mode)
+            .set_tx_mode(ZCanTxMode::try_from(self.tx_mode).map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?)
             .set_can_type(if self.is_fd { CanType::CanFd } else { CanType::Can })
             .set_bitrate_switch(self.bitrate_switch)
             .set_esi(self.error_state_indicator)

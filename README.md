@@ -1,7 +1,7 @@
 ![PyPI Downloads](https://static.pepy.tech/badge/zlgcan)
 ![PyPI Downloads](https://static.pepy.tech/badge/zlgcan/month)
 
-# ZLGCAN驱动及集成到python-can(因内存模型不同，目前Windows下32位python会报内存非法访问的错误)
+# ZLGCAN驱动及集成到python-can(不支持32位)
 
 1. 准备
     * 确保安装相关驱动(USBCAN-I/II驱动得额外安装)
@@ -14,7 +14,6 @@
         ├──linux
         │  └─x86_64
         └─windows
-           ├─x86
            └─x86_64
       ```
     * 在初始化can.Bus的时候指定zlgcan库路径(从0.2.0开始移除`zcan.env`配置), 默认为相对工程运行文件同级目录下`library`
