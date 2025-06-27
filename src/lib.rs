@@ -37,9 +37,13 @@ fn zlgcan_init_can(
     );
 
     for (i, cfg) in cfgs.into_iter().enumerate() {
+        let chl_type = ZCanChlType::try_from(cfg.chl_type)
+            .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?;
+        let chl_mode = ZCanChlMode::try_from(cfg.chl_mode)
+            .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?;
         let mut c = ChannelConfig::new(cfg.bitrate);
-        c.add_other(CHANNEL_TYPE, Box::new(cfg.chl_type))
-            .add_other(CHANNEL_MODE, Box::new(cfg.chl_mode));
+        c.add_other(CHANNEL_TYPE, Box::new(chl_type))
+            .add_other(CHANNEL_MODE, Box::new(chl_mode));
 
         cfg.dbitrate.map(|dbitrate| c.set_data_bitrate(dbitrate));
         cfg.resistance.map(|resistance| c.set_resistance(resistance));
