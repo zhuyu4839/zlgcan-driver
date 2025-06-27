@@ -25,6 +25,8 @@ fn zlgcan_init_can(
     cfgs: Vec<ZCanChlCfgPy>,
     derive_info: Option<ZDeriveInfoPy>,
 ) -> PyResult<ZCanDriverWrap> {
+    let dev_type = ZCanDeviceType::try_from(dev_type)
+        .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?;
     let mut builder = DeviceBuilder::new();
     builder
         .add_other(LIBPATH, Box::new(libpath))
