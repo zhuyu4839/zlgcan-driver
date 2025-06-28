@@ -13,8 +13,8 @@ pyo3 = "0.25"
 #iso15765-2 = { version = "0.1.0-alpha0" }
 #iso14229-1 = { version = "0.1.0-alpha0" }
 #docan = { version = "0.1.0-alpha0" }
-rs-can = { git = "https://github.com/jesses2025smith/rust-can.git", rev = "dae99127597a5a2086cd81eef097a87a3ab4b224", package = "rs-can" }
-zlgcan = { git = "https://github.com/jesses2025smith/rust-can.git", rev = "dae99127597a5a2086cd81eef097a87a3ab4b224", package = "zlgcan" }
+rs-can = { git = "https://github.com/jesses2025smith/rust-can.git", rev = "05a051f662385bcc33cd99bf195eedaa528983fe", package = "rs-can" }
+zlgcan = { git = "https://github.com/jesses2025smith/rust-can.git", rev = "05a051f662385bcc33cd99bf195eedaa528983fe", package = "zlgcan" }
 
 [dev-dependencies]
 anyhow = "1"
