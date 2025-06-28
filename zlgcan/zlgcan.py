@@ -28,10 +28,9 @@ except ModuleNotFoundError:
     }.get(_platform, not_support)
 
 
-class ZCanChlType:
-    CAN = 0
-    CANFD_ISO = 1
-    CANFD_NON_ISO = 2
+class ZCanFdChlType:
+    ISO = 0
+    NON_ISO = 1
 
 class ZCanChlMode:
     Normal = 0
@@ -169,12 +168,12 @@ class ZCanBus(can.BusABC):
                 dbitrate = cfg.get("dbitrate", None)
                 assert bitrate is not None, "bitrate is required!"
                 _cfg = ZCanChlCfgPy(
-                    chl_type=cfg.get("chl_type", ZCanChlType.CANFD_ISO if dbitrate else ZCanChlType.CAN),
-                    chl_mode=cfg.get("chl_mode", 0),
+                    chl_mode=cfg.get("chl_mode", ZCanChlMode.Normal),
                     bitrate=bitrate,
                     filter=cfg.get("filter"),
                     dbitrate=dbitrate,
                     resistance=bool(cfg.get("resistance", 1)),
+                    fdchl_type=cfg.get("fdchl_type", ZCanFdChlType.ISO),
                     acc_code=cfg.get("acc_code"),
                     acc_mask=cfg.get("acc_mask"),
                     brp=cfg.get("brp")
