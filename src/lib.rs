@@ -171,7 +171,6 @@ fn zlgcan_driver(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 
 #[cfg(test)]
 mod tests {
-    use std::time::Instant;
     use zlgcan::{
         can::{ZCanChlMode, ZCanChlType},
         device::ZCanDeviceType,
@@ -185,35 +184,42 @@ mod tests {
         let dev_type = ZCanDeviceType::ZCAN_USBCANFD_200U as u32;
         let dev_idx = 0;
         let cfg = ZCanChlCfgPy::new(
-            ZCanChlType::CANFD_ISO as u8,
+            ZCanChlType::CAN as u8,
             ZCanChlMode::Normal as u8,
             500_000,
             None,
-            Some(1_000_000),
+            None,
+            None,
+            None,
+            None,
+            None,
+        );
+        let cfg2 = ZCanChlCfgPy::new(
+            ZCanChlType::CAN as u8,
+            ZCanChlMode::Normal as u8,
+            500_000,
+            None,
+            None,
             None,
             None,
             None,
             None,
         );
 
-        let device = zlgcan_init_can("../../RustProjects/rust-can/zlgcan/library".into(), dev_type, dev_idx, vec![cfg, ], None)?;
+        let device = zlgcan_init_can("../../RustRoverProjects/rust-can/zlgcan/library".into(), dev_type, dev_idx, vec![cfg, cfg2], None)?;
         let dev_info = zlgcan_device_info(&device)?;
         println!("{}", dev_info);
         std::thread::sleep(std::time::Duration::from_secs(1));
 
-        let start = Instant::now();
-        let mut flag = false;
-        while start.elapsed().as_secs() < 15 {
-            let msgs = zlgcan_recv(&device, 0, None)?;
-            if !msgs.is_empty() {
-                println!("{:?}", msgs);
-                flag = true;
-            }
-            drop(msgs);
+        let mut msg = CanMessage::new(0x7df, &vec![0x02, 0x10, 0x01]).unwrap();
+        msg.set_channel(0);
+        let ret = zlgcan_send(&device, msg.into())?;
+        println!("send: {}", ret);
 
-            if flag {
-                break;
-            }
+        std::thread::sleep(std::time::Duration::from_micros(200));
+        let msgs = zlgcan_recv(&device, 1, None)?;
+        if !msgs.is_empty() {
+            println!("{:?}", msgs);
         }
 
         zlgcan_close(&device)?;
