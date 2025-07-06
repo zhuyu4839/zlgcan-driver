@@ -1,6 +1,6 @@
 [package]
 name = "zlgcan-driver"
-version = "0.2.3"
+version = "0.2.4"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -13,8 +13,8 @@ pyo3 = "0.25"
 #iso15765-2 = { version = "0.1.0-alpha0" }
 #iso14229-1 = { version = "0.1.0-alpha0" }
 #docan = { version = "0.1.0-alpha0" }
-rs-can = { git = "https://github.com/jesses2025smith/rust-can.git", package = "rs-can", branch = "py" }
-zlgcan = { git = "https://github.com/jesses2025smith/rust-can.git", package = "zlgcan", branch = "py" }
+rs-can = { git = "https://github.com/jesses2025smith/rust-can.git", package = "rs-can", rev = "00e625f39d6d2c27ee874b1b5c0aac36ba6ddf68" }
+zlgcan = { git = "https://github.com/jesses2025smith/rust-can.git", package = "zlgcan", rev = "00e625f39d6d2c27ee874b1b5c0aac36ba6ddf68" }
 
 [dev-dependencies]
 anyhow = "1"
