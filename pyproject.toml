@@ -1,29 +1,32 @@
-[build-system]
-requires = ["maturin>=1.5,<2.0"]
-build-backend = "maturin"
-
 [project]
-name = "zlgcan"
+name = "zlgcan-driver"
+version = "0.2.5"
+description = "Python wrapper for zlgcan driver."
+readme = "README.md"
 requires-python = ">=3.8"
+dependencies = [
+    "python-can>=4.0.0",
+]
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = [
-    "python-can",
+authors = [
+    { name = "Jesse Smith" },
 ]
-dynamic = ["version"]
-description = "Python wrapper for zlgcan driver."
-authors = [{ name = "Jesse Smith" }]
 license = { text = "LGPL v3" }
 
 [project.urls]
-homepage = "https://github.com/zhuyu4839/zlgcan-driver"
-repository = "https://github.com/zhuyu4839/zlgcan-driver"
+homepage = "https://github.com/jesses2025smith/zlgcan-driver"
+repository = "https://github.com/jesses2025smith/zlgcan-driver"
 
 [project.entry-points."can.interface"]
 zlgcan = "zlgcan.zlgcan:ZCanBus"
+
+[build-system]
+requires = ["maturin>=1.5,<2.0"]
+build-backend = "maturin"
 
 [tool.maturin]
 features = ["pyo3/extension-module"]

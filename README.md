@@ -6,7 +6,7 @@
 1. 准备
     * 确保安装相关驱动(USBCAN-I/II驱动得额外安装)
     * 确保安装相[VC++运行环境](https://manual.zlg.cn/web/#/152?page_id=5332)
-    * 下载[library](https://github.com/zhuyu4839/rust-can/tree/master/zlgcan/library)文件夹(里面包含[bitrate.cfg.yaml](https://github.com/zhuyu4839/rust-can/tree/master/zlgcan/library/bitrate.cfg.yaml))
+    * 下载[library](https://github.com/jesses2025smith/rust-can/tree/zlg-lib)文件夹(里面包含[bitrate.cfg.yaml](https://github.com/jesses2025smith/rust-can/tree/zlg-lib/library/bitrate.cfg.yaml))
     * 库文件示例:
       ```shell
       library
@@ -16,7 +16,7 @@
         └─windows
            └─x86_64
       ```
-    * 在初始化can.Bus的时候指定zlgcan库路径(从0.2.0开始移除`zcan.env`配置), 默认为相对工程运行文件同级目录下`library`
+    * 在初始化can.Bus的时候指定zlgcan库路径(0.2.x移除了`zcan.env`配置), 默认为相对工程运行文件同级目录下`library`
       ```python
       libpath=r"C:\your\library\path"
       ```
@@ -63,7 +63,7 @@
    * 其他CANFD类型的CAN卡仅仅在Linux上使用时`bitrate.cfg.yaml`中配置
      * 此时计算相关值可以通过`ZCANPRO`软件
    * 在Linux上使用ZCAN_USBCAN1衍生CAN卡时, 请在初始化时候设置`ZCanDeriveInfo`信息
-   * 该库主要依赖[rust-can](https://github.com/zhuyu4839/rust-can),如有问题,请提[issue](https://github.com/zhuyu4839/rust-can/issues/new)
+   * 该库主要依赖[rust-can](https://github.com/jesses2025smith/rust-can),如有问题,请提[issue](https://github.com/jesses2025smith/rust-can/issues/new)
 
 6. 官方工具及文档:
    * [工具下载](https://zlg.cn/can/down/down/id/22.html)
