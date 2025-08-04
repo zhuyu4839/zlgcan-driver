@@ -1,8 +1,9 @@
 [project]
 name = "zlgcan"
-version = "0.2.5"
+version = "0.2.6"
 description = "Python wrapper for zlgcan driver."
-readme = { files = ["README.md", "CHANGELOG.md"] }
+readme = "README.md"
+changelog = "CHANGELOG.md"
 requires-python = ">=3.8"
 dependencies = [
     "python-can>=4.0.0",
