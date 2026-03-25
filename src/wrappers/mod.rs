@@ -1,16 +1,16 @@
 mod constants;
 use constants::*;
 
-use std::sync::{Arc, Mutex};
 use pyo3::{exceptions, prelude::*, types::PyDict};
 use rs_can::{CanDirect, CanFrame, CanId, CanType};
+use std::sync::{Arc, Mutex};
 use zlgcan::{
     can::{CanMessage, ZCanTxMode},
     device::DeriveInfo,
-    driver::ZDriver
+    driver::ZDriver,
 };
 
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Default, Clone)]
 pub struct ZDeriveInfoPy {
     pub(crate) canfd: bool,
@@ -27,17 +27,20 @@ impl ZDeriveInfoPy {
 
 impl Into<DeriveInfo> for ZDeriveInfoPy {
     fn into(self) -> DeriveInfo {
-        DeriveInfo { canfd: self.canfd, channels: self.channels }
+        DeriveInfo {
+            canfd: self.canfd,
+            channels: self.channels,
+        }
     }
 }
 
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Clone)]
 pub struct ZCanDriverWrap {
     pub(crate) inner: Arc<Mutex<ZDriver>>,
 }
 
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Clone)]
 pub struct ZCanChlCfgPy {
     pub(crate) chl_type: u8,
@@ -80,7 +83,7 @@ impl ZCanChlCfgPy {
     }
 }
 
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Debug, Clone)]
 pub struct ZCanMessagePy {
     pub(crate) timestamp: u64,
@@ -128,15 +131,28 @@ impl TryInto<CanMessage> for ZCanMessagePy {
     fn try_into(self) -> Result<CanMessage, Self::Error> {
         let mut msg = if self.is_remote_frame {
             CanMessage::new_remote(CanId::from(self.arbitration_id), self.data.len())
-        }
-        else {
+        } else {
             CanMessage::new(CanId::from(self.arbitration_id), self.data.as_slice())
-        }.ok_or(PyErr::new::<exceptions::PyRuntimeError, String>("Can't new CAN message".into()))?;
+        }
+        .ok_or(PyErr::new::<exceptions::PyRuntimeError, String>(
+            "Can't new CAN message".into(),
+        ))?;
         msg.set_timestamp(None)
-            .set_direct(if self.is_rx { CanDirect::Receive } else { CanDirect::Transmit })
+            .set_direct(if self.is_rx {
+                CanDirect::Receive
+            } else {
+                CanDirect::Transmit
+            })
             .set_channel(self.channel)
-            .set_tx_mode(ZCanTxMode::try_from(self.tx_mode).map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?)
-            .set_can_type(if self.is_fd { CanType::CanFd } else { CanType::Can })
+            .set_tx_mode(
+                ZCanTxMode::try_from(self.tx_mode)
+                    .map_err(|e| exceptions::PyValueError::new_err(e.to_string()))?,
+            )
+            .set_can_type(if self.is_fd {
+                CanType::CanFd
+            } else {
+                CanType::Can
+            })
             .set_bitrate_switch(self.bitrate_switch)
             .set_esi(self.error_state_indicator)
             .set_error_frame(self.is_error_frame);

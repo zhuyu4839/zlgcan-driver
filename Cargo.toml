@@ -9,7 +9,7 @@ name = "zlgcan_driver"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = "0.25"
+pyo3 = "0.28"
 rs-can = { git = "https://github.com/jesses2025smith/rust-can.git", package = "rs-can", rev = "8cb3ada33480f42de71171dbc006533e514e9c28" }
 zlgcan = { git = "https://github.com/jesses2025smith/rust-can.git", package = "zlgcan", rev = "8cb3ada33480f42de71171dbc006533e514e9c28" }
 
