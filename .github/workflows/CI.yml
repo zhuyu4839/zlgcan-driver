@@ -92,11 +92,12 @@ jobs:
     needs: [linux, windows, sdist]
     steps:
       - uses: actions/download-artifact@v8
+      - name: Prepare dist directory
+        run: |
+          mkdir -p dist
+          mv wheels-*/* dist/ || true
       - name: Publish to PyPI
-        uses: PyO3/maturin-action@v1
-        env:
-          MATURIN_PYPI_TOKEN: ${{ secrets.ZLGCAN_TOKEN }}
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          token: ${{ secrets.ZLGCAN_TOKEN }}
-          command: upload
-          args: --non-interactive --skip-existing wheels-*/*
+          password: ${{ secrets.ZLGCAN_TOKEN }}
+          skip-existing: true
