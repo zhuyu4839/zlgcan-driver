@@ -1,3 +1,11 @@
+Version 0.2.7
+=============
+
+Features
+--------
+
+* 新增Linux aarch64支持
+
 Version 0.2.5
 =============
 
