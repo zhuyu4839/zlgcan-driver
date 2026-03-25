@@ -1,6 +1,6 @@
 [project]
 name = "zlgcan"
-version = "0.2.6"
+version = "0.2.7"
 description = "Python wrapper for zlgcan driver."
 readme = "README.md"
 changelog = "CHANGELOG.md"
