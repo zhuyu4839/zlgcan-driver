@@ -11,7 +11,7 @@ from can.bus import LOG
 
 from typing import Optional, Union, Sequence, Deque, Tuple, List, Dict
 try:
-    from zlgcan_driver import ZCanChlCfgPy, ZCanMessagePy, ZDeriveInfoPy, ZCanDriverWrap, \
+    from zlgcan_driver import ZCanChlCfgPy, ZCanFrame, DeriveInfo, ZCanDriverWrap, \
         convert_to_python, convert_from_python, set_message_mode, \
         zlgcan_device_info, zlgcan_init_can, zlgcan_clear_can_buffer, zlgcan_send, zlgcan_recv, zlgcan_close
 except ModuleNotFoundError:
@@ -146,7 +146,7 @@ class ZCanBus(can.BusABC):
                  libpath: str = "library/",
                  device_type: int,
                  device_index: int = 0,
-                 derive: ZDeriveInfoPy = None,
+                 derive: DeriveInfo = None,
                  rx_queue_size: Optional[int] = None,
                  configs: Union[List[Dict], Tuple[Dict]] = None,
                  can_filters: Optional[can.typechecking.CanFilters] = None,
@@ -219,7 +219,7 @@ class ZCanBus(can.BusABC):
         if timeout is not None:
             timeout = int(1_000 * timeout)
         for channel in self.channels:
-            raw_msgs: list[ZCanMessagePy] = zlgcan_recv(self.device, channel, timeout)
+            raw_msgs: list[ZCanFrame] = zlgcan_recv(self.device, channel, timeout)
             # for raw_msg in raw_msgs:
             #     self.rx_queue.append(convert_to_python(raw_msg))
             self.rx_queue.extend(map(lambda raw_msg: convert_to_python(raw_msg), raw_msgs))
