@@ -16,7 +16,7 @@ classifiers = [
 authors = [
     { name = "Jesse Smith" },
 ]
-license = { text = "LGPL v3" }
+license = { text = "MIT" }
 
 [project.urls]
 homepage = "https://github.com/jesses2025smith/zlgcan-driver"
