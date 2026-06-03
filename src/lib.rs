@@ -4,7 +4,7 @@ use crate::wrappers::{ZCanChlCfgPy, ZCanDriverWrap};
 use pyo3::{exceptions, prelude::*};
 use rs_can::{CanError, CanFrame, CanKind, ChannelConfig, DeviceBuilder};
 use std::sync::{Arc, Mutex};
-use zlgcan::{can::*, device::*, driver::*, *};
+use zlgcan_rs::{can::*, device::*, driver::*, *};
 
 #[pyfunction]
 fn convert_to_python<'py>(py: Python<'py>, rust_message: ZCanFrame) -> PyResult<Bound<'py, PyAny>> {
@@ -169,7 +169,7 @@ fn set_message_mode(msg: &mut ZCanFrame, mode: u8) {
 // 此方法名必须与Cargo.toml-[lib]配置下name保持一致
 #[pymodule]
 fn zlgcan_driver(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
-    use zlgcan::{can::ZCanFrame as ZCanMessagePy, device::DeriveInfo as ZDeriveInfoPy};
+    use zlgcan_rs::{can::ZCanFrame as ZCanMessagePy, device::DeriveInfo as ZDeriveInfoPy};
 
     m.add_class::<ZCanChlCfgPy>()?;
     m.add_class::<ZCanMessagePy>()?;

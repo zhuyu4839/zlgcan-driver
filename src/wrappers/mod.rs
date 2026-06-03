@@ -1,6 +1,6 @@
 use pyo3::prelude::*;
 use std::sync::{Arc, Mutex};
-use zlgcan::driver::ZDriver;
+use zlgcan_rs::driver::ZDriver;
 
 #[pyclass(from_py_object)]
 #[derive(Clone)]

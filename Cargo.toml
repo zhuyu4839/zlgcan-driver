@@ -10,8 +10,8 @@ crate-type = ["cdylib"]
 
 [dependencies]
 pyo3 = "0.28"
-rs-can = { git = "https://github.com/jesses2025smith/rust-can.git", package = "rs-can", rev = "93215a5db0ff6116a0e977acc81a6a75fa0b86c6" }
-zlgcan = { git = "https://github.com/jesses2025smith/rust-can.git", package = "zlgcan", rev = "93215a5db0ff6116a0e977acc81a6a75fa0b86c6", features = ["pyo3"] }
+rs-can = "0.4"
+zlgcan = { version = "0.4", features = ["pyo3"] }
 
 [dev-dependencies]
 anyhow = "1.0"
